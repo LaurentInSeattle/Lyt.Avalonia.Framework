@@ -1,6 +1,4 @@
-﻿using Avalonia.Reactive;
-
-namespace Lyt.Avalonia.Controls;
+﻿namespace Lyt.Avalonia.Controls;
 
 public delegate void RoutedEventDelegate(object sender, RoutedEventArgs rea);
 

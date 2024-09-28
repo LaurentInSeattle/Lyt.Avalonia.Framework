@@ -26,9 +26,8 @@ public partial class BadgeUserControl : UserControl
     }
 }
 
-
 /* 
- USAGE : 
+ EXAMPLE USAGE : 
 
     <UserControl.Styles>
 		<Style Selector="TextBlock.badge">
@@ -64,6 +63,4 @@ public partial class BadgeUserControl : UserControl
 				Fill="DarkOrange" Opacity="0.5"
 				/>
 		</badge:Badge>
-
-
 */

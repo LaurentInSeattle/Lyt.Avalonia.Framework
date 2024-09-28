@@ -27,11 +27,8 @@ global using Avalonia.Layout;
 global using Avalonia.Markup.Xaml;
 global using Avalonia.Media;
 global using Avalonia.Media.Immutable;
+global using Avalonia.Reactive;
 global using Avalonia.Remote.Protocol.Input;
 global using Avalonia.Styling;
 global using Avalonia.Threading;
-
-global using Lyt.Avalonia.Interfaces.Logger;
-global using Lyt.Avalonia.Interfaces.Messenger;
-global using Lyt.Avalonia.Interfaces.UserInterface;
 
