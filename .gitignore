@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Lyt.Avalonia.Framework.TestApp/obj
+/.vs
+/Lyt.Avalonia.Framework.TestApp/bin/Debug/net8.0
+/Lyt.Avalonia.Framework.TestApp/bin/Release/net8.0
