@@ -1,0 +1,103 @@
+<UserControl 
+    x:Class="Lyt.Avalonia.Controls.Glyphs.GlyphButton"
+	xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:Lyt.Avalonia.Controls.Glyphs"
+    mc:Ignorable="d" d:DesignWidth="80" d:DesignHeight="80"
+	>
+	<Grid
+        x:Name="mainGrid"
+        ClipToBounds="False"
+        VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+		ShowGridLines="False"
+        >
+		<Grid.RowDefinitions>
+			<RowDefinition Height ="*" />
+			<RowDefinition Height ="Auto" />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<!-- Popup Keyboard Grid and Rectangle: MUST be below everything else -->
+		<Grid
+            x:Name="gridPopup"
+            Grid.Row="0" Grid.Column="0"
+            Background="Transparent"
+            IsVisible="False"
+            Margin="-80 -104"
+            Height="100" Width="200"
+            VerticalAlignment="Top" HorizontalAlignment="Left"
+            >
+			<Rectangle
+                x:Name="rectanglePopup"
+                Grid.Row="0" Grid.Column="0"
+                IsHitTestVisible="False"
+                RadiusX="2" RadiusY="2"
+                Stroke="LightBlue"
+                StrokeThickness="1"
+                Fill="Transparent"
+                Margin="0"
+                VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                />
+		</Grid>
+		<!-- Rectangle used as background: MUST be below everything else -->
+		<Rectangle
+            x:Name="rectangleBackground"
+            Grid.ColumnSpan="3" Grid.RowSpan="2"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Margin="0"
+            IsHitTestVisible="False"
+            RadiusX="4" RadiusY="4"
+            Stroke="Aquamarine"
+            StrokeThickness="1"
+            Fill="Transparent"
+            />
+		<Viewbox
+            x:Name="viewBox"
+            Grid.Column="0"
+            Margin="2"
+            IsHitTestVisible="False"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            >
+			<local:SvgIcon
+                x:Name="icon"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                IsHitTestVisible="False"
+                Background="Transparent"
+                Foreground="DodgerBlue"
+				Wadding="0"
+                />
+		</Viewbox>
+		
+		<!-- TextBlock will programmatically moved to the side if spec'ed "Right Side" -->
+		<Border
+            x:Name="border"
+			Background ="Transparent"
+            Grid.Row="1" Grid.ColumnSpan="999"
+            Margin="1 0 1 4"
+			>			
+		    <TextBlock
+                x:Name="textBlock"
+                Margin="0"
+                IsHitTestVisible="False"
+                Background="Transparent"
+                Foreground="AntiqueWhite"
+                VerticalAlignment="Center" HorizontalAlignment="Stretch"
+				TextAlignment="Center"
+                TextWrapping="Wrap"
+                />
+		</Border>
+		<!-- Rectangle used for eventing MUST be above everything else -->
+		<Rectangle
+            x:Name="eventingRectangle"
+            Grid.ColumnSpan="3" Grid.RowSpan="2"
+            Margin="0"
+            IsHitTestVisible="True"
+            Fill="Transparent"
+            />
+	</Grid>
+</UserControl>

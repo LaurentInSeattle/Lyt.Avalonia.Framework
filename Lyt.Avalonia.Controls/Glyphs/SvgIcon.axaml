@@ -1,0 +1,26 @@
+<UserControl 
+    x:Class="Lyt.Avalonia.Controls.Glyphs.SvgIcon"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d" d:DesignWidth="32" d:DesignHeight="32"
+    >
+    <Grid
+        x:Name="grid"
+        Background="Transparent"
+        >
+        <Viewbox
+            x:Name="viewBox"
+            Margin="0"
+			HorizontalAlignment ="Stretch" VerticalAlignment ="Stretch"
+			Width="{Binding Width, ElementName=grid}"
+			Height="{Binding Height, ElementName=grid}"
+            >
+            <Image
+                x:Name="image"
+                >
+            </Image>
+        </Viewbox>
+    </Grid>
+</UserControl>

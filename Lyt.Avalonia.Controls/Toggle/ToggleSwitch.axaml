@@ -1,0 +1,71 @@
+<UserControl 
+    x:Class="Lyt.Avalonia.Controls.Toggle.ToggleSwitch"
+	xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+	>
+	<Grid
+        x:Name="mainGrid"
+        ClipToBounds="False"
+        ShowGridLines="False"
+        >
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="62" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<!-- Rectangle used as background: MUST be below everything else -->
+		<Rectangle
+            x:Name="rectangleBackground"
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Margin="0"
+            IsHitTestVisible="False"
+            RadiusX="8" RadiusY="8"
+            Stroke="Aquamarine"
+            StrokeThickness="1"
+            Fill="Transparent"
+            />
+		<TextBlock
+            x:Name="trueTextBlock"
+            Margin="0 0 10 0"
+            Grid.Column="0"
+            Background="Transparent"
+            Foreground="AntiqueWhite"
+            VerticalAlignment="Center" HorizontalAlignment="Right"
+            TextWrapping="Wrap"
+            IsHitTestVisible="False"
+            />
+		<TextBlock
+            x:Name="falseTextBlock"
+            Margin="10 0 0 0"
+            Grid.Column="2"
+            Background="Transparent"
+            Foreground="AntiqueWhite"
+            VerticalAlignment="Center" HorizontalAlignment="Left"
+            TextWrapping="Wrap"
+            IsHitTestVisible="False"
+            />
+		<Ellipse
+            x:Name="switchEllipse"
+            Margin="4"
+            Grid.Column="1"
+            Height="16" Width="16"
+            VerticalAlignment="Center" HorizontalAlignment="Left"
+            Fill="Aquamarine"
+            IsHitTestVisible="False"
+            />
+		<!-- Rectangle used for eventing MUST be above everything else -->
+		<Rectangle
+            x:Name="eventingRectangle"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            Grid.Column="1"
+            Margin="0"
+            IsHitTestVisible="True"
+            Fill="Transparent"
+            />
+	</Grid>
+</UserControl>

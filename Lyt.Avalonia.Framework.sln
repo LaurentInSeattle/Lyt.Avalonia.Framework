@@ -5,6 +5,18 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Framework.TestApp", "Lyt.Avalonia.Framework.TestApp\Lyt.Avalonia.Framework.TestApp.csproj", "{5FED511E-EE75-442C-AB6C-E1C7D1206F15}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Controls", "Lyt.Avalonia.Controls\Lyt.Avalonia.Controls.csproj", "{DDAEECCC-168D-4EC6-B063-A0E6F40C43A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Interfaces", "Lyt.Avalonia.Interfaces\Lyt.Avalonia.Interfaces.csproj", "{1097E385-09C7-41BE-ABE4-DCDF102FC0A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Localizer", "Lyt.Avalonia.Localizer\Lyt.Avalonia.Localizer.csproj", "{91937B4A-3BF8-4EDA-96CD-B77699BC76CA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Model", "Lyt.Avalonia.Model\Lyt.Avalonia.Model.csproj", "{BF19EBE6-36ED-4119-A9B5-0235E927A089}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Mvvm", "Lyt.Avalonia.Mvvm\Lyt.Avalonia.Mvvm.csproj", "{B4FB666E-EF0F-4234-AE76-D65ED8A6BC35}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Persistence", "Lyt.Avalonia.Persistence\Lyt.Avalonia.Persistence.csproj", "{A9501D65-5E03-4019-AA5B-4E2AACABB118}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +27,30 @@ Global
 		{5FED511E-EE75-442C-AB6C-E1C7D1206F15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FED511E-EE75-442C-AB6C-E1C7D1206F15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FED511E-EE75-442C-AB6C-E1C7D1206F15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDAEECCC-168D-4EC6-B063-A0E6F40C43A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDAEECCC-168D-4EC6-B063-A0E6F40C43A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDAEECCC-168D-4EC6-B063-A0E6F40C43A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDAEECCC-168D-4EC6-B063-A0E6F40C43A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1097E385-09C7-41BE-ABE4-DCDF102FC0A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1097E385-09C7-41BE-ABE4-DCDF102FC0A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1097E385-09C7-41BE-ABE4-DCDF102FC0A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1097E385-09C7-41BE-ABE4-DCDF102FC0A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91937B4A-3BF8-4EDA-96CD-B77699BC76CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91937B4A-3BF8-4EDA-96CD-B77699BC76CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91937B4A-3BF8-4EDA-96CD-B77699BC76CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91937B4A-3BF8-4EDA-96CD-B77699BC76CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF19EBE6-36ED-4119-A9B5-0235E927A089}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF19EBE6-36ED-4119-A9B5-0235E927A089}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF19EBE6-36ED-4119-A9B5-0235E927A089}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF19EBE6-36ED-4119-A9B5-0235E927A089}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4FB666E-EF0F-4234-AE76-D65ED8A6BC35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4FB666E-EF0F-4234-AE76-D65ED8A6BC35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4FB666E-EF0F-4234-AE76-D65ED8A6BC35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4FB666E-EF0F-4234-AE76-D65ED8A6BC35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9501D65-5E03-4019-AA5B-4E2AACABB118}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9501D65-5E03-4019-AA5B-4E2AACABB118}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9501D65-5E03-4019-AA5B-4E2AACABB118}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9501D65-5E03-4019-AA5B-4E2AACABB118}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
