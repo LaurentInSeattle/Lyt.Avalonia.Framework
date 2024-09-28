@@ -18,3 +18,5 @@
 /Lyt.Avalonia.Mvvm/obj
 /Lyt.Avalonia.Persistence/obj
 /Lyt.Avalonia.Persistence/bin
+/Lyt.StateMachine/bin/Release/net8.0
+/Lyt.StateMachine/obj
