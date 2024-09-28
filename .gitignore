@@ -24,3 +24,5 @@
 /Lyt.Avalonia.Orchestrator/obj
 /Lyt.Avalonia.Orchestrator/bin/Debug/net8.0
 /Lyt.StateMachine/bin/Debug/net8.0
+/Lyt.Avalonia.UserAdministration/obj
+/Lyt.Avalonia.UserAdministration/bin/Release/net8.0
