@@ -6,3 +6,15 @@
 /.vs
 /Lyt.Avalonia.Framework.TestApp/bin/Debug/net8.0
 /Lyt.Avalonia.Framework.TestApp/bin/Release/net8.0
+/Lyt.Avalonia.Controls/bin
+/Lyt.Avalonia.Controls/obj
+/Lyt.Avalonia.Interfaces/bin
+/Lyt.Avalonia.Interfaces/obj
+/Lyt.Avalonia.Localizer/bin
+/Lyt.Avalonia.Localizer/obj
+/Lyt.Avalonia.Model/bin
+/Lyt.Avalonia.Model/obj
+/Lyt.Avalonia.Mvvm/bin
+/Lyt.Avalonia.Mvvm/obj
+/Lyt.Avalonia.Persistence/obj
+/Lyt.Avalonia.Persistence/bin
