@@ -1,0 +1,132 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Candy.xaml" />
+    <None Remove="Citrus.xaml" />
+    <None Remove="Magma.xaml" />
+    <None Remove="Palette\CandyPalette.xaml" />
+    <None Remove="Palette\CitrusPalette.xaml" />
+    <None Remove="Palette\MagmaPalette.xaml" />
+    <None Remove="Palette\RustPalette.xaml" />
+    <None Remove="Palette\SeaPalette.xaml" />
+    <None Remove="Rust.xaml" />
+    <None Remove="Sea.xaml" />
+    <None Remove="Theme\BorderStyles.xaml" />
+    <None Remove="Theme\ButtonStyles.xaml" />
+    <None Remove="Theme\CalendarStyles.xaml" />
+    <None Remove="Theme\CheckBoxStyles.xaml" />
+    <None Remove="Theme\ComboBoxStyles.xaml" />
+    <None Remove="Theme\ExpanderStyles.xaml" />
+    <None Remove="Theme\Index.xaml" />
+    <None Remove="Theme\ListBoxStyles.xaml" />
+    <None Remove="Theme\MenuStyles.xaml" />
+    <None Remove="Theme\NumericUpDownStyles.xaml" />
+    <None Remove="Theme\ProgressBarStyles.xaml" />
+    <None Remove="Theme\RadioButtonStyles.xaml" />
+    <None Remove="Theme\SliderStyles.xaml" />
+    <None Remove="Theme\TabControlStyles.xaml" />
+    <None Remove="Theme\TextBlockStyles.xaml" />
+    <None Remove="Theme\TextBoxStyles.xaml" />
+    <None Remove="Theme\ToggleButtonStyles.xaml" />
+    <None Remove="Theme\TreeViewStyles.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Candy.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Citrus.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Magma.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Palette\CandyPalette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Palette\CitrusPalette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Palette\MagmaPalette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Palette\RustPalette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Palette\SeaPalette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Rust.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Sea.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\BorderStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\ButtonStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\CalendarStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\CheckBoxStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\ComboBoxStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\ExpanderStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\Index.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\ListBoxStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\MenuStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\NumericUpDownStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\ProgressBarStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\RadioButtonStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\SliderStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\TabControlStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\TextBlockStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\TextBoxStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\ToggleButtonStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Theme\TreeViewStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.10" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.10" />
+  </ItemGroup>
+
+</Project>

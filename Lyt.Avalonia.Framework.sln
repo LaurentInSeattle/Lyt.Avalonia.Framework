@@ -17,11 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Mvvm", "Lyt.Av
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Persistence", "Lyt.Avalonia.Persistence\Lyt.Avalonia.Persistence.csproj", "{A9501D65-5E03-4019-AA5B-4E2AACABB118}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.StateMachine", "Lyt.StateMachine\Lyt.StateMachine.csproj", "{2794620F-3AA8-42AD-BA40-1FB5CE86DCAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.StateMachine", "Lyt.StateMachine\Lyt.StateMachine.csproj", "{2794620F-3AA8-42AD-BA40-1FB5CE86DCAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.Avalonia.Orchestrator", "Lyt.Avalonia.Orchestrator\Lyt.Avalonia.Orchestrator.csproj", "{725FC519-AE6B-460E-A17F-DCA553F8CEC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Orchestrator", "Lyt.Avalonia.Orchestrator\Lyt.Avalonia.Orchestrator.csproj", "{725FC519-AE6B-460E-A17F-DCA553F8CEC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.Avalonia.UserAdministration", "Lyt.Avalonia.UserAdministration\Lyt.Avalonia.UserAdministration.csproj", "{DC0DA2D3-12C6-48EC-AF9F-745DCCA88EBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.UserAdministration", "Lyt.Avalonia.UserAdministration\Lyt.Avalonia.UserAdministration.csproj", "{DC0DA2D3-12C6-48EC-AF9F-745DCCA88EBB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Themes", "Lyt.Avalonia.Themes\Lyt.Avalonia.Themes.csproj", "{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{DC0DA2D3-12C6-48EC-AF9F-745DCCA88EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC0DA2D3-12C6-48EC-AF9F-745DCCA88EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC0DA2D3-12C6-48EC-AF9F-745DCCA88EBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
