@@ -28,6 +28,7 @@ global using Lyt.Avalonia.Interfaces;
 global using Lyt.Avalonia.Interfaces.Messenger;
 global using Lyt.Avalonia.Interfaces.Model;
 global using Lyt.Avalonia.Interfaces.Logger;
+global using Lyt.Avalonia.Interfaces.Profiler;
 
 global using Lyt.Avalonia.Model;
 
@@ -46,6 +47,7 @@ global using Lyt.Avalonia.UsersAdministration;
 
 global using Lyt.StateMachine;
 
+
 global using Lyt.Avalonia.Framework.TestApp; 
 global using Lyt.Avalonia.Framework.TestApp.Shell;
 global using Lyt.Avalonia.Framework.TestApp.Models;
@@ -54,4 +56,3 @@ global using Lyt.Avalonia.Framework.TestApp.Workflow.Login;
 global using Lyt.Avalonia.Framework.TestApp.Workflow.Process;
 global using Lyt.Avalonia.Framework.TestApp.Workflow.Select;
 global using Lyt.Avalonia.Framework.TestApp.Workflow.Startup;
-

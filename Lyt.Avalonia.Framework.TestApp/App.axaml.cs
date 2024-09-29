@@ -1,6 +1,4 @@
-﻿using Lyt.Avalonia.Interfaces.Profiler;
-
-namespace Lyt.Avalonia.Framework.TestApp;
+﻿namespace Lyt.Avalonia.Framework.TestApp;
 
 public partial class App : ApplicationBase
 {

@@ -35,10 +35,8 @@ public sealed class ShellViewModel : Bindable<ShellView>
 
     private void OnSvg(object? _)
     {
-        //var x = this.View!.callIcon;
-
-        //string source = this.View!.callIcon.Source;
-        //this.View.callIcon.Source = source == "call" ? "call_end" : "call";
+        string source = this.View!.callIcon.Source;
+        this.View.callIcon.Source = source == "call" ? "call_end" : "call";
         //var rootFolder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         //var folder = "assets";
         //var svgFolderPath = Path.Combine(rootFolder, folder);
@@ -97,7 +95,7 @@ public sealed class ShellViewModel : Bindable<ShellView>
         bool modelIsTicking = this.timingModel.IsTicking;
         this.IsTicking = modelIsTicking ? "Ticking" : "Stopped";
         this.ButtonText = modelIsTicking ? "Stop" : "Start";
-        var profiler = App.GetRequiredService<Profiler>();
+        var profiler = App.GetRequiredService<IProfiler>();
         profiler.MemorySnapshot();
         if (this.Workflow is not null)
         {

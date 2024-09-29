@@ -14,10 +14,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\avalonia-logo.ico" />
+    <None Remove="Assets\Images\dark.jpg" />
     <None Remove="Assets\Vectors\FluentUiIcons_Filled.xaml" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\avalonia-logo.ico" />
+    <AvaloniaResource Include="Assets\Images\dark.jpg" />
     <AvaloniaResource Include="Assets\Vectors\FluentSvgResourceDictionary.axaml" />
     <AvaloniaResource Include="Assets\Vectors\FluentUiIcons_Filled.xaml" />
     <AvaloniaResource Include="Assets\Vectors\FluentUiIcons_Regular.axaml" />
