@@ -1,0 +1,176 @@
+<UserControl 
+    x:Class="Lyt.Avalonia.Framework.TestApp.Shell.ShellView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:Lyt.Avalonia.Framework.TestApp.Shell"
+	xmlns:controls="clr-namespace:Lyt.Avalonia.Controls;assembly=Lyt.Avalonia.Controls"
+	xmlns:glyphs="clr-namespace:Lyt.Avalonia.Controls.Glyphs;assembly=Lyt.Avalonia.Controls"
+	xmlns:badgeControl="clr-namespace:Lyt.Avalonia.Controls.BadgeControl;assembly=Lyt.Avalonia.Controls"
+	xmlns:badge="clr-namespace:Lyt.Avalonia.Controls.Badge;assembly=Lyt.Avalonia.Controls"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="850"
+    x:DataType="vm:ShellViewModel" 
+    Background="Transparent"
+    >
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ShellViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <Style Selector="Button.btn /template/ ContentPresenter">
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
+        <Style Selector="Button.btn">
+            <Setter Property="Width" Value="160" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="12" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="DarkOrange" />
+            <Setter Property="Background" Value="#20FFFFFF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#40AAAAFF" />
+        </Style>
+        <Style Selector="Button:pointerover.btn /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="DarkOrange" />
+            <Setter Property="Background" Value="#20FFFFFF" />
+            <Setter Property="BorderBrush" Value="#80AAAAFF" />
+            <Setter Property="FontSize" Value="21" />
+        </Style>
+		<Style Selector="TextBlock.badge">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="Foreground" Value="White"/>
+		</Style>
+		<Style Selector="Ellipse.badge">
+			<Setter Property="Fill" Value="Green"/>
+			<Setter Property="Margin" Value="2"/>
+		</Style>
+	</UserControl.Styles>	
+    <Grid
+        x:Name="InnerGrid"
+        Background="Transparent"
+        RowDefinitions="4*,60, 60, 60 , *, 60"
+        ShowGridLines="False"
+        >
+        <Image
+            Stretch="UniformToFill"
+            Source="\Assets\Images\dark.jpg"
+            Grid.ColumnSpan="999" Grid.RowSpan="999"
+            />
+        <ContentControl
+            Grid.Row="0"
+            x:Name="WorkflowContent"
+            />
+		<badgeControl:BadgeUserControl
+			Margin="24"
+            Height="80" Width="180"
+            HorizontalAlignment="Left" VerticalAlignment="Top"
+			>
+			<Rectangle
+				RadiusX="10" RadiusY="10"
+				Fill="DarkOrange" Opacity="0.5"
+				/>
+		</badgeControl:BadgeUserControl>
+		<badge:Badge
+			BadgePosition="LeftTop"
+			BadgeContent="9+"
+			Margin="140 24 24 24"
+            Height="80" Width="180"
+            HorizontalAlignment="Left" VerticalAlignment="Top"
+			>
+			<Rectangle
+				RadiusX="10" RadiusY="10"
+				Fill="DarkOrange" Opacity="0.5"
+				/>
+		</badge:Badge>
+		<glyphs:SvgIcon
+            Source="icon_power_button"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Margin="12 64 12 12"
+            Wadding="4"
+            Height="32" Width="32"
+            StrokeThickness="1"
+            Foreground="Orange"
+            />
+		<glyphs:SvgIcon
+            Source="icon_brightness"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Margin="12 12 62 12"
+            Wadding="4"
+            Height="46" Width="46"
+            StrokeThickness="1"
+            Foreground="Orchid"
+            />
+		<glyphs:SvgIcon
+            Source="icon_contrast"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Margin="12 64 64 12"
+            Wadding="4"
+            Height="42" Width="42"
+            StrokeThickness="1"
+            Foreground="DarkOrchid"
+            />
+		<glyphs:SvgIcon
+            Source="icon_add_user"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Margin="12"
+            Wadding="4"
+            Height="32" Width="32"
+            StrokeThickness="1"
+            Foreground="DarkOrange"
+            />
+		<glyphs:SvgIcon
+			x:Name="callIcon"
+            Source="call"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Margin="12 64 128 12"
+            Wadding="4"
+            Height="128" Width="128"
+            StrokeThickness="0.05"
+            Foreground="DodgerBlue"
+            />
+		<TextBlock 
+            Grid.Row="1"
+            Text="{Binding TickCount}" 
+            FontSize="40"
+            Foreground="DarkOrange"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            />
+        <TextBlock
+            Grid.Row="3"
+            Text="{Binding IsTicking}"
+            FontSize="40"
+            Foreground="DarkOrange"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            />
+		<Button
+            Grid.Row="5"
+            Classes="Button.Primary"
+            Content="{Binding ButtonText}"
+            VerticalAlignment="Center" HorizontalAlignment="Right"
+            ClickMode="Release"
+            Command="{Binding OnStartStopCommand}"
+            
+            Width="160" Height ="40"
+            FontSize ="20"
+            Margin =" 12"
+            />
+		<Button
+            Grid.Row="5"
+            Classes="Button.Primary"
+            Content="SVG Extractor"
+            VerticalAlignment="Center" HorizontalAlignment="Left"
+            ClickMode="Release"
+            Command="{Binding OnSvgCommand}"
+            
+            Width="160" Height ="40"
+            FontSize ="20"
+            Margin =" 12"
+            />
+
+	</Grid>
+</UserControl>

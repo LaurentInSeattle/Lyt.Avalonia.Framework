@@ -1,8 +1,9 @@
-﻿namespace Lyt.Avalonia.MvvmTest.Models;
+﻿namespace Lyt.Avalonia.Framework.TestApp.Models;
 
 public sealed class UserAdministrationModel : ModelBase, IModel
 {
-    public UserAdministrationModel(IMessenger messenger, ILogger logger) : base(messenger, logger)
+    public UserAdministrationModel(IMessenger messenger, ILogger logger) 
+        : base(messenger, logger)
     {
     }
 

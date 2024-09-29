@@ -7,6 +7,22 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Assets\Vectors\FluentSvgResourceDictionary.axaml" />
+    <AvaloniaXaml Remove="Assets\Vectors\FluentUiIcons_Regular.axaml" />
+    <AvaloniaXaml Remove="Assets\Vectors\SvgResourceDictionary.axaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\avalonia-logo.ico" />
+    <None Remove="Assets\Vectors\FluentUiIcons_Filled.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\avalonia-logo.ico" />
+    <AvaloniaResource Include="Assets\Vectors\FluentSvgResourceDictionary.axaml" />
+    <AvaloniaResource Include="Assets\Vectors\FluentUiIcons_Filled.xaml" />
+    <AvaloniaResource Include="Assets\Vectors\FluentUiIcons_Regular.axaml" />
+    <AvaloniaResource Include="Assets\Vectors\SvgResourceDictionary.axaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.1.3" />
@@ -15,5 +31,18 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.3" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lyt.Avalonia.Controls\Lyt.Avalonia.Controls.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.Interfaces\Lyt.Avalonia.Interfaces.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.Localizer\Lyt.Avalonia.Localizer.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.Model\Lyt.Avalonia.Model.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.Mvvm\Lyt.Avalonia.Mvvm.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.Orchestrator\Lyt.Avalonia.Orchestrator.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.Persistence\Lyt.Avalonia.Persistence.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.Themes\Lyt.Avalonia.Themes.csproj" />
+    <ProjectReference Include="..\Lyt.Avalonia.UserAdministration\Lyt.Avalonia.UserAdministration.csproj" />
+    <ProjectReference Include="..\Lyt.StateMachine\Lyt.StateMachine.csproj" />
   </ItemGroup>
 </Project>
