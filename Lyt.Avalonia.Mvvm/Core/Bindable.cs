@@ -103,7 +103,22 @@ public class Bindable : NotifyPropertyChanged
     public void Bind(Control control)
     {
         this.Control = control;
-        this.Control.DataContext = this;
+        this.Unbind();
+        try
+        {
+            this.Control.DataContext = this;
+        }
+        catch (InvalidCastException ex)
+        {
+            // Crash here ? This should never happen, ever. 
+            // Major issue when defining the view, usually conflicting DaataContext by inheritance
+            Debugger.Break();
+            Debug.WriteLine(this.GetType().FullName);
+            Debug.WriteLine(this.Control.GetType().FullName);
+            Debug.WriteLine(this.Control.DataContext?.GetType().FullName);
+            Debug.WriteLine(ex);
+        }
+
         this.OnDataBinding();
         this.Control.Loaded += (s, e) => this.OnViewLoaded();
     }
@@ -111,7 +126,7 @@ public class Bindable : NotifyPropertyChanged
     /// <summary> Unbinds this bindable. </summary>
     public void Unbind()
     {
-        if (this.Control != null)
+        if (this.Control is not null)
         {
             if (this.Control.DataContext != null)
             {
