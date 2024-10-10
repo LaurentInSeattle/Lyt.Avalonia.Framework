@@ -10,7 +10,7 @@ public static class MiscUtilities
         StyledElement? parent = control.Parent;
         while ((parent is not null) && (parent is not TControl))
         {
-            parent = control.Parent;
+            parent = parent.Parent;
         }
 
         if (parent is not null && (parent is TControl parentAsT))

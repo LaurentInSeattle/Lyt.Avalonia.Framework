@@ -13,6 +13,8 @@ public class ApplicationBase(
     List<Tuple<Type, Type>> servicesInterfaceAndType,
     bool singleInstanceRequested = false) : Application, IApplicationBase
 {
+    public static Window MainWindow; 
+
     // The host cannot be null or else there is no app...
     public static IHost AppHost { get; private set; }
 
@@ -78,6 +80,7 @@ public class ApplicationBase(
             var startupWindow = ApplicationBase.GetRequiredService<Window>();
             if (startupWindow is Window window)
             {
+                ApplicationBase.MainWindow = window;
                 this.desktop.MainWindow = window;
                 // LATER, maybe, using Fluent theme for now
                 // this.StyleManager = new StyleManager(window);
