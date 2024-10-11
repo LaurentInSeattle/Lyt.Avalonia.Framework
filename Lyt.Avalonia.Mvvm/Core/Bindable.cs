@@ -100,6 +100,15 @@ public class Bindable : NotifyPropertyChanged
     }
 
     /// <summary> Binds a control and setup callbacks. </summary>
+    /// 
+    public void BindingOnDataContextChanged(Control control)
+    {
+        this.Control = control;
+        this.OnDataBinding();
+        this.Control.Loaded += (s, e) => this.OnViewLoaded();
+    }
+
+    /// <summary> Binds a control and setup callbacks. </summary>
     public void Bind(Control control)
     {
         this.Control = control;
