@@ -302,7 +302,15 @@ public partial class GlyphButton
     }
 
     /// <summary> Coerces the Text value. </summary>
-    private static string CoerceText(AvaloniaObject sender, string newText) => newText;
+    private static string CoerceText(AvaloniaObject sender, string newText)
+    {
+        if (sender is GlyphButton glyphButton)
+        {
+            glyphButton.textBlock.Text = newText;
+        }
+
+        return newText;
+    } 
 
     /// <summary> Typography Styled Property </summary>
     public static readonly StyledProperty<ControlTheme> TypographyProperty =
