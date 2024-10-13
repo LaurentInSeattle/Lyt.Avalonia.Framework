@@ -26,7 +26,7 @@ public static class MiscUtilities
         switch (informationLevel)
         {
             case InformationLevel.Info:
-                return "info";
+                return "icon_info_circle" ; //"info";
 
             case InformationLevel.Warning:
                 return "warning";

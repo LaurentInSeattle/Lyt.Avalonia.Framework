@@ -11,6 +11,7 @@
 	MaxWidth="820"
 	HorizontalAlignment="Left"
 	Margin="12"
+	ZIndex="999"
     >
     <Grid
 		x:Name="OuterGrid"
@@ -45,7 +46,8 @@
 			CornerRadius="4"
 			/>
 		<Rectangle
-			Fill="#58000020"
+			Margin="2"
+			Fill="#C0000020"
 			Grid.ColumnSpan="999" Grid.RowSpan="999"
 			RadiusX="4" RadiusY="4"
 			/>

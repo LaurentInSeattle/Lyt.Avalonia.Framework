@@ -17,6 +17,12 @@ public partial class SvgIcon : UserControl
 
     public void UpdateImage()
     {
+        //if ( this.Source == "measure" )
+        //{
+        //    // TODO: Figure out why this one is not loading
+        //    // Debugger.Break(); 
+        //}
+
         if (this.drawingImage is null)
         {
             return;

@@ -133,6 +133,16 @@
             StrokeThickness="0.05"
             Foreground="DodgerBlue"
             />
+		<glyphs:SvgIcon
+			x:Name="measureIcon"
+            Source="measure"
+            HorizontalAlignment="Right" VerticalAlignment="Top"
+            Margin="12 64 256 12"
+            Wadding="4"
+            Height="48" Width="48"
+            StrokeThickness="1.0"
+            Foreground="DodgerBlue"
+            />
 		<TextBlock 
             Grid.Row="1"
             Text="{Binding TickCount}" 
