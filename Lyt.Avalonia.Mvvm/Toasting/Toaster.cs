@@ -36,15 +36,15 @@ public sealed class Toaster : IToaster
     {
         if (this.Host == null)
         {
-            // No content control to host the toast
+            // No content control to host the toast, that could be problematic...
             if (Debugger.IsAttached) { Debugger.Break(); }
             return;
         }
 
         if (this.current == null)
         {
-            // Nothing to dismiss
-            if (Debugger.IsAttached) { Debugger.Break(); }
+            // Nothing to dismiss, usually not really an issue
+            // if (Debugger.IsAttached) { Debugger.Break(); }
             return;
         }
 
