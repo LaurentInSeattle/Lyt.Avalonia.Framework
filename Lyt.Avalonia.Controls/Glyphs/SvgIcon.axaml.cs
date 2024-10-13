@@ -180,7 +180,7 @@ public partial class SvgIcon : UserControl
             if (svgIcon.imageUpdateRequired)
             {
                 svgIcon.UpdateImage();
-                svgIcon.imageUpdateRequired = false;
+                //svgIcon.imageUpdateRequired = false;
                 return newSource;
             }
         }
