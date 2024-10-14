@@ -22,17 +22,23 @@ public static class MiscUtilities
     }
 
     public static string ToIconName(this InformationLevel informationLevel)
-    {
-        switch (informationLevel)
+        => informationLevel switch
         {
-            case InformationLevel.Info:
-                return "info_circle"; 
+            InformationLevel.Info => "path_info",
+            InformationLevel.Warning => "path_warning",
+            InformationLevel.Error => "path_error",
+            _ => throw new Exception("Missing resource for InformationLevel"),
+        };
 
-            case InformationLevel.Warning:
-                return "warning";
-
-            case InformationLevel.Error:
-                return "error";
+    public static StreamGeometry ToIconGeometry( this InformationLevel informationLevel)
+    {
+        string resourceName = informationLevel.ToIconName();
+        if( TryFindResource<StreamGeometry>(resourceName, out StreamGeometry? streamGeometry))
+        {
+            if ( streamGeometry is not null )
+            {
+                return streamGeometry;
+            }
         }
 
         throw new Exception("Missing resource for InformationLevel");

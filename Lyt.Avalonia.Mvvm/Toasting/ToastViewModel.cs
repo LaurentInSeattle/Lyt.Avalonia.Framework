@@ -11,7 +11,8 @@ public sealed class ToastViewModel : Bindable<ToastView>
     public ToastViewModel(IToaster toaster)
     {
         this.toaster = toaster;
-        this.IconName = "warning"; 
+        this.IconGeometry = InformationLevel.Info.ToIconGeometry();
+        this.ColorLevel = InformationLevel.Info.ToBrush();
     }
 
     private DispatcherTimer? dismissTimer;
@@ -20,11 +21,11 @@ public sealed class ToastViewModel : Bindable<ToastView>
     {
         this.Title = title;
         this.Message = message;
-        this.IconName = toastLevel.ToIconName();
+        this.IconGeometry = toastLevel.ToIconGeometry();
         this.ColorLevel = toastLevel.ToBrush();
 
         // We should not need to do that !!!
-        this.View.Icon.UpdateGlyphSource(this.IconName);
+        // this.View.Icon.UpdateGlyphSource(this.IconName);
 
         this.DismissCommand = new Command(this.Dismiss);
 
@@ -78,7 +79,7 @@ public sealed class ToastViewModel : Bindable<ToastView>
     public SolidColorBrush ColorLevel { get => this.Get<SolidColorBrush>()!; [DoNotLog] set => _ = this.Set(value); }
 
     /// <summary> Gets or sets the IconName bound property.</summary>
-    public string IconName { get => this.Get<string>()!; [DoNotLog] set => _ = this.Set(value); }
+    public StreamGeometry IconGeometry { get => this.Get<StreamGeometry>()!; [DoNotLog] set => _ = this.Set(value); }
 
     /// <summary> Gets or sets the Title bound property.</summary>
     public string? Title { get => this.Get<string>(); [DoNotLog] set => _ = this.Set(value); }

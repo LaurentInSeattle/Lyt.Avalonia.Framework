@@ -51,16 +51,15 @@
 			Grid.ColumnSpan="999" Grid.RowSpan="999"
 			RadiusX="4" RadiusY="4"
 			/>
-		<glyphs:SvgIcon
+		<PathIcon
 			x:Name="Icon"
 			Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
-			Source="{Binding IconName, FallbackValue=warning}"
+			Data="{Binding IconGeometry}"
 			Foreground="{Binding ColorLevel}"
-			StrokeThickness="0.2"
 			Width="48" Height="48"
 			Margin="0"
 			>
-		</glyphs:SvgIcon>
+		</PathIcon>
 		<TextBlock
 			Grid.Column="2"
 			Foreground ="{Binding ColorLevel}"
