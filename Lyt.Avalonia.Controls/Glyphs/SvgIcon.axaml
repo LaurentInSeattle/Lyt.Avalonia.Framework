@@ -17,10 +17,12 @@
 			Width="{Binding Width, ElementName=grid}"
 			Height="{Binding Height, ElementName=grid}"
             >
+			<!--
             <Image
                 x:Name="image"
                 >
             </Image>
+			-->
         </Viewbox>
     </Grid>
 </UserControl>

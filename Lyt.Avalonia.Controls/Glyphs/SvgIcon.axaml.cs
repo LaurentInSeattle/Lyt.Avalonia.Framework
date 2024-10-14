@@ -15,14 +15,46 @@ public partial class SvgIcon : UserControl
 
     public SvgIcon() => this.InitializeComponent();
 
+    public void UpdateGlyphSource(string newSource)
+    {
+        this.SetValue(SourceProperty, newSource);
+        bool valid = !string.IsNullOrWhiteSpace(newSource);
+        if (valid)
+        {
+            if (Utilities.TryFindResource<DrawingImage>(newSource, out this.drawingImage))
+            {
+                this.imageUpdateRequired = true;
+            }
+            else if (Utilities.TryFindResource<GeometryDrawing>(newSource, out GeometryDrawing? geometryDrawing))
+            {
+                if (geometryDrawing is not null)
+                {
+                    this.CreateDrawingImage(geometryDrawing);
+                    this.imageUpdateRequired = true;
+                }
+            }
+            else if (Utilities.TryFindResource<DrawingGroup>(newSource, out DrawingGroup? drawingGroup))
+            {
+                if (drawingGroup is not null)
+                {
+                    this.CreateDrawingImage(drawingGroup);
+                    this.imageUpdateRequired = true;
+                }
+            }
+            else
+            {
+                throw new Exception("Resource not found: " + newSource);
+            }
+
+            if (this.imageUpdateRequired)
+            {
+                this.UpdateImage();
+            }
+        }
+    }
+
     public void UpdateImage()
     {
-        //if ( this.Source == "measure" )
-        //{
-        //    // TODO: Figure out why this one is not loading
-        //    // Debugger.Break(); 
-        //}
-
         if (this.drawingImage is null)
         {
             return;
@@ -31,10 +63,15 @@ public partial class SvgIcon : UserControl
         if (this.drawingImage.Drawing is DrawingGroup drawingGroup)
         {
             this.ProcessDrawingGroup(drawingGroup);
-            this.image.Source = this.drawingImage;
-            this.image.InvalidateVisual();
-            this.viewBox.InvalidateVisual();
         }
+
+        //this.dummyDrawingImage = new DrawingImage();
+        //this.image.Source = this.dummyDrawingImage;
+        //this.image.SetValue(Image.SourceProperty , this.drawingImage);
+        //this.image.InvalidateVisual();
+        this.viewBox.Child = null;
+        this.viewBox.Child = new Image() { Source = this.drawingImage };
+        this.viewBox.InvalidateVisual();
     }
 
     private void CreateDrawingImage(GeometryDrawing geometryDrawing)
@@ -94,7 +131,7 @@ public partial class SvgIcon : UserControl
         {
             // If the pen is null, no stroke, no need to do anything 
             if ((pen.Brush is SolidColorBrush) ||
-                (pen.Brush is ImmutableSolidColorBrush) || 
+                (pen.Brush is ImmutableSolidColorBrush) ||
                 (pen.Brush is ImmutableLinearGradientBrush))
             {
                 geometryDrawing.Pen = new Pen() { Thickness = this.StrokeThickness, Brush = this.Foreground };
@@ -108,6 +145,7 @@ public partial class SvgIcon : UserControl
                 else
                 {
                     Debug.WriteLine("No brush ??? ");
+                    geometryDrawing.Pen = new Pen() { Thickness = 1.0, Brush = this.Foreground };
                 }
 
                 // if (Debugger.IsAttached) { Debugger.Break(); }
@@ -154,9 +192,7 @@ public partial class SvgIcon : UserControl
         bool valid = !string.IsNullOrWhiteSpace(newSource);
         if (valid && (sender is SvgIcon svgIcon))
         {
-            string source = string.Concat("icon_", newSource, "DrawingImage");
-            if (Utilities.TryFindResource<DrawingImage>(newSource, out svgIcon.drawingImage) ||
-                Utilities.TryFindResource<DrawingImage>(source, out svgIcon.drawingImage))
+            if (Utilities.TryFindResource<DrawingImage>(newSource, out svgIcon.drawingImage))                
             {
                 svgIcon.imageUpdateRequired = true;
             }
@@ -175,6 +211,10 @@ public partial class SvgIcon : UserControl
                     svgIcon.CreateDrawingImage(drawingGroup);
                     svgIcon.imageUpdateRequired = true;
                 }
+            }
+            else
+            {
+                throw new Exception("Resource not found: " + newSource);
             }
 
             if (svgIcon.imageUpdateRequired)

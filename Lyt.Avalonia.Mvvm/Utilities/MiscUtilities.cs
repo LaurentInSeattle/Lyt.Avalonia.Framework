@@ -26,13 +26,13 @@ public static class MiscUtilities
         switch (informationLevel)
         {
             case InformationLevel.Info:
-                return "icon_info_circle" ; //"info";
+                return "info_circle"; 
 
             case InformationLevel.Warning:
                 return "warning";
 
             case InformationLevel.Error:
-                return "error_circle";
+                return "error";
         }
 
         throw new Exception("Missing resource for InformationLevel");

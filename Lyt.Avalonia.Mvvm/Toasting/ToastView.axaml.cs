@@ -13,7 +13,7 @@ public partial class ToastView : UserControl
             if (this.DataContext is ToastViewModel toastViewModel)
             {
                 // There should be no reason 
-                this.Icon.Source = toastViewModel.IconName;
+                //this.Icon.Source = toastViewModel.IconName;
             }
         };
     }

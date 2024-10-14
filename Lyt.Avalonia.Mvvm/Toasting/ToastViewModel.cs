@@ -1,12 +1,18 @@
 ﻿namespace Lyt.Avalonia.Controls.Toasting;
 
-public sealed class ToastViewModel(IToaster toaster) : Bindable<ToastView>
+public sealed class ToastViewModel : Bindable<ToastView>
 {
     private const int NoDelay = 0;
     private const int MinDelay = 1_000;
     private const int MaxDelay = 60_000;
 
-    private readonly IToaster toaster = toaster;
+    private readonly IToaster toaster;
+
+    public ToastViewModel(IToaster toaster)
+    {
+        this.toaster = toaster;
+        this.IconName = "warning"; 
+    }
 
     private DispatcherTimer? dismissTimer;
 
@@ -18,7 +24,7 @@ public sealed class ToastViewModel(IToaster toaster) : Bindable<ToastView>
         this.ColorLevel = toastLevel.ToBrush();
 
         // We should not need to do that !!!
-        this.View.Icon.Source = this.IconName;
+        this.View.Icon.UpdateGlyphSource(this.IconName);
 
         this.DismissCommand = new Command(this.Dismiss);
 

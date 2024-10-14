@@ -19,7 +19,7 @@
 	    HorizontalAlignment="Stretch"
 	    VerticalAlignment="Bottom"
 		Height="64"
-		Opacity="0"
+		Opacity="1"
 		>
 		<Grid.Transitions>
 			<Transitions>
@@ -46,17 +46,17 @@
 			CornerRadius="4"
 			/>
 		<Rectangle
-			Margin="2"
-			Fill="#C0000020"
+			Margin="1"
+			Fill="#F0000020"
 			Grid.ColumnSpan="999" Grid.RowSpan="999"
 			RadiusX="4" RadiusY="4"
 			/>
 		<glyphs:SvgIcon
 			x:Name="Icon"
 			Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
-			Source="{Binding IconName}"
+			Source="{Binding IconName, FallbackValue=warning}"
 			Foreground="{Binding ColorLevel}"
-			StrokeThickness="1"
+			StrokeThickness="0.2"
 			Width="48" Height="48"
 			Margin="0"
 			>
