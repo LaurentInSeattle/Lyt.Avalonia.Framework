@@ -11,7 +11,7 @@
 	MaxWidth="820"
 	HorizontalAlignment="Left"
 	Margin="12"
-	ZIndex="999"
+	ZIndex="99999"
     >
     <Grid
 		x:Name="OuterGrid"

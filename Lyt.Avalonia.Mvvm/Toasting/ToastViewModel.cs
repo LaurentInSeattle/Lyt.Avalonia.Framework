@@ -23,11 +23,22 @@ public sealed class ToastViewModel : Bindable<ToastView>
         this.Message = message;
         this.IconGeometry = toastLevel.ToIconGeometry();
         this.ColorLevel = toastLevel.ToBrush();
-
-        // We should not need to do that !!!
-        // this.View.Icon.UpdateGlyphSource(this.IconName);
-
         this.DismissCommand = new Command(this.Dismiss);
+        string loggedMessage =
+            "Toast: " + toastLevel.ToString() + " - " + title + " - " + message;
+        if (toastLevel == InformationLevel.Error)
+        {
+            this.Logger.Error(loggedMessage);
+        }
+        else if (toastLevel == InformationLevel.Warning)
+        {
+            this.Logger.Warning(loggedMessage);
+        }
+        else
+
+        {
+            this.Logger.Info(loggedMessage);
+        }
 
         if (dismissDelay == ToastViewModel.NoDelay)
         {

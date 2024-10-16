@@ -51,7 +51,7 @@ public static class MiscUtilities
         switch (informationLevel)
         {
             case InformationLevel.Success:
-                TryFindResource<SolidColorBrush>("FreshGreen_0_100", out brush);
+                TryFindResource<SolidColorBrush>("FreshGreen_1_100", out brush);
                 break;
 
             case InformationLevel.Info:
