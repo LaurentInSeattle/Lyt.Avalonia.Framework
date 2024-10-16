@@ -24,6 +24,7 @@ public static class MiscUtilities
     public static string ToIconName(this InformationLevel informationLevel)
         => informationLevel switch
         {
+            InformationLevel.Success => "emoji_happy",
             InformationLevel.Info => "path_info",
             InformationLevel.Warning => "path_warning",
             InformationLevel.Error => "path_error",
@@ -49,6 +50,10 @@ public static class MiscUtilities
         SolidColorBrush? brush= null;
         switch (informationLevel)
         {
+            case InformationLevel.Success:
+                TryFindResource<SolidColorBrush>("FreshGreen_0_100", out brush);
+                break;
+
             case InformationLevel.Info:
                 TryFindResource<SolidColorBrush>("LightAqua_0_120", out brush);
                 break;

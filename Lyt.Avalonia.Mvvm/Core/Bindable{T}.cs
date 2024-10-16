@@ -16,10 +16,11 @@ public class Bindable<TControl> : Bindable where TControl : Control, new()
 
     public Bindable(TControl control) : base()  => this.Bind(control);
 
-    public void CreateViewAndBind()
+    public TControl CreateViewAndBind()
     {
         var view = new TControl();
         this.Bind(view);
+        return view;
     }
 
     public TControl View

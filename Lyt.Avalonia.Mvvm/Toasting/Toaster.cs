@@ -78,8 +78,7 @@ public sealed class Toaster : IToaster
 
         this.current?.Dismiss();
         this.current = new ToastViewModel(this);
-        this.current.CreateViewAndBind();
-        ToastView? view = this.current.View;
+        ToastView? view = this.current.CreateViewAndBind();
         if (view is not null)
         {
             panel.Children.Add(view);

@@ -5,4 +5,5 @@ public enum InformationLevel
     Info,
     Warning,
     Error,
+    Success, 
 }
