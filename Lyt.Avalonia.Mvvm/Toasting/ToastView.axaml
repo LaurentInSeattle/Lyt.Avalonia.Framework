@@ -10,14 +10,14 @@
     Background="Transparent"
 	MaxWidth="820"
 	HorizontalAlignment="Left"
+	VerticalAlignment="Bottom"
 	Margin="12"
-	ZIndex="99999"
+	ZIndex="9999999"
     >
     <Grid
 		x:Name="OuterGrid"
 		Margin ="8"
 	    HorizontalAlignment="Stretch"
-	    VerticalAlignment="Bottom"
 		Height="64"
 		Opacity="1"
 		>

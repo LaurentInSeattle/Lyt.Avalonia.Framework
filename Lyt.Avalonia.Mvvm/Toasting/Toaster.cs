@@ -28,6 +28,20 @@ public sealed class Toaster : IToaster
         }
     }
 
+    // Provide access to the View so that it can eventually moved around, re-aligned, etc
+    public object? View
+    {
+        get 
+        {
+            if (this.current is ToastViewModel viewModel)
+            {
+                return viewModel.View;
+            }
+
+            return null;
+        }
+    }
+
     public void Show(string title, string message, int dismissDelay = 10, InformationLevel toastLevel = InformationLevel.Info)
         => this.messenger.Publish(
             new ToastMessage.Show { Title = title, Message = message, Delay = dismissDelay, Level = toastLevel });
