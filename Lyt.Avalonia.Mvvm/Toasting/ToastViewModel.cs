@@ -56,6 +56,7 @@ public sealed class ToastViewModel : Bindable<ToastView>
                 dismissDelay = ToastViewModel.MaxDelay;
             }
 
+            this.StopTimer();
             this.dismissTimer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromMilliseconds(dismissDelay),

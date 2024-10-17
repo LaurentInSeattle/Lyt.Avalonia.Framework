@@ -73,9 +73,6 @@ public sealed class Toaster : IToaster
             panel.Children.Remove(view);
         }
 
-        this.current.Unbind();
-        this.current = null;
-
         this.messenger.Publish(new ToastMessage.OnDismiss());
     }
 
@@ -90,14 +87,20 @@ public sealed class Toaster : IToaster
             throw new Exception("The Toaster Host Panel is not initialized.");
         }
 
-        this.current?.Dismiss();
-        this.current = new ToastViewModel(this);
-        ToastView? view = this.current.CreateViewAndBind();
-        if (view is not null)
+        if (this.current is null)
         {
-            panel.Children.Add(view);
+            this.current = new ToastViewModel(this);
+            _ = this.current.CreateViewAndBind();
         }
 
-        this.current.Show(show.Title, show.Message, show.Delay, show.Level);
+        ToastView? view = this.current.View;
+        if (view is not null)
+        {
+            this.current.Show(show.Title, show.Message, show.Delay, show.Level);
+            if (!panel.Children.Contains(view))
+            {
+                panel.Children.Add(view);
+            } 
+        }
     }
 }
