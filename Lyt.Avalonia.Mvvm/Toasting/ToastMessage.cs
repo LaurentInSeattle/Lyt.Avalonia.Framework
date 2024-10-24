@@ -2,13 +2,9 @@
 
 public sealed class ToastMessage
 {
-    public sealed class Show
-    {
-        public string Title { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-        public int Delay { get; set; } = 10_000; 
-        public InformationLevel Level { get; set; } = InformationLevel.Info;
-    }
+    public sealed record class Show(
+         string Title = "", string Message = "", 
+         int Delay = 10_000, InformationLevel Level = InformationLevel.Info) { }
 
     public sealed class Dismiss { }
 
