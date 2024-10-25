@@ -18,9 +18,9 @@ public sealed class FileManagerModel : ModelBase, IModel
         Binary,
     }
 
-    private const string JsonExtension = ".json";
-    private const string TextExtension = ".txt";
-    private const string BinaryExtension = ".data";
+    public const string JsonExtension = ".json";
+    public const string TextExtension = ".txt";
+    public const string BinaryExtension = ".data";
 
     private const string LogsFolder = "Logs";
     private const string ConfigurationFolder = "Configuration";
