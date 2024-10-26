@@ -1,4 +1,6 @@
-﻿namespace Lyt.Avalonia.Persistence;
+﻿using Lyt.Avalonia.Interfaces.Model;
+
+namespace Lyt.Avalonia.Persistence;
 
 public sealed class FileManagerModel : ModelBase, IModel
 {
@@ -18,6 +20,7 @@ public sealed class FileManagerModel : ModelBase, IModel
         Binary,
     }
 
+    public const string Wildcard = "*";
     public const string JsonExtension = ".json";
     public const string TextExtension = ".txt";
     public const string BinaryExtension = ".data";
@@ -342,8 +345,13 @@ public sealed class FileManagerModel : ModelBase, IModel
                 throw new NotSupportedException("Use LoadResourceFromStream<T>");
             }
 
-            string path =
-                Path.Combine(this.PathFromArea(area), string.Concat(name, FileManagerModel.ExtensionFromKind(kind)));
+            string extension = FileManagerModel.ExtensionFromKind(kind);
+            if (name.EndsWith(extension))
+            {
+                name = name.Replace(extension, string.Empty);
+            }
+
+            string path = Path.Combine(this.PathFromArea(area), string.Concat(name, extension));
             switch (kind)
             {
                 default:
@@ -437,6 +445,54 @@ public sealed class FileManagerModel : ModelBase, IModel
             string msg = "Failed to save for " + area.ToString() + " - " + name + kind.ToString();
             this.Logger.Fatal(msg);
             throw new Exception(msg, ex);
+        }
+    }
+
+    public List<string> Enumerate(Area area, Kind kind, string filter = "")
+    {
+        try
+        {
+            string documentFolder = this.PathFromArea(area);
+            if (Directory.Exists(documentFolder))
+            {
+                // Enumerates files 
+                var enumerationOptions = new EnumerationOptions()
+                {
+                    IgnoreInaccessible = true,
+                    RecurseSubdirectories = true,
+                    MatchType = MatchType.Simple,
+                    MaxRecursionDepth = 8,
+                };
+                string extension = Wildcard + ExtensionFromKind(kind);
+                var files =
+                    Directory.EnumerateFiles(documentFolder, extension, enumerationOptions);
+                var list = new List<string>(16);
+                foreach (string file in files)
+                {
+                    if ((!string.IsNullOrWhiteSpace(filter)) &&
+                        (!file.Contains(filter, StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        continue;
+                    }
+
+                    // Drop full path
+                    var fileInfo = new FileInfo(file);
+                    list.Add(fileInfo.Name);
+                }
+
+                return list;
+            }
+            else
+            {
+                // Create the folder and return empty
+                this.CreateFolderIfNeeded(documentFolder);
+                return [];
+            }
+        }
+        catch (Exception ex)
+        {
+            this.Logger.Error(ex.ToString());
+            return [];
         }
     }
 }
