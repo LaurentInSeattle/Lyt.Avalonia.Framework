@@ -244,7 +244,9 @@ public partial class GlyphButton : UserControl, ICanSelect
         if (this.HasIcon)
         {
             this.icon.Foreground = hotColor;
-            this.GlyphAngle = this.glyphAngle + 3.0; 
+            // Consider creating a property for this 'feature'...
+            // feature that has been given some negative feedback.
+            // this.GlyphAngle = this.glyphAngle + 3.0; 
             this.viewBox.Margin = new Thickness(this.viewboxMargin + 2.0);
         }
 
