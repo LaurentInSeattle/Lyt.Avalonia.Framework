@@ -1,4 +1,6 @@
-﻿namespace Lyt.Avalonia.Mvvm.Extensions;
+﻿using System.Text.Json.Serialization;
+
+namespace Lyt.Avalonia.Mvvm.Extensions;
 
 public static class GeneralExtensions
 {
