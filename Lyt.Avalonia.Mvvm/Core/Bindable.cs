@@ -121,7 +121,7 @@ public class Bindable : NotifyPropertyChanged
         {
             // Crash here ? This should never happen, ever. 
             // Major issue when defining the view, usually conflicting DaataContext by inheritance
-            Debugger.Break();
+            if (Debugger.IsAttached) { Debugger.Break(); }
             Debug.WriteLine(this.GetType().FullName);
             Debug.WriteLine(this.Control.GetType().FullName);
             Debug.WriteLine(this.Control.DataContext?.GetType().FullName);
