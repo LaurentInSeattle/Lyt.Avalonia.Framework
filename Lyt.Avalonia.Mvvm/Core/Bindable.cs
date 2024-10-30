@@ -5,7 +5,7 @@ public class DoNotLogAttribute : Attribute { }
 
 /// <summary> Bindable class, aka a View Model.  </summary>
 /// <remarks> All bound properties are held in a dictionary.</remarks>
-public class Bindable : NotifyPropertyChanged
+public class Bindable : NotifyPropertyChanged, ISupportBehaviors
 {
     /// <summary> The property currently being set. </summary>
     /// <remarks> 
@@ -98,6 +98,8 @@ public class Bindable : NotifyPropertyChanged
             }
         }
     }
+
+    public List<object> Behaviors { get; private set; } = [];
 
     /// <summary> Binds a control and setup callbacks. </summary>
     /// 

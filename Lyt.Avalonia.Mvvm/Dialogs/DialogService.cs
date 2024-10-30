@@ -1,7 +1,8 @@
 ﻿namespace Lyt.Avalonia.Mvvm.Dialogs;
 
-public sealed class DialogService(ILogger logger) : IDialogService
+public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialogService
 {
+    private readonly IMessenger messenger = messenger;
     private readonly ILogger logger = logger;
 
     private Panel? modalHostPanel;
@@ -83,6 +84,8 @@ public sealed class DialogService(ILogger logger) : IDialogService
         panel.Children.Add(host);
         host.ContentGrid.Children.Add(dialog);
 
+        this.messenger.Publish(new ModalMessage(ModalMessage.Modal.Enter));
+        panel.IsHitTestVisible = true;
         this.modalHostPanel = panel;
         this.modalHostControl = host;
         this.modalUserControl = dialog;
@@ -110,6 +113,7 @@ public sealed class DialogService(ILogger logger) : IDialogService
 
             if (this.modalHostPanel is not null && this.modalHostControl is not null)
             {
+                this.modalHostPanel.IsHitTestVisible = false;
                 this.modalHostPanel.Children.Remove(this.modalHostControl);
             }
 
@@ -121,6 +125,10 @@ public sealed class DialogService(ILogger logger) : IDialogService
         {
             this.logger.Error("Failed to dismiss dialog, exception thrown: \n" + ex.ToString());
             throw;
+        }
+        finally
+        {
+            this.messenger.Publish(new ModalMessage(ModalMessage.Modal.Leave));
         }
     }
 

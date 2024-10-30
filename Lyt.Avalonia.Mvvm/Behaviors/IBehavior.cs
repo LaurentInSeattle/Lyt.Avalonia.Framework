@@ -13,3 +13,4 @@ public interface IBehavior
     /// <summary> Detaches this instance from its associated object. </summary>
     void Detach();
 }
+
