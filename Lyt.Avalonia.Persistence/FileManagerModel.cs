@@ -336,6 +336,13 @@ public sealed class FileManagerModel : ModelBase, IModel
         return Path.Exists(path);
     }
 
+    /// <summary> Can throw, use in a TCF construct! </summary>
+    public void Delete(Area area, Kind kind, string name)
+    {
+        string path = this.MakePath(area, kind, name);
+        File.Delete(path);
+    }
+
     public T Load<T>(Area area, Kind kind, string name) where T : class
     {
         try
