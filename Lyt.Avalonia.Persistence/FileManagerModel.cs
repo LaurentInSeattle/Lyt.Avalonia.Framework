@@ -1,6 +1,4 @@
-﻿using Lyt.Avalonia.Interfaces.Model;
-
-namespace Lyt.Avalonia.Persistence;
+﻿namespace Lyt.Avalonia.Persistence;
 
 public sealed class FileManagerModel : ModelBase, IModel
 {
