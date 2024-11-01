@@ -12,25 +12,14 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     public bool IsModal
         => this.modalHostPanel is not null || this.modalUserControl is not null || this.modalHostControl is not null;
 
-    public void Confirm(object maybePanel, ConfirmActionParameters parameters )
+    public void Confirm(object maybePanel, ConfirmActionParameters parameters)
     {
         try
         {
-            if (this.IsModal)
-            {
-                this.logger.Error("Already showing a modal");
-                throw new InvalidOperationException("Already showing a modal");
-            }
-
-            if (maybePanel is not Panel panel)
-            {
-                this.logger.Error("Must provide a host panel");
-                throw new InvalidOperationException("Must provide a host panel");
-            }
-
+            Panel panel = this.Guard(maybePanel);
             var viewModel = new ConfirmActionViewModel(parameters);
             viewModel.CreateViewAndBind();
-            this.ShowInternal(panel, viewModel.View); 
+            this.ShowInternal(panel, viewModel.View);
         }
         catch (Exception ex)
         {
@@ -78,17 +67,26 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         }
     }
 
-    private void ShowInternal(Panel panel, UserControl dialog)
+    public void RunModal<TDialog, TParameters>(
+        object maybePanel, 
+        DialogBindable<TDialog, TParameters> viewModel,        
+        Action<object, bool> onClose,
+        TParameters? parameters=null)
+        where TDialog : UserControl, new()
+        where TParameters : class
     {
-        var host = new ModalHostControl(panel, (bool _) => { });
-        panel.Children.Add(host);
-        host.ContentGrid.Children.Add(dialog);
-
-        this.messenger.Publish(new ModalMessage(ModalMessage.Modal.Enter));
-        panel.IsHitTestVisible = true;
-        this.modalHostPanel = panel;
-        this.modalHostControl = host;
-        this.modalUserControl = dialog;
+        try
+        {
+            Panel panel = this.Guard(maybePanel);
+            viewModel.CreateViewAndBind();
+            viewModel.Initialize(onClose, parameters);
+            this.ShowInternal(panel, viewModel.View);
+        }
+        catch (Exception ex)
+        {
+            this.logger.Error("Failed to launch dialog, exception thrown: \n" + ex.ToString());
+            throw;
+        }
     }
 
     public void Dismiss()
@@ -96,7 +94,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         if (this.modalHostPanel is null && this.modalUserControl is null && this.modalHostControl is null)
         {
             this.logger.Warning("DialogService: Nothing to dismiss.");
-            return; 
+            return;
         }
 
         if (this.modalHostPanel is null || this.modalUserControl is null || this.modalHostControl is null)
@@ -132,57 +130,90 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         }
     }
 
-    public void Run<TDialog, TDialogParameters>(
-        object maybePanel, Action<bool> onClose, TDialogParameters dialogParameters)
-        where TDialog : IDialog<TDialogParameters>, new()
-        where TDialogParameters : class
+    private void ShowInternal(Panel panel, UserControl dialog)
     {
-        try
-        {
-            if (maybePanel is not Panel panel)
-            {
-                this.logger.Error("Must provide a host panel");
-                throw new InvalidOperationException("Must provide a host panel");
-            }
+        var host = new ModalHostControl(panel, (bool _) => { });
+        panel.Children.Add(host);
+        host.ContentGrid.Children.Add(dialog);
 
-            if (!typeof(TDialog).IsSubclassOf(typeof(UserControl)))
-            {
-                this.logger.Error("TDialog Must provide a type deriving from UserControl");
-                throw new InvalidOperationException("TDialog Must provide a type deriving from UserControl");
-            }
-
-            this.RunInternal<TDialog, TDialogParameters>(panel, onClose, dialogParameters);
-        }
-        catch (Exception ex)
-        {
-            this.logger.Error("Failed to launch dialog, exception thrown: \n" + ex.ToString());
-            throw;
-        }
+        this.messenger.Publish(new ModalMessage(ModalMessage.Modal.Enter));
+        panel.IsHitTestVisible = true;
+        this.modalHostPanel = panel;
+        this.modalHostControl = host;
+        this.modalUserControl = dialog;
     }
 
-    private void RunInternal<TDialog, TDialogParameters>(
-        Panel panel, Action<bool> onClose, TDialogParameters? dialogParameters = null)
-        where TDialog : IDialog<TDialogParameters>, new()
-        where TDialogParameters : class
+    private Panel Guard(object maybePanel)
     {
-        var host = new ModalHostControl(panel, onClose);
-        var modal = new TDialog { Host = host };
-        if (modal is not UserControl userControl)
+        if (this.IsModal)
         {
-            this.logger.Error("Failed to cast to UserControl");
-            throw new InvalidOperationException("Failed to cast to UserControl");
+            this.logger.Error("Already showing a modal");
+            throw new InvalidOperationException("Already showing a modal");
         }
 
-        if (dialogParameters is not null)
+        if (maybePanel is not Panel panel)
         {
-            modal.Initialize(dialogParameters);
+            this.logger.Error("Must provide a host panel");
+            throw new InvalidOperationException("Must provide a host panel");
         }
 
-        panel.Children.Add(host);
-        host.ContentGrid.Children.Add(userControl);
+        return panel;
     }
 
     #region LATER: Run a Modal Window 
+
+    //public void Run<TDialog, TDialogParameters>(
+    //    object maybePanel, Action<bool> onClose, TDialogParameters dialogParameters)
+    //    where TDialog : IDialog<TDialogParameters>, new()
+    //    where TDialogParameters : class
+    //{
+    //    try
+    //    {
+    //        if (maybePanel is not Panel panel)
+    //        {
+    //            this.logger.Error("Must provide a host panel");
+    //            throw new InvalidOperationException("Must provide a host panel");
+    //        }
+
+    //        if (!typeof(TDialog).IsSubclassOf(typeof(UserControl)))
+    //        {
+    //            this.logger.Error("TDialog Must provide a type deriving from UserControl");
+    //            throw new InvalidOperationException("TDialog Must provide a type deriving from UserControl");
+    //        }
+
+    //        this.RunInternal<TDialog, TDialogParameters>(panel, onClose, dialogParameters);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        this.logger.Error("Failed to launch dialog, exception thrown: \n" + ex.ToString());
+    //        throw;
+    //    }
+    //}
+
+    //private void RunInternal<TDialog, TDialogParameters>(
+    //    Panel panel, Action<bool> onClose, TDialogParameters? dialogParameters = null)
+    //    where TDialog : IDialog<TDialogParameters>, new()
+    //    where TDialogParameters : class
+    //{
+    //    var host = new ModalHostControl(panel, onClose);
+    //    var modal = new TDialog { Host = host };
+    //    if (modal is not UserControl userControl)
+    //    {
+    //        this.logger.Error("Failed to cast to UserControl");
+    //        throw new InvalidOperationException("Failed to cast to UserControl");
+    //    }
+
+    //    if (dialogParameters is not null)
+    //    {
+    //        modal.Initialize(dialogParameters);
+    //    }
+
+    //    panel.Children.Add(host);
+    //    host.ContentGrid.Children.Add(userControl);
+    //    this.messenger.Publish(new ModalMessage(ModalMessage.Modal.Enter));
+    //    panel.IsHitTestVisible = true;
+
+    //}
 
     //public static bool Run<TDialog, TDialogParameters>(Window window, TDialogParameters? dialogParameters = null)
     //    where TDialog : UserControl, IDialog<TDialogParameters>, new()

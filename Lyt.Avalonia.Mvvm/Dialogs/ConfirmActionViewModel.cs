@@ -26,10 +26,8 @@ public class ConfirmActionViewModel : Bindable<ConfirmActionView>
     }
 
     protected override void OnViewLoaded ( )
-    {
         // Need to figure out why we need to do this !!!
-        this.View.Icon.Foreground = this.ColorLevel;
-    }
+        => this.View.Icon.Foreground = this.ColorLevel;
 
     private void OnAction(object? _)
     {

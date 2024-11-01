@@ -12,9 +12,9 @@ public class Bindable<TControl> : Bindable where TControl : Control, new()
     public Bindable() : base() { }
 
     public Bindable(bool disablePropertyChangedLogging = false, bool disableAutomaticBindingsLogging = false)
-        : base(disablePropertyChangedLogging , disableAutomaticBindingsLogging ) { }
+        : base(disablePropertyChangedLogging, disableAutomaticBindingsLogging) { }
 
-    public Bindable(TControl control) : base()  => this.Bind(control);
+    public Bindable(TControl control) : base() => this.Bind(control);
 
     public TControl CreateViewAndBind()
     {
