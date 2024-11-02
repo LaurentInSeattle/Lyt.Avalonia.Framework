@@ -148,6 +148,8 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     {
         if (this.IsModal)
         {
+            // You should have checked if the service was modal, and if so, first
+            // invoke 'Dismiss' before launching a new dialog 
             this.logger.Error("Already showing a modal");
             throw new InvalidOperationException("Already showing a modal");
         }
