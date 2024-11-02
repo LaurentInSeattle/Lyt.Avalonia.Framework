@@ -10,7 +10,6 @@
     x:DataType="vm:ConfirmActionViewModel" 
 
     Background="Transparent"
-	ZIndex="999999"
 	>
 	<Grid
 		x:Name="OuterGrid"

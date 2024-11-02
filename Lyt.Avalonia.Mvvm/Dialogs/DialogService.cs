@@ -132,6 +132,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
 
     private void ShowInternal(Panel panel, UserControl dialog)
     {
+        dialog.ZIndex = 999_999; 
         var host = new ModalHostControl(panel, (bool _) => { });
         panel.Children.Add(host);
         host.ContentGrid.Children.Add(dialog);
