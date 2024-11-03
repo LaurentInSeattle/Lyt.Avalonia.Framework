@@ -37,7 +37,21 @@ public sealed class FileManagerModel : ModelBase, IModel
     public FileManagerModel(IMessenger messenger, ILogger logger) : base(messenger, logger)
     {
         this.Configuration = new FileManagerConfiguration(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-        this.jsonSerializerOptions = new JsonSerializerOptions { AllowTrailingCommas = true };
+        this.jsonSerializerOptions = 
+            new JsonSerializerOptions 
+            { 
+                AllowTrailingCommas = true,
+                WriteIndented = true,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                IgnoreReadOnlyFields = true,
+                IgnoreReadOnlyProperties = true,
+                // .Net 9 properties 
+                //
+                // AllowOutOfOrderMetadataProperties = true,
+                // IndentSize = 4,
+                // RespectRequiredConstructorParameters = true,
+                // RespectNullableAnnotations= true,
+            };
         this.jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     }
 
