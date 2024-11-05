@@ -118,7 +118,7 @@ public sealed class LocalizerModel : ModelBase
         }
 
         this.Logger.Warning("Failed to translate: " + localizationKey + " for language: " + this.currentLanguage);
-        return string.Empty;
+        return localizationKey;
     }
 
     public string LookupResource(string localizationKey)

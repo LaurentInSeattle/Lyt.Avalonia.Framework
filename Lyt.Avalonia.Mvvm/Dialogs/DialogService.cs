@@ -5,9 +5,11 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     private readonly IMessenger messenger = messenger;
     private readonly ILogger logger = logger;
 
+    private bool isClassHandlerRegistered; 
     private Panel? modalHostPanel;
     private ModalHostControl? modalHostControl;
     private UserControl? modalUserControl;
+    private Bindable? modalBindable;
 
     public bool IsModal
         => this.modalHostPanel is not null || this.modalUserControl is not null || this.modalHostControl is not null;
@@ -68,10 +70,10 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     }
 
     public void RunModal<TDialog, TParameters>(
-        object maybePanel, 
-        DialogBindable<TDialog, TParameters> viewModel,        
+        object maybePanel,
+        DialogBindable<TDialog, TParameters> viewModel,
         Action<object, bool> onClose,
-        TParameters? parameters=null)
+        TParameters? parameters = null)
         where TDialog : UserControl, new()
         where TParameters : class
     {
@@ -81,11 +83,36 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
             viewModel.CreateViewAndBind();
             viewModel.Initialize(onClose, parameters);
             this.ShowInternal(panel, viewModel.View);
+            if (!this.isClassHandlerRegistered)
+            {
+                this.isClassHandlerRegistered = true;
+                InputElement.KeyDownEvent.AddClassHandler<TopLevel>(
+                    this.OnKeyDown, handledEventsToo: true);
+            }
         }
         catch (Exception ex)
         {
             this.logger.Error("Failed to launch dialog, exception thrown: \n" + ex.ToString());
             throw;
+        }
+    }
+
+    private void OnKeyDown(TopLevel level, KeyEventArgs args)
+    {
+        if ((this.IsModal) &&
+            (this.modalUserControl is not null) &&
+            (this.modalUserControl.DataContext is Bindable bindable))
+        {
+            if (args.Key == Key.Escape)
+            {
+                bindable.Cancel();
+            }
+            else if (args.Key == Key.Enter)
+            {
+                bindable.TrySaveAndClose();
+            }
+
+            args.Handled = true;
         }
     }
 
@@ -132,7 +159,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
 
     private void ShowInternal(Panel panel, UserControl dialog)
     {
-        dialog.ZIndex = 999_999; 
+        dialog.ZIndex = 999_999;
         var host = new ModalHostControl(panel, (bool _) => { });
         panel.Children.Add(host);
         host.ContentGrid.Children.Add(dialog);

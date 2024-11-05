@@ -15,12 +15,12 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     //  private string setPropertyName = string.Empty;
 
     /// <summary> The bounds properties.</summary>
-    protected readonly Dictionary<string, object?> properties = [] ;
+    protected readonly Dictionary<string, object?> properties = [];
 
     /// <summary> Actions to invoke for changing properties.</summary>
     protected readonly Dictionary<string, MethodInfo> actions = [];
 
-    public Bindable(bool disablePropertyChangedLogging = false, bool disableAutomaticBindingsLogging = false )
+    public Bindable(bool disablePropertyChangedLogging = false, bool disableAutomaticBindingsLogging = false)
     {
         this.DisablePropertyChangedLogging = disablePropertyChangedLogging;
         this.DisableAutomaticBindingsLogging = disableAutomaticBindingsLogging;
@@ -231,6 +231,12 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
         this.properties.Clear();
     }
 
+    public virtual bool Validate() => true;
+
+    public virtual bool TrySaveAndClose() => true;
+
+    public virtual void Cancel() { }
+
     private void CreateAndBindCommands()
     {
         var type = this.GetType();
@@ -279,7 +285,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
             {
                 this.Logger.Info(
                     string.Format("{0}: Command {1} has been bound to {2}", type.Name, propertyName, methodName));
-            } 
+            }
         }
     }
 
@@ -324,7 +330,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
             {
                 this.Logger.Info(
                     string.Format("{0}: Changes of property {1} have been bound to {2}", type.Name, propertyName, methodName));
-            } 
+            }
         }
     }
 

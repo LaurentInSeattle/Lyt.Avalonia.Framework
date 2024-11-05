@@ -30,4 +30,24 @@ public class DialogBindable<TControl, TParameters> : Bindable<TControl>
         this.onClose = onClose;
         this.parameters = parameters;
     }
+
+    public override bool Validate() => true;
+
+    public override bool TrySaveAndClose()
+    {
+        bool isValid = this.Validate();
+        if (isValid)
+        {
+            this.onClose?.Invoke(this, true);
+            this.dialogService.Dismiss();
+        }
+
+        return isValid;
+    }
+
+    public override void Cancel()
+    {
+        this.onClose?.Invoke(this, false);
+        this.dialogService.Dismiss();
+    }
 }
