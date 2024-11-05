@@ -5,11 +5,11 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     private readonly IMessenger messenger = messenger;
     private readonly ILogger logger = logger;
 
-    private bool isClassHandlerRegistered; 
+    private bool isClassHandlerRegistered;
+    // private IDisposable? disposableKeyDownClassHandler; 
     private Panel? modalHostPanel;
     private ModalHostControl? modalHostControl;
     private UserControl? modalUserControl;
-    private Bindable? modalBindable;
 
     public bool IsModal
         => this.modalHostPanel is not null || this.modalUserControl is not null || this.modalHostControl is not null;
@@ -85,9 +85,12 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
             this.ShowInternal(panel, viewModel.View);
             if (!this.isClassHandlerRegistered)
             {
+                ApplicationBase.MainWindow.AddHandler(
+                    InputElement.KeyDownEvent, this.OnKeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
+                //this.disposableKeyDownClassHandler = 
+                //    InputElement.KeyDownEvent.AddClassHandler<TopLevel>(
+                //        this.OnKeyDown, handledEventsToo: true);
                 this.isClassHandlerRegistered = true;
-                InputElement.KeyDownEvent.AddClassHandler<TopLevel>(
-                    this.OnKeyDown, handledEventsToo: true);
             }
         }
         catch (Exception ex)
@@ -97,22 +100,25 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         }
     }
 
-    private void OnKeyDown(TopLevel level, KeyEventArgs args)
+    private void OnKeyDown(object? _, KeyEventArgs args)
     {
         if ((this.IsModal) &&
             (this.modalUserControl is not null) &&
             (this.modalUserControl.DataContext is Bindable bindable))
         {
-            if (args.Key == Key.Escape)
+            if ((args.Key == Key.Escape) || (args.Key == Key.Enter))
             {
-                bindable.Cancel();
+                args.Handled = true;
+                if (args.Key == Key.Escape)
+                {
+                    bindable.Cancel();
+                }
+                else // if (args.Key == Key.Enter)
+                {
+                    bindable.TrySaveAndClose();
+                }
             }
-            else if (args.Key == Key.Enter)
-            {
-                bindable.TrySaveAndClose();
-            }
-
-            args.Handled = true;
+            // else : NOT handled or else cant type anything :( 
         }
     }
 
@@ -140,6 +146,14 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
             {
                 this.modalHostPanel.IsHitTestVisible = false;
                 this.modalHostPanel.Children.Remove(this.modalHostControl);
+            }
+
+            if (this.isClassHandlerRegistered)
+            {
+                ApplicationBase.MainWindow.RemoveHandler(InputElement.KeyDownEvent, this.OnKeyDown);
+                //this.disposableKeyDownClassHandler?.Dispose();
+                //this.disposableKeyDownClassHandler = null;
+                this.isClassHandlerRegistered = false;
             }
 
             this.modalHostControl = null;

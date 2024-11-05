@@ -13,7 +13,7 @@ public class ApplicationBase(
     List<Tuple<Type, Type>> servicesInterfaceAndType,
     bool singleInstanceRequested = false) : Application, IApplicationBase
 {
-    public static Window MainWindow; 
+    public static Window MainWindow { get; private set; }
 
     // The host cannot be null or else there is no app...
     public static IHost AppHost { get; private set; }
