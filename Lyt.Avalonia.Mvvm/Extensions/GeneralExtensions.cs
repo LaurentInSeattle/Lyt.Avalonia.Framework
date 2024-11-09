@@ -1,11 +1,13 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Lyt.Avalonia.Mvvm.Extensions;
+﻿namespace Lyt.Avalonia.Mvvm.Extensions;
 
 public static class GeneralExtensions
 {
-    public static bool Implements<TInterface>(this Type type)
+    public static bool Implements<TInterface>(this Type type)        
         => typeof(TInterface).IsAssignableFrom(type);
+
+    public static bool DerivesFrom<TBase>(this Type type)
+        where TBase : class
+        => typeof(TBase).IsAssignableFrom(type);
 
     public static Action<object>? CastToActionObject<T>(this Action<T> actionOfT)
     {
