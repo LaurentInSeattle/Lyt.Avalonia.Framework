@@ -6,7 +6,6 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     private readonly ILogger logger = logger;
 
     private bool isClassHandlerRegistered;
-    // private IDisposable? disposableKeyDownClassHandler; 
     private Panel? modalHostPanel;
     private ModalHostControl? modalHostControl;
     private UserControl? modalUserControl;
@@ -87,9 +86,6 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
             {
                 ApplicationBase.MainWindow.AddHandler(
                     InputElement.KeyDownEvent, this.OnKeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
-                //this.disposableKeyDownClassHandler = 
-                //    InputElement.KeyDownEvent.AddClassHandler<TopLevel>(
-                //        this.OnKeyDown, handledEventsToo: true);
                 this.isClassHandlerRegistered = true;
             }
         }
@@ -151,8 +147,6 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
             if (this.isClassHandlerRegistered)
             {
                 ApplicationBase.MainWindow.RemoveHandler(InputElement.KeyDownEvent, this.OnKeyDown);
-                //this.disposableKeyDownClassHandler?.Dispose();
-                //this.disposableKeyDownClassHandler = null;
                 this.isClassHandlerRegistered = false;
             }
 
