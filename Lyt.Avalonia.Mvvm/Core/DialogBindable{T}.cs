@@ -2,7 +2,6 @@
 
 public class DialogBindable<TControl, TParameters> : Bindable<TControl>
     where TControl : Control, new()
-    where TParameters : class
 {
     protected readonly IDialogService dialogService;
 
