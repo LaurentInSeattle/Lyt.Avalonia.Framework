@@ -54,6 +54,8 @@ public abstract class ModelBase(IMessenger messenger, ILogger logger) : IModel
     /// <summary> The model properties.</summary>
     protected readonly Dictionary<string, object?> properties = [];
 
+    public void Clean() => this.IsDirty = false; 
+
     public void SubscribeToUpdates(Action<ModelUpdateMessage> onUpdate, bool withUiDispatch = false)
         => this.Messenger?.Subscribe(onUpdate, withUiDispatch);
 
