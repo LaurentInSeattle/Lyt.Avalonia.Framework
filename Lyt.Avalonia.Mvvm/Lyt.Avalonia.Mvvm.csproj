@@ -10,7 +10,7 @@
     <PackageReference Include="Avalonia" Version="11.1.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
