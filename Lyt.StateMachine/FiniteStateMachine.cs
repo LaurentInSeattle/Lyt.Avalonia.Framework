@@ -278,7 +278,7 @@ public class FiniteStateMachine<TState, TTrigger, TTag> : IDisposable
     }
 
     /// <summary> If valid, Fires the transition, identified by its trigger </summary>
-    /// <returns> True if successfule transition</returns>
+    /// <returns> True if successfull transition</returns>
     public bool Fire(TTrigger trigger)
     {
         try

@@ -1,9 +1,4 @@
 ﻿namespace Lyt.StateMachine;
 
-public sealed class TimeoutDefinition<TState>(TState toState, int valueMillisecs)
-        where TState : struct, Enum
-{
-    public TState ToState { get; set; } = toState;
-
-    public int ValueMillisecs { get; private set; } = valueMillisecs;
-}
+public sealed record class TimeoutDefinition<TState>(TState ToState, int ValueMillisecs)
+        where TState : struct, Enum;
