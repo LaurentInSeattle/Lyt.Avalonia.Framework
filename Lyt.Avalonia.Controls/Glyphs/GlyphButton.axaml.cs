@@ -685,8 +685,6 @@ public partial class GlyphButton : UserControl, ICanSelect
     {
         if (this.IsDisabled)
         {
-            // This should never happen
-            if (Debugger.IsAttached) { Debugger.Break(); }
             return;
         }
 
