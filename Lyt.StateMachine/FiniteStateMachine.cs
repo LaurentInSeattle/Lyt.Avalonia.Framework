@@ -244,7 +244,7 @@ public class FiniteStateMachine<TState, TTrigger, TTag> : IDisposable
             var triggers = stateDefinition.TriggerDefinitions;
             if ((triggers is null) || (triggers.Count == 0))
             {
-                this.logger.Info("No triggers defined for state " + this.State.ToString());
+                this.logger.Warning("No triggers defined for state " + this.State.ToString());
                 return false;
             }
 
@@ -255,7 +255,7 @@ public class FiniteStateMachine<TState, TTrigger, TTag> : IDisposable
                  .FirstOrDefault();
             if (triggerDefinition is null)
             {
-                this.logger.Info(this.State.ToString() + " cannot be triggered by " + trigger.ToString());
+                this.logger.Warning(this.State.ToString() + " cannot be triggered by " + trigger.ToString());
                 return false;
             }
 

@@ -342,6 +342,12 @@ public sealed class FileManagerModel : ModelBase, IModel
         }
     }
 
+    public bool Exists(FileId fileId)
+    {
+        fileId.Deconstruct(out Area area, out Kind kind, out string name);
+        return this.Exists(area, kind, name);
+    }
+
     public bool Exists(Area area, Kind kind, string name)
     {
         string path = this.MakePath(area, kind, name);
@@ -349,10 +355,22 @@ public sealed class FileManagerModel : ModelBase, IModel
     }
 
     /// <summary> Can throw, use in a TCF construct! </summary>
+    public void Delete(FileId fileId)
+    {
+        fileId.Deconstruct(out Area area, out Kind kind, out string name);
+        this.Delete(area, kind, name);
+    }
+
     public void Delete(Area area, Kind kind, string name)
     {
         string path = this.MakePath(area, kind, name);
         File.Delete(path);
+    }
+
+    public T Load<T>(FileId fileId) where T : class
+    {
+        fileId.Deconstruct(out Area area, out Kind kind, out string name);
+        return this.Load<T>(area, kind, name);
     }
 
     public T Load<T>(Area area, Kind kind, string name) where T : class
@@ -422,6 +440,12 @@ public sealed class FileManagerModel : ModelBase, IModel
             case Kind.Binary:
                 throw new NotSupportedException("No binaries for now");
         }
+    }
+
+    public void Save<T>(FileId fileId, T content) where T : class
+    {
+        fileId.Deconstruct(out Area area, out Kind kind, out string name);
+        this.Save<T>(area, kind, name, content);
     }
 
     public void Save<T>(Area area, Kind kind, string name, T content) where T : class
