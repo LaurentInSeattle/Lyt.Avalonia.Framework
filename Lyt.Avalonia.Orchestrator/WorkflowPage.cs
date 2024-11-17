@@ -6,7 +6,7 @@ public class WorkflowPage<TState, TTrigger> : Bindable
 {
     public virtual TState State { get; set; } = default;
 
-    public string? Title { get => this.Get<string>(); set => this.Set(value); }
+    public virtual string? Title { get => this.Get<string>(); set => this.Set(value); }
 
     public virtual Task OnInitialize() => Task.CompletedTask;
 
