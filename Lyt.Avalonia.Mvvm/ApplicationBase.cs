@@ -118,7 +118,7 @@ public class ApplicationBase(
                 .ConfigureServices((_0, services) =>
                 {
                     // Register the app
-                    _ = services.AddSingleton(typeof(IApplicationBase), this);
+                    _ = services.AddSingleton<IApplicationBase>(this);
 
                     // Always Main Window 
                     _ = services.AddSingleton(typeof(Window), this.mainWindowType);
@@ -292,7 +292,11 @@ public class ApplicationBase(
                     return false;
                 }
             }
-            catch { /* Swallow */  }
+            catch 
+            {
+                // Swallow and assume we are permitted to run 
+                return false;
+            }
 
             return true;
         }
