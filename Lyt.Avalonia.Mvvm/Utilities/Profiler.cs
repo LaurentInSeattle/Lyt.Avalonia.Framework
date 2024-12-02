@@ -94,19 +94,19 @@ public sealed class Profiler(ILogger logger) : IProfiler
             await this.FullGcCollect(0);
         }
 
-        //var currentProcess = Process.GetCurrentProcess();
-        //string processName = currentProcess.ProcessName;
-        //var ctr1 = new PerformanceCounter("Process", "Private Bytes", processName);
-        //float privateBytes = ctr1.NextValue();
-        //ctr1.Dispose();
-        //int[] collections = this.CollectionCounts();
+        var currentProcess = Process.GetCurrentProcess();
+        string processName = currentProcess.ProcessName;
+        var ctr1 = new PerformanceCounter("Process", "Private Bytes", processName);
+        float privateBytes = ctr1.NextValue();
+        ctr1.Dispose();
+        int[] collections = this.CollectionCounts();
 
-        //string rightNow = DateTime.Now.ToLocalTime().ToLongTimeString();
-        //string withCollect = withGCCollect ? ", with GC Collect " : " "; 
-        //int megaPrivateBytes = (int)((privateBytes + 512 * 1024) / (1024 * 1024));
-        //string part1 = "***** Memory Snapshot: " + comment + "  at: " + rightNow + withCollect;
-        //string part2 = "Private Bytes:  " + megaPrivateBytes.ToString() + " MB.";
-        //string part3 = string.Format(" Gen. 0: {0} - 1: {1} - 2: {2}", collections[0], collections[1], collections[2]);
-        //this.logger.Info(part1 + "  -  " + part2 + "  -  " + part3);
+        string rightNow = DateTime.Now.ToLocalTime().ToLongTimeString();
+        string withCollect = withGCCollect ? ", with GC Collect " : " ";
+        int megaPrivateBytes = (int)((privateBytes + 512 * 1024) / (1024 * 1024));
+        string part1 = "***** Memory Snapshot: " + comment + "  at: " + rightNow + withCollect;
+        string part2 = "Private Bytes:  " + megaPrivateBytes.ToString() + " MB.";
+        string part3 = string.Format(" Gen. 0: {0} - 1: {1} - 2: {2}", collections[0], collections[1], collections[2]);
+        this.logger.Info(part1 + "  -  " + part2 + "  -  " + part3);
     }
 }
