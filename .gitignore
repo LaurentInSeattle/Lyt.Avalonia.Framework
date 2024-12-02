@@ -29,3 +29,5 @@
 /Lyt.Avalonia.Themes/bin
 /Lyt.Avalonia.Themes/obj
 /Lyt.Avalonia.UserAdministration/bin/Debug/net8.0
+/Lyt.Avalonia.Orchestrator/bin/Debug/net9.0
+/Lyt.StateMachine/bin/Debug/net9.0
