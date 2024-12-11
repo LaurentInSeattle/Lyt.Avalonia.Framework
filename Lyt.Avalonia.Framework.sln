@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.UserAdministra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyt.Avalonia.Themes", "Lyt.Avalonia.Themes\Lyt.Avalonia.Themes.csproj", "{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.Avalonia.LocalizationTool", "Lyt.Avalonia.LocalizationTool\Lyt.Avalonia.LocalizationTool.csproj", "{FE7990FC-B577-4AA8-91D4-8B0FF8C840F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA778778-6815-4A44-B0EE-D6CE4EAA38E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE7990FC-B577-4AA8-91D4-8B0FF8C840F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE7990FC-B577-4AA8-91D4-8B0FF8C840F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE7990FC-B577-4AA8-91D4-8B0FF8C840F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE7990FC-B577-4AA8-91D4-8B0FF8C840F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
