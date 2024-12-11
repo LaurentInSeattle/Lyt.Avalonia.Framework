@@ -37,3 +37,5 @@
 /Lyt.Avalonia.Orchestrator/bin/Release/net9.0
 /Lyt.Avalonia.UserAdministration/bin/Release/net9.0
 /Lyt.StateMachine/bin/Release/net9.0
+/Lyt.Avalonia.LocalizationTool/obj
+/Lyt.Avalonia.LocalizationTool/bin
