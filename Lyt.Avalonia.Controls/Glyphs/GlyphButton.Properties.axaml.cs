@@ -391,6 +391,7 @@ public partial class GlyphButton
         set
         {
             this.SetValue(BackgroundBorderThicknessProperty, value);
+            this.border.BorderThickness = new Thickness(value);
             this.rectangleBackground.StrokeThickness = value;
         }
     }

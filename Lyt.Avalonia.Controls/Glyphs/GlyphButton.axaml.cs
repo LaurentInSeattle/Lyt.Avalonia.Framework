@@ -136,7 +136,7 @@ public partial class GlyphButton : UserControl, ICanSelect
                 this.border.SetValue(Grid.ColumnProperty, 0);
                 this.textBlock.SetValue(HorizontalAlignmentProperty, HorizontalAlignment.Center);
                 this.textBlock.SetValue(HorizontalContentAlignmentProperty, HorizontalAlignment.Center);
-                this.textBlock.SetValue(MarginProperty, new Thickness(4));
+                this.textBlock.SetValue(MarginProperty, new Thickness(4, 0 , 4 , 0));
                 //this.mainGrid.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Pixel);
                 this.mainGrid.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
                 break;
