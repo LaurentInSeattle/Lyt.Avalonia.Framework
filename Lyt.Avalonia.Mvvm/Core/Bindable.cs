@@ -240,7 +240,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     private void CreateAndBindCommands()
     {
         var type = this.GetType();
-        Debug.WriteLine("CreateAndBindCommands: " + type.Name);
+        // Debug.WriteLine("CreateAndBindCommands: " + type.Name);
         PropertyInfo[] propertyInfos =
             type.GetProperties(
                 BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
@@ -292,7 +292,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     private void CreateAndBindPropertyChangedActions()
     {
         var type = this.GetType();
-        Debug.WriteLine("CreateAndBindPropertyChangedActions: " + type.Name);
+        // Debug.WriteLine("CreateAndBindPropertyChangedActions: " + type.Name);
         var methodInfos =
             type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod);
         if (methodInfos is null || methodInfos.Length == 0)
