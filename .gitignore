@@ -39,3 +39,5 @@
 /Lyt.StateMachine/bin/Release/net9.0
 /Lyt.Avalonia.LocalizationTool/obj
 /Lyt.Avalonia.LocalizationTool/bin
+/Lyt.Search/bin
+/Lyt.Search/obj
