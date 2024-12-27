@@ -17,9 +17,16 @@ public sealed class SearchEngine<TContent> where TContent : class
         this.CreateReflectionCache();
     }
 
-    /// <summary> Filter the source collection - Implicit OR on all criteria  </summary>
+    public List<TContent> All => [.. this.source];
+
+    /// <summary> 
+    /// Filter the source collection 
+    /// Content must satisfy all predicates (AND) 
+    /// then...  Implicit OR on all string criteria  
+    /// </summary>
     public FilterResult<TContent> Filter(
-        IEnumerable<FilterString> filterStrings, IEnumerable<FilterPredicate> filterPredicates)
+        IEnumerable<FilterString> filterStrings, 
+        IEnumerable<FilterPredicate> filterPredicates)
     {
         string message = string.Empty;
 
@@ -28,35 +35,45 @@ public sealed class SearchEngine<TContent> where TContent : class
             var list = new List<TContent>();
             foreach (TContent content in this.source)
             {
-                bool added = false;
+                bool exclude = false;
                 foreach (FilterPredicate predicate in filterPredicates)
                 {
-                    if (this.InvokeBoolProperty(predicate.PropertyName, content))
+                    if (predicate.PropertyValue != this.InvokeBoolProperty(predicate.PropertyName, content))
                     {
-                        list.Add(content);
-                        added = true;
+                        exclude = true;
                         break;
                     }
                 }
 
-                if (added)
+                if (!exclude)
                 {
-                    continue;
-                }
+                    list.Add(content);
+                } 
+            }
 
-                foreach (FilterString filterString in filterStrings)
+            var finalList = new List<TContent>();
+            if (filterStrings.Any())
+            {
+                foreach (TContent content in list)
                 {
-                    string propertyValue = this.InvokeStringProperty(filterString.PropertyName, content);
-                    if (propertyValue.Contains(
-                        filterString.PropertyValue, StringComparison.InvariantCultureIgnoreCase))
+                    foreach (FilterString filterString in filterStrings)
                     {
-                        list.Add(content);
-                        break;
+                        string propertyValue = this.InvokeStringProperty(filterString.PropertyName, content);
+                        if (propertyValue.Contains(
+                            filterString.PropertyValue, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            finalList.Add(content);
+                            break;
+                        }
                     }
                 }
             }
+            else
+            {
+                finalList = list; 
+            } 
 
-            return new FilterResult<TContent>(Success: true, list, message);
+            return new FilterResult<TContent>(Success: true, finalList, message);
         }
         catch (Exception e)
         {

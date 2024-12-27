@@ -8,4 +8,4 @@ public sealed record class FilterResult<TContent>(
 
 public sealed record class FilterString(string PropertyName, string PropertyValue);
 
-public sealed record class FilterPredicate(string PropertyName);
+public sealed record class FilterPredicate(string PropertyName, bool PropertyValue);
