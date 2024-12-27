@@ -237,15 +237,14 @@ public partial class ToggleSwitch : UserControl
 
     private void Down()
     {
-        Debug.WriteLine("Down");
-
+        // Debug.WriteLine("Down");
         this.isPressed = true;
         this.UpdateVisualState();
     }
 
     private void Up(PointerReleasedEventArgs args)
     {
-        Debug.WriteLine("Up");
+        // Debug.WriteLine("Up");
         if (!this.eventingRectangle.IsPointerInside(args))
         {
             Debug.WriteLine("Pointer outside : leave");
