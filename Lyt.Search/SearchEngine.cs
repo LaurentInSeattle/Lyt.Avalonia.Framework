@@ -19,6 +19,12 @@ public sealed class SearchEngine<TContent> where TContent : class
 
     public List<TContent> All => [.. this.source];
 
+    public FilterResult<TContent> Filter(IEnumerable<FilterPredicate> filterPredicates)
+        => this.Filter([], filterPredicates);
+
+    public FilterResult<TContent> Filter(IEnumerable<FilterString> filterStrings)
+        => this.Filter(filterStrings, []);
+
     /// <summary> 
     /// Filter the source collection 
     /// Content must satisfy all predicates (AND) 
@@ -30,25 +36,32 @@ public sealed class SearchEngine<TContent> where TContent : class
     {
         string message = string.Empty;
 
-        try
+        try 
         {
             var list = new List<TContent>();
-            foreach (TContent content in this.source)
+            if (filterPredicates.Any())
             {
-                bool exclude = false;
-                foreach (FilterPredicate predicate in filterPredicates)
+                foreach (TContent content in this.source)
                 {
-                    if (predicate.PropertyValue != this.InvokeBoolProperty(predicate.PropertyName, content))
+                    bool exclude = false;
+                    foreach (FilterPredicate predicate in filterPredicates)
                     {
-                        exclude = true;
-                        break;
+                        if (predicate.PropertyValue != this.InvokeBoolProperty(predicate.PropertyName, content))
+                        {
+                            exclude = true;
+                            break;
+                        }
+                    }
+
+                    if (!exclude)
+                    {
+                        list.Add(content);
                     }
                 }
-
-                if (!exclude)
-                {
-                    list.Add(content);
-                } 
+            } 
+            else
+            {
+                list = [.. this.source];
             }
 
             var finalList = new List<TContent>();
