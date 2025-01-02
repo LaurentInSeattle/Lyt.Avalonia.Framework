@@ -37,6 +37,7 @@ public sealed class Keyboard
         this.window.RemoveHandler(InputElement.KeyDownEvent, this.OnKey);
         this.window.RemoveHandler(InputElement.KeyUpEvent, this.OnKey);
         this.IsStarted = false;
+        this.window = null;
     }
 
     // NOT handled or else cant type anything :( 
