@@ -1,11 +1,18 @@
 ﻿namespace Lyt.Search;
 
+/// <summary> Filter and sort collections of objects of any type. </summary>
+/// <remarks> 
+/// Note: This is single threaded and is heavily using Reflection and is only suitable for 
+/// small collections, typically collections visualized on a User Interface. 
+/// Warning => This will start to become annoyingly slow at around 1000 elements.
+/// </remarks>
 public sealed class SearchEngine<TContent> where TContent : class
 {
     private readonly ICollection<TContent> source;
     private readonly ILogger logger;
     private readonly Dictionary<string, MethodInfo> stringProperties;
     private readonly Dictionary<string, MethodInfo> boolProperties;
+    private readonly Dictionary<string, MethodInfo> allProperties;
 
     public SearchEngine(ICollection<TContent> source, ILogger logger)
     {
@@ -13,6 +20,7 @@ public sealed class SearchEngine<TContent> where TContent : class
         this.logger = logger;
         this.stringProperties = [];
         this.boolProperties = [];
+        this.allProperties = [];
 
         this.CreateReflectionCache();
     }
@@ -20,10 +28,16 @@ public sealed class SearchEngine<TContent> where TContent : class
     public List<TContent> All => [.. this.source];
 
     public FilterResult<TContent> Filter(IEnumerable<FilterPredicate> filterPredicates)
-        => this.Filter([], filterPredicates);
+        => this.Filter([], filterPredicates, []);
 
     public FilterResult<TContent> Filter(IEnumerable<FilterString> filterStrings)
-        => this.Filter(filterStrings, []);
+        => this.Filter(filterStrings, [], []);
+
+    public FilterResult<TContent> Filter(IEnumerable<FilterPredicate> filterPredicates, IEnumerable<FilterSort> filterSorts)
+        => this.Filter([], filterPredicates, filterSorts);
+
+    public FilterResult<TContent> Filter(IEnumerable<FilterString> filterStrings, IEnumerable<FilterSort> filterSorts)
+        => this.Filter(filterStrings, [], filterSorts);
 
     /// <summary> 
     /// Filter the source collection 
@@ -32,7 +46,8 @@ public sealed class SearchEngine<TContent> where TContent : class
     /// </summary>
     public FilterResult<TContent> Filter(
         IEnumerable<FilterString> filterStrings, 
-        IEnumerable<FilterPredicate> filterPredicates)
+        IEnumerable<FilterPredicate> filterPredicates, 
+        IEnumerable<FilterSort> filterSorts)
     {
         string message = string.Empty;
 
@@ -84,9 +99,36 @@ public sealed class SearchEngine<TContent> where TContent : class
             else
             {
                 finalList = list; 
-            } 
+            }
 
-            return new FilterResult<TContent>(Success: true, finalList, message);
+            var sortedList = finalList;
+            if (filterSorts.Any())
+            {
+                if (filterSorts.Count() == 1)
+                {
+                    var filterSort = filterSorts.First();
+                    if (filterSort.IsAscending)
+                    {
+                        sortedList =
+                            [.. (from x in sortedList
+                             orderby this.InvokeProperty(filterSort.PropertyName, x)
+                             select x)];
+                    }
+                    else
+                    {
+                        sortedList =
+                            [.. (from x in sortedList
+                                orderby this.InvokeProperty(filterSort.PropertyName, x) descending
+                                select x)];
+                    }
+                }
+                else
+                {
+                    throw new NotSupportedException("Only one sort specification for now."); 
+                } 
+            }
+
+            return new FilterResult<TContent>(Success: true, sortedList, message);
         }
         catch (Exception e)
         {
@@ -133,10 +175,8 @@ public sealed class SearchEngine<TContent> where TContent : class
                 {
                     this.boolProperties.Add(property.Name, getter);
                 }
-                else
-                {
-                    // Ignore all other returning different types 
-                }
+
+                this.allProperties.Add(property.Name, getter); 
             }
 
             if ((this.stringProperties.Count == 0) && (this.boolProperties.Count == 0))
@@ -188,6 +228,27 @@ public sealed class SearchEngine<TContent> where TContent : class
             }
 
             throw new Exception("Not a bool property: " + propertyName);
+        }
+
+        throw new Exception("No such property " + propertyName);
+    }
+
+    private object InvokeProperty(string propertyName, TContent content)
+    {
+        if (this.allProperties.TryGetValue(propertyName, out var getter))
+        {
+            if (getter is null)
+            {
+                throw new Exception("Null getter for " + propertyName);
+            }
+
+            object? maybe = getter.Invoke(content, null);
+            if (maybe is object result)
+            {
+                return result;
+            }
+
+            throw new Exception("Not an object property: " + propertyName);
         }
 
         throw new Exception("No such property " + propertyName);
