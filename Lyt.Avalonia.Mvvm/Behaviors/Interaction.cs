@@ -48,9 +48,6 @@ public sealed class Interaction
             oldCollection.Detach();
         }
 
-        if (newCollection is not null)
-        {
-            newCollection.Attach(e.Sender);
-        }
+        newCollection?.Attach(e.Sender);
     }
 }
