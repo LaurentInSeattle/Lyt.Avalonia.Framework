@@ -23,6 +23,8 @@ public class Bindable<TControl> : Bindable where TControl : Control, new()
         return view;
     }
 
+    public bool IsBound => this.Control as TControl is not null ;
+
     public TControl View
         => this.Control as TControl ?? throw new InvalidOperationException("View is null");
 }
