@@ -1,4 +1,6 @@
-﻿namespace Lyt.Avalonia.Mvvm.Behaviors;
+﻿using Lyt.Avalonia.Mvvm.Extensions;
+
+namespace Lyt.Avalonia.Mvvm.Behaviors;
 
 /// <summary> Allows extending functionality to any object, including Bindable. </summary>
 /// <typeparam name="TObject">The type of the associated object.</typeparam>
@@ -41,6 +43,24 @@ public abstract class BehaviorBase<TObject> where TObject : class, ISupportBehav
 
         this.AssociatedObject.Behaviors.Remove(this);
         this.AssociatedObject = null;
+    }
+
+    protected TObject GuardAssociatedObject()
+    {
+        if (this.AssociatedObject is null)
+        {
+            throw new InvalidOperationException("Not attached.");
+        }
+
+        if (!this.AssociatedObject.GetType().DerivesFrom<TObject>())
+        {
+            throw new InvalidOperationException("Invalid asociated object.");
+        }
+
+        var associatedObject =
+            this.AssociatedObject as TObject ??
+                throw new InvalidOperationException("Not attached or invalid asociated object.");
+        return associatedObject;
     }
 
     /// <summary> Called after the behavior is attached to the AssociatedObject. </summary>
