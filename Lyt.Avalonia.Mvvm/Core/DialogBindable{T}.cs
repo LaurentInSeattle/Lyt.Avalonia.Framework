@@ -23,7 +23,7 @@ public class DialogBindable<TControl, TParameters> : Bindable<TControl>
     }
 
     public virtual void Initialize(
-        Action<DialogBindable<TControl, TParameters>, bool> onClose,
+        Action<DialogBindable<TControl, TParameters>, bool>? onClose,
         TParameters? parameters)
     {
         this.onClose = onClose;

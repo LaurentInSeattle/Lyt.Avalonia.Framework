@@ -71,7 +71,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     public void RunModal<TDialog, TParameters>(
         object maybePanel,
         DialogBindable<TDialog, TParameters> viewModel,
-        Action<object, bool> onClose,
+        Action<object, bool>? onClose = null,
         TParameters? parameters = null)
         where TDialog : UserControl, new()
         where TParameters : class
