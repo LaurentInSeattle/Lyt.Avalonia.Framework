@@ -173,7 +173,7 @@ public class ApplicationBase(
         bool isModel = typeof(IModel).IsAssignableFrom(typeof(TModel));
         if (!isModel)
         {
-            throw new ApplicationException(typeof(TModel).FullName + "  is not a IMOdel");
+            throw new ApplicationException(typeof(TModel).FullName + "  is not a IModel");
         }
 
         return model;
