@@ -1,4 +1,4 @@
-﻿namespace Lyt.Avalonia.Controls.Logging;
+﻿namespace Lyt.Avalonia.Mvvm.Logging;
 
 public sealed class LogEntry
 {

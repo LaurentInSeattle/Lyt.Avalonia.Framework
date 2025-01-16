@@ -1,4 +1,4 @@
-﻿namespace Lyt.Avalonia.Mvvm.Messenger;
+﻿namespace Lyt.Avalonia.Mvvm.Messaging;
 
 public class WeakAction
 {

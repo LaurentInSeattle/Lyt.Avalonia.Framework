@@ -1,4 +1,4 @@
-﻿namespace Lyt.Avalonia.Controls.Toasting;
+﻿namespace Lyt.Avalonia.Mvvm.Toasting;
 
 public sealed class ToastMessage
 {

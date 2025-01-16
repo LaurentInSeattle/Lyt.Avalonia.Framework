@@ -1,11 +1,11 @@
 <Window 
+    x:Class="Lyt.Avalonia.Mvvm.Logging.LogViewerWindow"
 	xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-    x:Class="Lyt.Avalonia.Controls.Logging.LogViewerWindow"
-	xmlns:local="Lyt.Avalonia.Controls.Logging"
+	xmlns:local="Lyt.Avalonia.Mvvm.Logging"
     Title="Log Window" 
     Height="720" Width="980"
     FontSize="18"

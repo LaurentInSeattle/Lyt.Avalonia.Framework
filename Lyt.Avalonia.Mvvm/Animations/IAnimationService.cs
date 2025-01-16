@@ -1,4 +1,4 @@
-﻿namespace Lyt.Avalonia.Mvvm.Interfaces.Animations;
+﻿namespace Lyt.Avalonia.Mvvm.Animations;
 
 public interface IAnimationService
 {

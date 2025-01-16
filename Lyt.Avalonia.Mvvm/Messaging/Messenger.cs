@@ -1,4 +1,4 @@
-﻿namespace Lyt.Avalonia.Mvvm.Messenger;
+﻿namespace Lyt.Avalonia.Mvvm.Messaging;
 
 /// <summary>
 /// The Messenger is a Singleton class allowing objects to exchange messages.

@@ -1,6 +1,6 @@
-﻿namespace Lyt.Avalonia.Controls.Toasting;
+﻿namespace Lyt.Avalonia.Mvvm.Toasting;
 
-public sealed class ToastViewModel : Bindable<ToastView>
+public sealed class ToastViewModel : Bindable<ToastView> 
 {
     private const int NoDelay = 0;
     private const int MinDelay = 1_000;

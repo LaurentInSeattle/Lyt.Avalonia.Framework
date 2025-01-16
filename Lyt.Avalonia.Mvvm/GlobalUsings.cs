@@ -36,8 +36,6 @@ global using Avalonia.Reactive;
 global using Avalonia.Styling;
 global using Avalonia.Threading;
 
-global using Lyt.Avalonia.Controls.Logging;
-
 global using Lyt.Avalonia.Interfaces;
 global using Lyt.Avalonia.Interfaces.Logger;
 global using Lyt.Avalonia.Interfaces.Messenger;
@@ -46,8 +44,9 @@ global using Lyt.Avalonia.Interfaces.Profiler;
 global using Lyt.Avalonia.Interfaces.Random;
 global using Lyt.Avalonia.Interfaces.UserInterface;
 
+global using Lyt.Avalonia.Mvvm.Animations;
 global using Lyt.Avalonia.Mvvm.Behaviors;
 global using Lyt.Avalonia.Mvvm.Core;
-global using Lyt.Avalonia.Mvvm.Interfaces.Animations;
-global using Lyt.Avalonia.Mvvm.Messenger;
+global using Lyt.Avalonia.Mvvm.Logging;
+global using Lyt.Avalonia.Mvvm.Messaging;
 global using Lyt.Avalonia.Mvvm.Utilities;
