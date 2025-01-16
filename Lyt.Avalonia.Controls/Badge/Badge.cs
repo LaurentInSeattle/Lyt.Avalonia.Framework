@@ -16,10 +16,7 @@ public partial class Badge : ContentControl
 {
     private ContentPresenter? badgePresenter;
 
-    static Badge()
-    {
-        ClipToBoundsProperty.OverrideDefaultValue<Badge>(false);
-    }
+    static Badge() => ClipToBoundsProperty.OverrideDefaultValue<Badge>(false);
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -48,54 +45,54 @@ public partial class Badge : ContentControl
         {
             case BadgePosition.Right:
                 right = -this.badgePresenter.Bounds.Width / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Center;
-                BadgeHorizontalAlignment = HorizontalAlignment.Right;
+                this.BadgeVerticalAlignment = VerticalAlignment.Center;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Right;
                 break;
 
             case BadgePosition.Left:
                 left = -this.badgePresenter.Bounds.Width / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Center;
-                BadgeHorizontalAlignment = HorizontalAlignment.Left;
+                this.BadgeVerticalAlignment = VerticalAlignment.Center;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Left;
                 break;
 
             case BadgePosition.Top:
                 top = -this.badgePresenter.Bounds.Height / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Top;
-                BadgeHorizontalAlignment = HorizontalAlignment.Center;
+                this.BadgeVerticalAlignment = VerticalAlignment.Top;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Center;
                 break;
 
             case BadgePosition.Bottom:
-                bottom = -badgePresenter.Bounds.Height / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Bottom;
-                BadgeHorizontalAlignment = HorizontalAlignment.Center;
+                bottom = -this.badgePresenter.Bounds.Height / 2;
+                this.BadgeVerticalAlignment = VerticalAlignment.Bottom;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Center;
                 break;
 
             case BadgePosition.RightTop:
-                right = -badgePresenter.Bounds.Width / 2;
-                top = -badgePresenter.Bounds.Height / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Top;
-                BadgeHorizontalAlignment = HorizontalAlignment.Right;
+                right = -this.badgePresenter.Bounds.Width / 2;
+                top = -this.badgePresenter.Bounds.Height / 2;
+                this.BadgeVerticalAlignment = VerticalAlignment.Top;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Right;
                 break;
 
             case BadgePosition.LeftTop:
-                left = -badgePresenter.Bounds.Width / 2;
-                top = -badgePresenter.Bounds.Height / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Top;
-                BadgeHorizontalAlignment = HorizontalAlignment.Left;
+                left = -this.badgePresenter.Bounds.Width / 2;
+                top = -this.badgePresenter.Bounds.Height / 2;
+                this.BadgeVerticalAlignment = VerticalAlignment.Top;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Left;
                 break;
 
             case BadgePosition.RightBottom:
-                right = -badgePresenter.Bounds.Width / 2;
-                bottom = -badgePresenter.Bounds.Height / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Bottom;
-                BadgeHorizontalAlignment = HorizontalAlignment.Right;
+                right = -this.badgePresenter.Bounds.Width / 2;
+                bottom = -this.badgePresenter.Bounds.Height / 2;
+                this.BadgeVerticalAlignment = VerticalAlignment.Bottom;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Right;
                 break;
 
             case BadgePosition.LeftBottom:
-                left = -badgePresenter.Bounds.Width / 2;
-                bottom = -badgePresenter.Bounds.Height / 2;
-                BadgeVerticalAlignment = VerticalAlignment.Bottom;
-                BadgeHorizontalAlignment = HorizontalAlignment.Left;
+                left = -this.badgePresenter.Bounds.Width / 2;
+                bottom = -this.badgePresenter.Bounds.Height / 2;
+                this.BadgeVerticalAlignment = VerticalAlignment.Bottom;
+                this.BadgeHorizontalAlignment = HorizontalAlignment.Left;
                 break;
         }
 

@@ -4,8 +4,7 @@ public class EnumBooleanConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        string? parameterString = parameter as string;
-        if ((parameterString is null) || (value is null))
+        if ((parameter is not string parameterString) || (value is null))
         {
             return AvaloniaProperty.UnsetValue;
         }

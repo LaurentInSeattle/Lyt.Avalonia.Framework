@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace Lyt.Avalonia.Mvvm.Animations;
+﻿namespace Lyt.Avalonia.Mvvm.Animations;
 
 public sealed class AnimationService : IAnimationService
 {
@@ -56,10 +54,7 @@ public sealed class AnimationService : IAnimationService
                 });
 
         // Save the CancellationTokenSource should we fade in soon 
-        if (this.fadeOutAnimations is null)
-        {
-            this.fadeOutAnimations = [];
-        }
+        this.fadeOutAnimations ??= [];
 
         if (this.fadeOutAnimations.ContainsKey(control))
         {

@@ -269,7 +269,7 @@ public sealed class FileManagerModel : ModelBase, IModel
     {
         try
         {
-            string serialized = JsonSerializer.Serialize(deserialized, typeof(T), this.jsonSerializerOptions);
+            string serialized = JsonSerializer.Serialize(deserialized, this.jsonSerializerOptions);
             if (!string.IsNullOrWhiteSpace(serialized))
             {
                 return serialized;
@@ -289,7 +289,7 @@ public sealed class FileManagerModel : ModelBase, IModel
     {
         try
         {
-            object? deserialized = JsonSerializer.Deserialize(serialized, typeof(T), this.jsonSerializerOptions);
+            object? deserialized = JsonSerializer.Deserialize<T>(serialized, this.jsonSerializerOptions);
             if (deserialized is T deserializedOfT)
             {
                 return deserializedOfT;

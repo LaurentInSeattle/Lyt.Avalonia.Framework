@@ -64,12 +64,12 @@ public partial class PanZoomControl : UserControl
         }
 
         this.contentSize = control.Bounds.Size;
-        if ((contentSize.Width <= 0.000_001) || (contentSize.Height <= 0.000_001))
+        if ((this.contentSize.Width <= 0.000_001) || (this.contentSize.Height <= 0.000_001))
         {
             Debug.WriteLine("Invalid content size, forcing a layout pass");
             control.InvalidateVisual();
             this.contentSize = control.Bounds.Size;
-            if ((contentSize.Width <= 0.000_001) || (contentSize.Height <= 0.000_001))
+            if ((this.contentSize.Width <= 0.000_001) || (this.contentSize.Height <= 0.000_001))
             {
                 Debug.WriteLine("Still... Invalid content size");
             }

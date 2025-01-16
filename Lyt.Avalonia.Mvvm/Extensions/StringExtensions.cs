@@ -34,8 +34,8 @@ public static class StringExtensions
 
     public static string BeautifyEnumString(this string enumString)
     {
-        string eString = string.Empty;
-        if (enumString.Contains("_", StringComparison.InvariantCultureIgnoreCase))
+        string eString ;
+        if (enumString.Contains('_', StringComparison.InvariantCultureIgnoreCase))
         {
             eString = enumString.ToLower().Replace("_", " ").ToTitleCase();
             eString.Capitalize().Wordify();
