@@ -1,6 +1,6 @@
 ﻿namespace Lyt.Avalonia.Mvvm.Extensions;
 
-public static class StringExtensions
+public static partial class StringExtensions
 {
     public static string Capitalize(this string str)
     {
@@ -12,7 +12,7 @@ public static class StringExtensions
         return string.Concat(char.ToUpper(str[0]), str[1..]);
     }
 
-    public static TextInfo? UsaTextInfo;
+    private static TextInfo? UsaTextInfo;
 
     public static string ToTitleCase(this string phrase)
     {
@@ -72,7 +72,8 @@ public static class StringExtensions
         return enumString.BeautifyEnumString();
     }
 
-    private static Regex? WordifyingRegex;
+    [GeneratedRegex("(?<=[a-z])(?<x>[A-Z])|(?<=.)(?<x>[A-Z])(?=[a-z])")]
+    private static partial Regex WordifyingRegex();
 
     /// <summary>
     /// Add spaces to separate the capitalized words in the string,  i.e. insert a space before
@@ -84,13 +85,12 @@ public static class StringExtensions
     /// <returns>A wordified string.</returns>
     public static string Wordify(this string pascalCaseString)
     {
-        StringExtensions.WordifyingRegex ??= new Regex("(?<=[a-z])(?<x>[A-Z])|(?<=.)(?<x>[A-Z])(?=[a-z])");
         if (string.IsNullOrWhiteSpace(pascalCaseString))
         {
             return string.Empty;
         }
 
-        return StringExtensions.WordifyingRegex.Replace(pascalCaseString, " ${x}");
+        return WordifyingRegex().Replace(pascalCaseString, " ${x}");
     }
 
     public static string ToMonthOrdinal(this int value)

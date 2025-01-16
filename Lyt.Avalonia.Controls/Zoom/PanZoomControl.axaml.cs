@@ -106,6 +106,7 @@ public partial class PanZoomControl : UserControl
                 this.ZoomToFit();
                 break;
             case ActionRequest.One:
+                this.ZoomToOne();
                 break;
         }
     }

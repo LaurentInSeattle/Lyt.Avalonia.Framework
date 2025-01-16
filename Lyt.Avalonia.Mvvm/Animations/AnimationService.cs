@@ -2,10 +2,8 @@
 
 public sealed class AnimationService : IAnimationService
 {
-#pragma warning disable CA2211 // Non-constant fields should not be visible
     // Cannot be made const to use as a default parameter.
-    public static IterationCount OneIteration = IterationCount.Parse("1");
-#pragma warning restore CA2211 
+    private static readonly IterationCount OneIteration = IterationCount.Parse("1");
 
     private Dictionary<Control, CancellationTokenSource>? fadeOutAnimations; 
 
