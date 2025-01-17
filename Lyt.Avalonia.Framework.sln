@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.Avalonia.LocalizationTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.Search", "Lyt.Search\Lyt.Search.csproj", "{0577BEE4-7EF0-4366-A489-E4545696A3C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.Validation", "Lyt.Validation\Lyt.Validation.csproj", "{5A53F485-CAC1-4A20-9601-E027A9905F63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{0577BEE4-7EF0-4366-A489-E4545696A3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0577BEE4-7EF0-4366-A489-E4545696A3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0577BEE4-7EF0-4366-A489-E4545696A3C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A53F485-CAC1-4A20-9601-E027A9905F63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A53F485-CAC1-4A20-9601-E027A9905F63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A53F485-CAC1-4A20-9601-E027A9905F63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A53F485-CAC1-4A20-9601-E027A9905F63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

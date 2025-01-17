@@ -1,6 +1,6 @@
 ﻿namespace Lyt.Avalonia.Localizer;
 
-public sealed class LocalizerModel : ModelBase
+public sealed class LocalizerModel : ModelBase, ILocalizer
 {
     private readonly Application application;
     private readonly FileManagerModel fileManagerModel;
