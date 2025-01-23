@@ -2,32 +2,17 @@
 
 public sealed class FieldValidator<T>(
     Bindable viewModel, FieldValidatorParameters<T> parameters)
-    : FieldValidator(viewModel)
+    : FieldValidator(viewModel, typeof(T), parameters)
     where T : IParsable<T>
 {
     private readonly FieldValidatorParameters<T> parameters = parameters;
 
-    public Type TargetType => typeof(T);
+    public new FieldValidatorParameters<T> Parameters => this.parameters;
 
-    public FieldValidatorResults<T> Validate()
+    public override FieldValidatorResults<T> Validate()
     {
         string ShowValidationMessage(string message)
-        {
-            if (!string.IsNullOrWhiteSpace(this.parameters.MessagePropertyName) &&
-                !string.IsNullOrWhiteSpace(message))
-            {
-                // Localize message if a localizer is available 
-                var localizer = Validators.Validators.Localizer;
-                if (localizer is not null)
-                {
-                    message = localizer.Lookup(message);
-                }
-
-                this.viewModel.Set<string>(this.parameters.SourcePropertyName, message);
-            }
-
-            return message;
-        }
+            => this.viewModel.ShowValidationMessage(this.parameters.MessagePropertyName, message);
 
         // Get property value 
         string propertyText = string.Empty;

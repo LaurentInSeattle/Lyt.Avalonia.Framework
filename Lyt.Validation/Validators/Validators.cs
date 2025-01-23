@@ -42,6 +42,25 @@ public static partial class Validators
         return result.IsValid;
     }
 
+    public static string ShowValidationMessage(this Bindable viewModel, string? messagePropertyName, string message)
+    {
+        if (!string.IsNullOrWhiteSpace(messagePropertyName) &&
+            !string.IsNullOrWhiteSpace(message))
+        {
+            // Localize message if a localizer is available 
+            var localizer = Localizer;
+            if (localizer is not null)
+            {
+                message = localizer.Lookup(message);
+            }
+
+            viewModel.Set<string>(messagePropertyName, message);
+        }
+
+        return message;
+    }
+
+
     // Duplicated to avoid referencing another assembly 
     public static bool Is<T>(this Type type) => typeof(T) == type;
 
@@ -52,6 +71,40 @@ public static partial class Validators
     public static bool TryParse<T>(this string s, out T? value, IFormatProvider? provider = null) 
         where T : IParsable<T>
         => TryParse<T>(s, out value, provider);
+
+    public static void InvokeSetProperty(this object target, string propertyName, object? value)
+    {
+        var propertyInfo = target.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (propertyInfo is null)
+        {
+            return;
+        }
+
+        var methodInfo = propertyInfo.GetSetMethod();
+        if (methodInfo is null)
+        {
+            return;
+        }
+
+        methodInfo.Invoke(target, [value]);
+    }
+
+    public static object? InvokeGetProperty(this object target, string propertyName)
+    {
+        var propertyInfo = target.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (propertyInfo is null)
+        {
+            return null;
+        }
+
+        var methodInfo = propertyInfo.GetGetMethod();
+        if (methodInfo is null)
+        {
+            return null;
+        }
+
+        return methodInfo.Invoke(target, null);
+    }
 }
 
 public static partial class Validators
