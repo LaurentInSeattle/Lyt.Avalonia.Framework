@@ -1,51 +1,97 @@
 ﻿namespace Lyt.Validation;
 
-public sealed record class FieldValidatorParameters<T>
-    (
-        string SourcePropertyName,
-        AbstractValidator<T> Validator,
-        string MessagePropertyName ="" 
-    )
-{
-}
-
-public sealed record class FieldValidatorResults<T>
-    (
-        bool IsValid = false,
-        bool HasValue =false, 
-        T? Value = default, 
-        string Message = ""
-    )
-{
-}
-
 public sealed class FieldValidator<T>(Bindable viewModel, FieldValidatorParameters<T> parameters)
+    where T : IParsable<T>
 {
+    public const string DefaultEmptyFieldMessage = "Validation.EmptyFieldMessageKey";
+    public const string DefaultFailedToParseMessage = "Validation.FailedToParseMessageKey";
+
     private readonly Bindable viewModel = viewModel;
     private readonly FieldValidatorParameters<T> parameters = parameters;
 
-    public FieldValidatorResults<T> Validate ()
+    public FieldValidatorResults<T> Validate()
     {
-        // Get property value 
-        string propertyText = this.parameters.SourcePropertyName;
-        // string propertyText = this.viewModel.Get(this.parameters.SourcePropertyName);
-
-        // Trim 
-
-        // Parse (if needed) 
-        bool failedToParse = false;
-        if (failedToParse)
+        string ShowValidationMessage(string message)
         {
-            // Localize message 
-            string parseMessage = "Cant parse";
-            var parseResults = new FieldValidatorResults<T>(IsValid: false, HasValue: false, Message: parseMessage);
-            return parseResults;
+            if (!string.IsNullOrWhiteSpace(this.parameters.MessagePropertyName) &&
+                !string.IsNullOrWhiteSpace(message))
+            {
+                // Localize message if a localizer is available 
+                var localizer = Validators.Validators.Localizer;
+                if (localizer is not null)
+                {
+                    message = localizer.Lookup(message);
+                }
+
+                this.viewModel.Set<string>(this.parameters.SourcePropertyName, message);
+            }
+
+            return message;
         }
 
-        T? propertyValue = default; 
-        bool isValid = propertyValue!.IsValid<AbstractValidator<T>, T>( out string message);
-        // Localize message 
-        var results = new FieldValidatorResults<T>(IsValid: isValid, HasValue: true, Message: message);
-        return results;
+        // Get property value 
+        string propertyText = string.Empty;
+        string? maybePropertyText = this.viewModel.Get<string>(this.parameters.SourcePropertyName);
+        bool isEmpty = string.IsNullOrWhiteSpace(maybePropertyText);
+        if (!isEmpty)
+        {
+            // Trim 
+            propertyText = maybePropertyText!;
+            propertyText = propertyText.Trim();
+            isEmpty = string.IsNullOrWhiteSpace(propertyText);
+        }
+
+        if (isEmpty)
+        {
+            // Clear white space noise 
+            this.viewModel.Set<string>(this.parameters.SourcePropertyName, string.Empty);
+
+            if (this.parameters.AllowEmpty)
+            {
+                return
+                    new FieldValidatorResults<T>(IsValid: true, HasValue: false, Value: default);
+            }
+            else
+            {
+                string emptyMessage = this.parameters.EmptyFieldMessage;
+                emptyMessage = string.IsNullOrWhiteSpace(emptyMessage) ? DefaultEmptyFieldMessage : emptyMessage;
+                emptyMessage = ShowValidationMessage(emptyMessage);
+                return
+                    new FieldValidatorResults<T>(IsValid: false, HasValue: false, Message: emptyMessage);
+            }
+        }
+
+        // Check if parsing is needed 
+        T propertyValue;
+        if (typeof(string).Is<T>() && propertyText is T propertyString)
+        {
+            // Target type is string, no parsing needed
+            propertyValue = propertyString;
+        }
+        else
+        {
+            // Need to parse  
+            bool isParsed = propertyText.TryParse<T>(out T? maybeValue);
+            if (!isParsed || maybeValue is not T value)
+            {
+                // failed to parse
+                string parseMessage = this.parameters.FailedToParseMessage;
+                parseMessage = string.IsNullOrWhiteSpace(parseMessage) ? DefaultFailedToParseMessage : parseMessage;
+                parseMessage = ShowValidationMessage(parseMessage);
+                var parseResults = new FieldValidatorResults<T>(IsValid: false, HasValue: false, Message: parseMessage);
+                return parseResults;
+            }
+
+            propertyValue = value;
+        }
+
+        // Now we have a value: Run the Fluent Validator 
+        bool isValid = propertyValue.IsValid<AbstractValidator<T>, T>(out string message);
+        if (!isValid)
+        {
+            ShowValidationMessage(message);
+        }
+
+        return new FieldValidatorResults<T>(IsValid: isValid, HasValue: true, Value: propertyValue);
     }
 }

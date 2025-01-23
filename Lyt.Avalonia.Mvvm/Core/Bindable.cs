@@ -175,7 +175,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     public virtual void Deactivate() => this.LogDeactivation();
 
     /// <summary> Gets the value of a property </summary>
-    protected T? Get<T>([CallerMemberName] string? name = null)
+    public T? Get<T>([CallerMemberName] string? name = null)
     {
         if (name is null)
         {
@@ -188,7 +188,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
 
     /// <summary> Sets the value of a property </summary>
     /// <returns> True, if the value was changed, false otherwise. </returns>
-    protected bool Set<T>(T? value, [CallerMemberName] string? name = null)
+    public bool Set<T>(T? value, [CallerMemberName] string? name = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {

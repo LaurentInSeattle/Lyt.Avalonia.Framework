@@ -1,4 +1,6 @@
-﻿namespace Lyt.Validation.Validators;
+﻿using Lyt.Avalonia.Interfaces.Localization;
+
+namespace Lyt.Validation.Validators;
 
 public static partial class Validators
 {
@@ -8,6 +10,7 @@ public static partial class Validators
         { typeof(Password), new Password() },
     };
 
+    public static ILocalizer? Localizer { get; private set; }
 
     public static bool IsValid<TValidator, TType>(this TType toValidate, out string message)
         where TValidator : AbstractValidator<TType>
@@ -40,9 +43,15 @@ public static partial class Validators
     }
 
     // Duplicated to avoid referencing another assembly 
+    public static bool Is<T>(this Type type) => typeof(T) == type;
+
     public static bool DerivesFrom<TBase>(this Type type)
         where TBase : class
         => typeof(TBase).IsAssignableFrom(type);
+
+    public static bool TryParse<T>(this string s, out T? value, IFormatProvider? provider = null) 
+        where T : IParsable<T>
+        => TryParse<T>(s, out value, provider);
 }
 
 public static partial class Validators
@@ -51,7 +60,6 @@ public static partial class Validators
     {
         public Email()
         {
-            // TODO: Localize once we are ready. :)
             this.RuleFor(x => x)
                 .NotEmpty().WithMessage("Your email cannot be empty")
                 .EmailAddress().WithMessage("This email is invalid or malformed.");
@@ -62,7 +70,6 @@ public static partial class Validators
     {
         public Password()
         {
-            // TODO: Localize once we are ready. :)
             this.RuleFor(x => x)
                 .NotEmpty().WithMessage("Your password cannot be empty")
                 .MinimumLength(10).WithMessage("Your password length must be at least 10.")
