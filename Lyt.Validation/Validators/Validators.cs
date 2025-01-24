@@ -1,24 +1,30 @@
-﻿using Lyt.Avalonia.Interfaces.Localization;
+﻿namespace Lyt.Validation.Validators;
 
-namespace Lyt.Validation.Validators;
-
+// TODO: Build that as a Service 
 public static partial class Validators
 {
-    private static readonly Dictionary<Type, object> validators = new()
-    {
-        { typeof(Email), new Email() },
-        { typeof(Password), new Password() },
-    };
+    // TODO: Allow apps to populate this 
+    // CONSIDER: Provide basic validators based on fluent 
+    private static readonly Dictionary<Type, object> validators = [];
 
     public static ILocalizer? Localizer { get; private set; }
 
     public static bool IsValid<TValidator, TType>(this TType toValidate, out string message)
         where TValidator : AbstractValidator<TType>
-        //where TType : class
     {
         if (!validators.TryGetValue(typeof(TValidator), out object? maybeValidator))
         {
             throw new Exception("No validator for type: " + typeof(TValidator).FullName);
+        }
+
+        return maybeValidator.IsValid(toValidate, out message);
+    }
+
+    public static bool IsValid<TValidator, TType>(this TValidator maybeValidator, TType toValidate, out string message)
+    {
+        if (maybeValidator is null)
+        {
+            throw new Exception("Null validator");
         }
 
         if (!maybeValidator.GetType().DerivesFrom<AbstractValidator<TType>>())
@@ -54,12 +60,21 @@ public static partial class Validators
                 message = localizer.Lookup(message);
             }
 
-            viewModel.Set<string>(messagePropertyName, message);
+            // Set property: value comes first for Set
+            viewModel.Set<string>(message, messagePropertyName);
         }
 
         return message;
     }
 
+    public static void ClearValidationMessage(this Bindable viewModel, string? messagePropertyName)
+    {
+        if (!string.IsNullOrWhiteSpace(messagePropertyName))
+        {
+            // Nothing to Localize, Set property: value comes first for Set
+            viewModel.Set<string>(string.Empty, messagePropertyName);
+        }
+    }
 
     // Duplicated to avoid referencing another assembly 
     public static bool Is<T>(this Type type) => typeof(T) == type;
@@ -68,7 +83,7 @@ public static partial class Validators
         where TBase : class
         => typeof(TBase).IsAssignableFrom(type);
 
-    public static bool TryParse<T>(this string s, out T? value, IFormatProvider? provider = null) 
+    public static bool TryParse<T>(this string s, out T? value, IFormatProvider? provider = null)
         where T : IParsable<T>
         => TryParse<T>(s, out value, provider);
 
@@ -104,31 +119,5 @@ public static partial class Validators
         }
 
         return methodInfo.Invoke(target, null);
-    }
-}
-
-public static partial class Validators
-{
-    public class Email : AbstractValidator<string>
-    {
-        public Email()
-        {
-            this.RuleFor(x => x)
-                .NotEmpty().WithMessage("Your email cannot be empty")
-                .EmailAddress().WithMessage("This email is invalid or malformed.");
-        }
-    }
-
-    public class Password : AbstractValidator<string>
-    {
-        public Password()
-        {
-            this.RuleFor(x => x)
-                .NotEmpty().WithMessage("Your password cannot be empty")
-                .MinimumLength(10).WithMessage("Your password length must be at least 10.")
-                .MaximumLength(20).WithMessage("Your password length must not exceed 20.")
-                .Matches(@"[a-z]+").WithMessage("Your password must contain at least one lowercase letter.")
-                .Matches(@"[0-9]+").WithMessage("Your password must contain at least one number.");
-        }
     }
 }

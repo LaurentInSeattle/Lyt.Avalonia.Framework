@@ -28,13 +28,13 @@ public sealed class FieldValidator<T>(
 
         if (isEmpty)
         {
-            // Clear white space noise 
-            this.viewModel.Set<string>(this.parameters.SourcePropertyName, string.Empty);
+            // Clear white space noise (value comes first for Set) 
+            this.viewModel.Set<string>(string.Empty, this.parameters.SourcePropertyName);
 
             if (this.parameters.AllowEmpty)
             {
                 return
-                    new FieldValidatorResults<T>(IsValid: true, HasValue: false, Value: default);
+                    new FieldValidatorResults<T>(IsValid: true);
             }
             else
             {
@@ -42,7 +42,7 @@ public sealed class FieldValidator<T>(
                 emptyMessage = string.IsNullOrWhiteSpace(emptyMessage) ? DefaultEmptyFieldMessage : emptyMessage;
                 emptyMessage = ShowValidationMessage(emptyMessage);
                 return
-                    new FieldValidatorResults<T>(IsValid: false, HasValue: false, Message: emptyMessage);
+                    new FieldValidatorResults<T>(Message: emptyMessage);
             }
         }
 
@@ -63,20 +63,28 @@ public sealed class FieldValidator<T>(
                 string parseMessage = this.parameters.FailedToParseMessage;
                 parseMessage = string.IsNullOrWhiteSpace(parseMessage) ? DefaultFailedToParseMessage : parseMessage;
                 parseMessage = ShowValidationMessage(parseMessage);
-                var parseResults = new FieldValidatorResults<T>(IsValid: false, HasValue: false, Message: parseMessage);
+                var parseResults = new FieldValidatorResults<T>(Message: parseMessage);
                 return parseResults;
             }
 
             propertyValue = value;
         }
 
-        // Now we have a value: Run the Fluent Validator 
-        bool isValid = propertyValue.IsValid<AbstractValidator<T>, T>(out string message);
-        if (!isValid)
+        // Now we have a value: Run the Fluent Validator if we have one, 
+        // If no validator is specified, it's all done and valid...
+        var validator = this.parameters.Validator;
+        if (validator != null) 
         {
-            ShowValidationMessage(message);
+            bool isValid = validator.IsValid(propertyValue, out string message);
+            if (!isValid)
+            {
+                ShowValidationMessage(message);
+                return
+                    new FieldValidatorResults<T>(Message: message);
+            }
         }
 
-        return new FieldValidatorResults<T>(IsValid: isValid, HasValue: true, Value: propertyValue);
+        this.viewModel.ClearValidationMessage(this.parameters.MessagePropertyName);
+        return new FieldValidatorResults<T>(IsValid: true, HasValue: true, Value: propertyValue);
     }
 }

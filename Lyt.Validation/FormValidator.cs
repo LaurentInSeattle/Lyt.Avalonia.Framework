@@ -1,6 +1,6 @@
 ﻿namespace Lyt.Validation;
 
-public sealed record class FormValidatorResults<T> 
+public sealed record class FormValidatorResults<T>
     (
         T? Value = default,
         bool IsValid = false,
@@ -11,7 +11,7 @@ public sealed record class FormValidatorResults<T>
 public sealed record class FormValidatorParameters<T>
     (
         IEnumerable<FieldValidator> FieldValidators,
-        AbstractValidator<T> FormValidator,
+        AbstractValidator<T>? FormValidator = null,
         string MessagePropertyName = ""
     );
 
@@ -19,12 +19,12 @@ public sealed class FormValidator<T>(Bindable viewModel, FormValidatorParameters
     where T : class, new()
 {
     private readonly Bindable viewModel = viewModel;
-    private readonly FormValidatorParameters<T> parameters = parameters; 
+    private readonly FormValidatorParameters<T> parameters = parameters;
     private readonly List<FieldValidator> fieldValidators = new(parameters.FieldValidators);
 
     public Type TargetType => typeof(T);
 
-    public FormValidatorResults<T> Validate () 
+    public FormValidatorResults<T> Validate()
     {
         string ShowValidationMessage(string message)
             => this.viewModel.ShowValidationMessage(this.parameters.MessagePropertyName, message);
@@ -52,20 +52,23 @@ public sealed class FormValidator<T>(Bindable viewModel, FormValidatorParameters
 
             // Copy validated property value into new object 
             string propertyName = fieldValidator.Parameters.SourcePropertyName;
-            object? propertyValue = result.InvokeGetProperty("Value"); 
+            object? propertyValue = result.InvokeGetProperty("Value");
             formValue.InvokeSetProperty(propertyName, propertyValue);
         }
 
-        // 2-b Validate the resulting object 
-        bool isValid = formValue.IsValid<AbstractValidator<T>, T>(out string message);
-        if (!isValid)
+        // 2-b Validate the resulting object if a validator is provided 
+        var maybeValidator = this.parameters.FormValidator; 
+        if (maybeValidator is not null)
         {
-            ShowValidationMessage(message);
-            return new FormValidatorResults<T>(IsValid: false, Message: message);
+            bool isValid = maybeValidator.IsValid(formValue, out string message);
+            if (!isValid)
+            {
+                ShowValidationMessage(message);
+                return new FormValidatorResults<T>(IsValid: false, Message: message);
+            }
         }
 
         // All passed, fully validated 
         return new FormValidatorResults<T>(IsValid: true, HasValue: true, Value: formValue);
     }
-
 }

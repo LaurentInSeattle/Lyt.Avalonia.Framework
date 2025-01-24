@@ -11,8 +11,8 @@ public record class FieldValidatorParameters
 
 public sealed record class FieldValidatorParameters<T>
 (
-    AbstractValidator<T> Validator,
     string SourcePropertyName,
+    AbstractValidator<T>? Validator = null,
     bool AllowEmpty = false,
     string MessagePropertyName = "",
     string EmptyFieldMessage = "",
