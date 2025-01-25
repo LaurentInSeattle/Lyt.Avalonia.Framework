@@ -1,25 +1,7 @@
-﻿namespace Lyt.Validation.Validators;
+﻿namespace Lyt.Validation.Extensions;
 
-// TODO: Build that as a Service 
-public static partial class Validators
+public static class ValidationExtensions
 {
-    // TODO: Allow apps to populate this 
-    // CONSIDER: Provide basic validators based on fluent 
-    private static readonly Dictionary<Type, object> validators = [];
-
-    public static ILocalizer? Localizer { get; private set; }
-
-    public static bool IsValid<TValidator, TType>(this TType toValidate, out string message)
-        where TValidator : AbstractValidator<TType>
-    {
-        if (!validators.TryGetValue(typeof(TValidator), out object? maybeValidator))
-        {
-            throw new Exception("No validator for type: " + typeof(TValidator).FullName);
-        }
-
-        return maybeValidator.IsValid(toValidate, out message);
-    }
-
     public static bool IsValid<TValidator, TType>(this TValidator maybeValidator, TType toValidate, out string message)
     {
         if (maybeValidator is null)
@@ -54,10 +36,9 @@ public static partial class Validators
             !string.IsNullOrWhiteSpace(message))
         {
             // Localize message if a localizer is available 
-            var localizer = Localizer;
-            if (localizer is not null)
+            if (viewModel.CanLocalize)
             {
-                message = localizer.Lookup(message);
+                message = viewModel.Localizer.Lookup(message);
             }
 
             // Set property: value comes first for Set

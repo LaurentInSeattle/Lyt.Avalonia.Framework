@@ -7,6 +7,38 @@ public class DoNotLogAttribute : Attribute { }
 /// <remarks> All bound properties are held in a dictionary.</remarks>
 public class Bindable : NotifyPropertyChanged, ISupportBehaviors
 {
+    private static readonly ILocalizer? StaticLocalizer;
+
+    private static readonly ILogger StaticLogger;
+
+    private static readonly IMessenger StaticMessenger;
+
+    private static readonly IProfiler StaticProfiler; 
+
+    static Bindable()
+    {
+        try
+        {
+            StaticMessenger = ApplicationBase.GetRequiredService<IMessenger>();
+            StaticLogger = ApplicationBase.GetRequiredService<ILogger>();
+            StaticProfiler = ApplicationBase.GetRequiredService<IProfiler>();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Missing essential services \n" + ex.ToString());
+            throw;
+        }
+
+        try
+        {
+            StaticLocalizer = ApplicationBase.GetRequiredService<ILocalizer>();
+        }
+        catch (Exception ex)
+        {
+            StaticLogger.Warning("Missing localizer services, will not be able to localize. \n" + ex.ToString());
+        }
+    }
+
     /// <summary> The property currently being set. </summary>
     /// <remarks> 
     /// Needed in some special cases to prevent spurious calls to Set from Avalonia controls, such as the radio button.
@@ -21,41 +53,13 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     protected readonly Dictionary<string, MethodInfo> actions = [];
 
     public Bindable(bool disablePropertyChangedLogging = false, bool disableAutomaticBindingsLogging = false)
+        : this() 
     {
         this.DisablePropertyChangedLogging = disablePropertyChangedLogging;
         this.DisableAutomaticBindingsLogging = disableAutomaticBindingsLogging;
-        try
-        {
-            this.Messenger = ApplicationBase.GetRequiredService<IMessenger>();
-            this.Logger = ApplicationBase.GetRequiredService<ILogger>();
-            this.Profiler = ApplicationBase.GetRequiredService<IProfiler>();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine("Missing essential services \n" + ex.ToString());
-            throw;
-        }
-
-        this.Construct();
     }
 
     public Bindable()
-    {
-        try
-        {
-            this.Messenger = ApplicationBase.GetRequiredService<IMessenger>();
-            this.Logger = ApplicationBase.GetRequiredService<ILogger>();
-            this.Profiler = ApplicationBase.GetRequiredService<IProfiler>();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine("Missing essential services \n" + ex.ToString());
-            throw;
-        }
-        this.Construct();
-    }
-
-    private void Construct()
     {
         try
         {
@@ -69,11 +73,22 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
         }
     }
 
-    public ILogger Logger { get; private set; }
+#pragma warning disable IDE0079
+#pragma warning disable CA1822 // Mark members as static
 
-    public IMessenger Messenger { get; private set; }
+    public bool CanLocalize => StaticLocalizer is not null;
 
-    public IProfiler Profiler { get; private set; }
+    public ILocalizer Localizer => 
+        this.CanLocalize ? StaticLocalizer! : throw new Exception("Should have checked CanLocalize property."); 
+
+    public ILogger Logger => StaticLogger;
+
+    public IMessenger Messenger => StaticMessenger;
+
+    public IProfiler Profiler => StaticProfiler;
+
+#pragma warning restore CA1822 // Mark members as static
+#pragma warning restore IDE0079
 
     /// <summary> The control, its Data Context is this instance. </summary>
     /// <remarks> Aka, the "View" </remarks>
