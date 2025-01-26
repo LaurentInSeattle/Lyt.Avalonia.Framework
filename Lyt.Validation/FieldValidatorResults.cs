@@ -13,4 +13,8 @@ public sealed record class FieldValidatorResults<T>
     bool IsValid = false,
     bool HasValue = false,
     string Message = ""
-) : FieldValidatorResults(IsValid , HasValue , Message );
+) : FieldValidatorResults(IsValid , HasValue , Message )
+{
+    public T SafeValue 
+        => this.HasValue ? this.Value! : throw new Exception("Should have checked 'HasValue'..."); 
+}
