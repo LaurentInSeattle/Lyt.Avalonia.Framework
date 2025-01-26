@@ -13,7 +13,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
 
     private static readonly IMessenger StaticMessenger;
 
-    private static readonly IProfiler StaticProfiler; 
+    private static readonly IProfiler StaticProfiler;
 
     static Bindable()
     {
@@ -31,11 +31,15 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
 
         try
         {
-            StaticLocalizer = ApplicationBase.GetRequiredService<ILocalizer>();
+            StaticLocalizer = ApplicationBase.GetOptionalService<ILocalizer>();
+            if (StaticLocalizer is null)
+            {
+                StaticLogger.Error("Missing localizer service, will not be able to localize. \n");
+            }
         }
         catch (Exception ex)
         {
-            StaticLogger.Warning("Missing localizer services, will not be able to localize. \n" + ex.ToString());
+            StaticLogger.Error("Exception when trying to retrieve localizer service. \n" + ex.ToString());
         }
     }
 
@@ -45,7 +49,6 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     /// =>> Last implemented solution was creating issues of view models non updating properly. 
     /// </remarks>
     //  private string setPropertyName = string.Empty;
-
     /// <summary> The bounds properties.</summary>
     protected readonly Dictionary<string, object?> properties = [];
 
@@ -53,7 +56,7 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     protected readonly Dictionary<string, MethodInfo> actions = [];
 
     public Bindable(bool disablePropertyChangedLogging = false, bool disableAutomaticBindingsLogging = false)
-        : this() 
+        : this()
     {
         this.DisablePropertyChangedLogging = disablePropertyChangedLogging;
         this.DisableAutomaticBindingsLogging = disableAutomaticBindingsLogging;
@@ -78,8 +81,8 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
 
     public bool CanLocalize => StaticLocalizer is not null;
 
-    public ILocalizer Localizer => 
-        this.CanLocalize ? StaticLocalizer! : throw new Exception("Should have checked CanLocalize property."); 
+    public ILocalizer Localizer =>
+        this.CanLocalize ? StaticLocalizer! : throw new Exception("Should have checked CanLocalize property.");
 
     public ILogger Logger => StaticLogger;
 
