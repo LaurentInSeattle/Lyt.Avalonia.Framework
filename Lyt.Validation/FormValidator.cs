@@ -1,4 +1,8 @@
-﻿namespace Lyt.Validation;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
+using Lyt.Avalonia.Mvvm.Utilities;
+
+namespace Lyt.Validation;
 
 public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
     where T : class, new()
@@ -17,6 +21,25 @@ public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
 
         viewModel.ClearValidationMessage(this.parameters.MessagePropertyName);
         this.SetFormValidProperty(viewModel, isValid: false);
+
+        bool focused = false;
+        string? focusFieldName = this.parameters.FocusFieldName;
+        if (!string.IsNullOrWhiteSpace(focusFieldName))
+        {
+            var field = viewModel.GetControlByName(focusFieldName);
+            if (field is Control control && control.Focusable)
+            {
+                focused = true;
+                // viewModel.Logger.Debug(viewModel.GetType().Name + ": Focus on : " + focusFieldName);
+                // Why we need to wait is still a bit of a mistery !
+                Schedule.OnUiThread(222, () => { control.Focus(); }, DispatcherPriority.ApplicationIdle);
+            }
+        }
+
+        if (!focused)
+        {
+            viewModel.Logger.Warning(viewModel.GetType().Name + ": Focus has not been set.");
+        }
     }
 
     public FormValidatorResults<T> Validate(Bindable viewModel)

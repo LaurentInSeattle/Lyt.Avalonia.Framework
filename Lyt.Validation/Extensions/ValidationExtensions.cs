@@ -1,4 +1,6 @@
-﻿namespace Lyt.Validation.Extensions;
+﻿using Avalonia.Controls;
+
+namespace Lyt.Validation.Extensions;
 
 public static class ValidationExtensions
 {
@@ -100,5 +102,22 @@ public static class ValidationExtensions
         }
 
         return methodInfo.Invoke(target, null);
+    }
+
+    public static Control? GetControlByName(this Bindable bindable, string name)
+    {
+        if ((string.IsNullOrWhiteSpace(name)) || (bindable.Control is null))
+        {
+            return null;
+        }
+
+        var view = bindable.Control;
+        object? maybeControl = view.FindControl<Control>(name);
+        if (maybeControl is Control control)
+        {
+            return control;
+        }
+
+        return null;
     }
 }
