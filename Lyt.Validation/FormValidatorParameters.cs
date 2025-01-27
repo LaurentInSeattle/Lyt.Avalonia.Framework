@@ -12,5 +12,6 @@ public sealed record class FormValidatorParameters<T>
     (
         IEnumerable<FieldValidator> FieldValidators,
         AbstractValidator<T>? FormValidator = null,
-        string MessagePropertyName = ""
+        string MessagePropertyName = "",
+        string FormValidPropertyName = ""
     );

@@ -1,26 +1,40 @@
 ﻿namespace Lyt.Validation;
 
-public sealed class FormValidator<T>(Bindable viewModel, FormValidatorParameters<T> parameters)
+public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
     where T : class, new()
 {
-    private readonly Bindable viewModel = viewModel;
     private readonly FormValidatorParameters<T> parameters = parameters;
     private readonly List<FieldValidator> fieldValidators = new(parameters.FieldValidators);
 
     public Type TargetType => typeof(T);
 
-    public FormValidatorResults<T> Validate()
+    public void Clear(Bindable viewModel)
+    {
+        foreach (var fieldValidator in this.fieldValidators)
+        {
+            fieldValidator.Clear(viewModel);
+        }
+
+        viewModel.ClearValidationMessage(this.parameters.MessagePropertyName);
+        this.SetFormValidProperty(viewModel, isValid: false);
+    }
+
+    public FormValidatorResults<T> Validate(Bindable viewModel)
     {
         string ShowValidationMessage(string message)
-            => this.viewModel.ShowValidationMessage(this.parameters.MessagePropertyName, message);
+            => viewModel.ShowValidationMessage(this.parameters.MessagePropertyName, message);
+
+        void SetFormValidProperty(bool isValid)
+            => this.SetFormValidProperty(viewModel, isValid);
 
         // Step #1 : Validate field by field 
         List<FieldValidatorResults> results = [];
         foreach (var fieldValidator in this.fieldValidators)
         {
-            var result = fieldValidator.Validate();
+            var result = fieldValidator.Validate(viewModel);
             if (!result.IsValid)
             {
+                SetFormValidProperty(isValid: false);
                 return new FormValidatorResults<T>(IsValid: false);
             }
 
@@ -42,18 +56,29 @@ public sealed class FormValidator<T>(Bindable viewModel, FormValidatorParameters
         }
 
         // 2-b Validate the resulting object if a validator is provided 
-        var maybeValidator = this.parameters.FormValidator; 
+        var maybeValidator = this.parameters.FormValidator;
         if (maybeValidator is not null)
         {
             bool isValid = maybeValidator.IsValid(formValue, out string message);
             if (!isValid)
             {
+                SetFormValidProperty(isValid: false);
                 ShowValidationMessage(message);
                 return new FormValidatorResults<T>(IsValid: false, Message: message);
             }
         }
 
         // All passed, fully validated 
+        SetFormValidProperty(isValid: true);
         return new FormValidatorResults<T>(IsValid: true, HasValue: true, Value: formValue);
+    }
+
+    private void SetFormValidProperty(Bindable viewModel, bool isValid)
+    {
+        string propertyName = this.parameters.FormValidPropertyName;
+        if (!string.IsNullOrWhiteSpace(propertyName))
+        {
+            viewModel.InvokeSetProperty(propertyName, isValid);
+        }
     }
 }
