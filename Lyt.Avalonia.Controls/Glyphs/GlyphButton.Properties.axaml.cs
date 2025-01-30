@@ -82,32 +82,59 @@ public partial class GlyphButton
 
     /// <summary> IsDisabled Styled Property </summary>
     public static readonly StyledProperty<bool> IsDisabledProperty =
-        AvaloniaProperty.Register<GlyphButton, bool>(nameof(IsDisabled), defaultValue: false);
+        AvaloniaProperty.Register<GlyphButton, bool>(
+            nameof(IsDisabled), 
+            defaultValue: false,
+            inherits: false,
+            defaultBindingMode: BindingMode.OneWay,
+            validate: null,
+            coerce: CoerceIsDisabled,
+            enableDataValidation: false);
 
     /// <summary> Gets or sets the IsDisabled property.</summary>
     public bool IsDisabled
     {
         get => this.GetValue(IsDisabledProperty);
-        set
+        set => this.SetValue(IsDisabledProperty, value);
+    }
+
+    private static bool CoerceIsDisabled(AvaloniaObject sender, bool newIsDisabled)
+    {
+        if (sender is GlyphButton glyphButton)
         {
-            this.SetValue(IsDisabledProperty, value);
-            this.UpdateVisualState();
+            glyphButton.isDisabled = newIsDisabled;
+            glyphButton.UpdateVisualState();
         }
+
+        return newIsDisabled;
     }
 
     /// <summary> IsSelected Styled Property </summary>
     public static readonly StyledProperty<bool> IsSelectedProperty =
-        AvaloniaProperty.Register<GlyphButton, bool>(nameof(IsSelected), defaultValue: false);
+        AvaloniaProperty.Register<GlyphButton, bool>(nameof(IsSelected),
+            defaultValue: false,
+            inherits: false,
+            defaultBindingMode: BindingMode.OneWay,
+            validate: null,
+            coerce: CoerceIsSelected,
+            enableDataValidation: false);
 
     /// <summary> Gets or sets the IsSelected property.</summary>
     public bool IsSelected
     {
         get => this.GetValue(IsSelectedProperty);
-        set
+        set => this.SetValue(IsSelectedProperty, value);
+    }
+
+    private static bool CoerceIsSelected(AvaloniaObject sender, bool newIsSelected)
+    {
+        if (sender is GlyphButton glyphButton)
         {
-            this.SetValue(IsSelectedProperty, value);
-            this.UpdateVisualState();
+            glyphButton.isSelected = newIsSelected;
+            glyphButton.UpdateVisualState();
         }
+
+        return newIsSelected;
     }
 
     /// <summary> Group Styled Property </summary>

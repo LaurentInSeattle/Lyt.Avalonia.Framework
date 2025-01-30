@@ -11,6 +11,8 @@ public partial class GlyphButton : UserControl, ICanSelect
     private const int CountdownTimerIntervalMilliseconds = 100;
     private const int ContinuousTimerIntervalMilliseconds = 250;
 
+    private bool isDisabled;
+    private bool isSelected;
     private DispatcherTimer? timer;
     private bool isOver;
     private DateTime pressedAt;
@@ -182,11 +184,11 @@ public partial class GlyphButton : UserControl, ICanSelect
 
     #region Visual States 
 
-    private bool IsHot => !this.isPressed && this.isOver && !this.IsDisabled; 
+    private bool IsHot => !this.isPressed && this.isOver && !this.isDisabled; 
 
     private void UpdateVisualState()
     {
-        if (this.isPressed && !this.IsDisabled)
+        if (this.isPressed && !this.isDisabled)
         {
             this.SetPressedVisualState();
         }
@@ -196,11 +198,11 @@ public partial class GlyphButton : UserControl, ICanSelect
         }
         else
         {
-            if (this.IsDisabled)
+            if (this.isDisabled)
             {
                 this.SetDisabledVisualState();
             }
-            else if (this.IsSelected)
+            else if (this.isSelected)
             {
                 this.SetSelectedVisualState();
             }
@@ -209,6 +211,8 @@ public partial class GlyphButton : UserControl, ICanSelect
                 this.SetNormalVisualState();
             }
         }
+
+        this.InvalidateVisual();
     }
 
     private void SetPressedVisualState()
