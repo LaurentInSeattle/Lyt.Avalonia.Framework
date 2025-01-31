@@ -1,4 +1,6 @@
-﻿namespace Lyt.Avalonia.Mvvm.Dialogs;
+﻿using Avalonia.Controls;
+
+namespace Lyt.Avalonia.Mvvm.Dialogs;
 
 public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialogService
 {
@@ -6,6 +8,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     private readonly ILogger logger = logger;
 
     private bool isClassHandlerRegistered;
+    private bool modalHostPanelHitTestVisible; 
     private Panel? modalHostPanel;
     private ModalHostControl? modalHostControl;
     private UserControl? modalUserControl;
@@ -104,12 +107,12 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         {
             if ((args.Key == Key.Escape) || (args.Key == Key.Enter))
             {
-                if (bindable.CanEscape && (args.Key == Key.Escape)) 
+                if (bindable.CanEscape && (args.Key == Key.Escape))
                 {
                     args.Handled = true;
                     bindable.Cancel();
                 }
-                else if (bindable.CanEnter && (args.Key == Key.Enter)) 
+                else if (bindable.CanEnter && (args.Key == Key.Enter))
                 {
                     args.Handled = true;
                     bindable.TrySaveAndClose();
@@ -138,17 +141,35 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
 
         try
         {
+            // #1 - Remove user control from the modal host control 
             if (this.modalUserControl is not null && this.modalHostControl is not null)
             {
-                this.modalHostControl.ContentGrid.Children.Remove(this.modalUserControl);
+                bool removedDialog = this.modalHostControl.ContentGrid.Children.Remove(this.modalUserControl);
+                if (!removedDialog)
+                {
+                    if (Debugger.IsAttached) { Debugger.Break(); }
+                    this.logger.Warning("Failed to remove user dialog from modal host ");
+                }
             }
 
+            // #2 - Remove host control from the host panel 
             if (this.modalHostPanel is not null && this.modalHostControl is not null)
             {
-                this.modalHostPanel.IsHitTestVisible = false;
-                this.modalHostPanel.Children.Remove(this.modalHostControl);
+                bool removedHost = this.modalHostPanel.Children.Remove(this.modalHostControl);
+                if (!removedHost)
+                {
+                    if (Debugger.IsAttached) { Debugger.Break(); }
+                    this.logger.Warning("Failed to remove modal host from host panel");
+                }
             }
 
+            // #3 - Restore host panel visibility state 
+            if (this.modalHostPanel is not null)
+            {
+                this.modalHostPanel.IsHitTestVisible = this.modalHostPanelHitTestVisible;
+            }
+
+            // #4 - Unhook keyboard events 
             if (this.isClassHandlerRegistered)
             {
                 ApplicationBase.MainWindow.RemoveHandler(InputElement.KeyDownEvent, this.OnKeyDown);
@@ -156,8 +177,8 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
             }
 
             this.modalHostControl = null;
-            this.modalHostPanel = null;
             this.modalUserControl = null;
+            this.modalHostPanel = null;
         }
         catch (Exception ex)
         {
@@ -172,13 +193,12 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
 
     private void ShowInternal(Panel panel, UserControl dialog)
     {
-        dialog.ZIndex = 999_999;
-        var host = new ModalHostControl(panel, (bool _) => { });
+        this.modalHostPanelHitTestVisible = panel.IsHitTestVisible;
+        panel.IsHitTestVisible = true; 
+        var host = new ModalHostControl();
         panel.Children.Add(host);
         host.ContentGrid.Children.Add(dialog);
-
         this.messenger.Publish(new ModalMessage(ModalMessage.Modal.Enter));
-        panel.IsHitTestVisible = true;
         this.modalHostPanel = panel;
         this.modalHostControl = host;
         this.modalUserControl = dialog;
