@@ -104,15 +104,20 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         {
             if ((args.Key == Key.Escape) || (args.Key == Key.Enter))
             {
-                args.Handled = true;
-                if (args.Key == Key.Escape)
+                if (bindable.CanEscape && (args.Key == Key.Escape)) 
                 {
+                    args.Handled = true;
                     bindable.Cancel();
                 }
-                else // if (args.Key == Key.Enter)
+                else if (bindable.CanEnter && (args.Key == Key.Enter)) 
                 {
+                    args.Handled = true;
                     bindable.TrySaveAndClose();
                 }
+
+                // Here; We could have Key == Enter and CanEnter == false 
+                // So dont move here: args.Handled = true; 
+                // or else Enters are ignored 
             }
             // else : NOT handled or else cant type anything :( 
         }

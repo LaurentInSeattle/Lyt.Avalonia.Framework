@@ -249,6 +249,10 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
         this.properties.Clear();
     }
 
+    public virtual bool CanEscape { get; set; } = true;
+
+    public virtual bool CanEnter { get; set; } = true;
+
     public virtual bool Validate() => true;
 
     public virtual bool TrySaveAndClose() => true;
