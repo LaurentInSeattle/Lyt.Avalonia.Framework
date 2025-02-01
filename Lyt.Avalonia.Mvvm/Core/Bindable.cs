@@ -257,6 +257,8 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
 
     public virtual bool TrySaveAndClose() => true;
 
+    public virtual void CancelViewModel() { }
+
     public virtual void Cancel() { }
 
     private void CreateAndBindCommands()

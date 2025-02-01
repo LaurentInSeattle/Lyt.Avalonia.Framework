@@ -45,9 +45,11 @@ public class DialogBindable<TControl, TParameters> : Bindable<TControl>
         return isValid;
     }
 
+    public override void CancelViewModel() => this.onClose?.Invoke(this, false);
+
     public override void Cancel()
     {
-        this.onClose?.Invoke(this, false);
+        this.CancelViewModel();
         this.dialogService.Dismiss();
     }
 }

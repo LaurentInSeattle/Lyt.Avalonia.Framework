@@ -4,6 +4,8 @@ public sealed class Toaster : IToaster
 {
     private readonly IMessenger messenger;
     private ToastViewModel? current;
+    private bool hostPanelHitTestVisibility;
+
     public Panel? hostPanel;
 
     public Toaster(IMessenger messenger)
@@ -67,6 +69,9 @@ public sealed class Toaster : IToaster
             throw new Exception("The Toaster Host Panel is not initialized.");
         }
 
+        // Restore the hit test status of the host panel 
+        panel.IsHitTestVisible = this.hostPanelHitTestVisibility;
+
         ToastView? view = this.current.View;
         if (view is not null)
         {
@@ -99,6 +104,10 @@ public sealed class Toaster : IToaster
             this.current.Show(show.Title, show.Message, show.Delay, show.Level);
             if (!panel.Children.Contains(view))
             {
+                // Save hit test status and make the panel clickable so that we can 
+                // dismiss toasts if needed.
+                this.hostPanelHitTestVisibility = panel.IsHitTestVisible;
+                panel.IsHitTestVisible = true ;
                 panel.Children.Add(view);
             } 
         }

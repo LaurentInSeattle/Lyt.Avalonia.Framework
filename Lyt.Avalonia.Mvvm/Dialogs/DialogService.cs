@@ -1,6 +1,4 @@
-﻿using Avalonia.Controls;
-
-namespace Lyt.Avalonia.Mvvm.Dialogs;
+﻿namespace Lyt.Avalonia.Mvvm.Dialogs;
 
 public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialogService
 {
@@ -8,7 +6,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     private readonly ILogger logger = logger;
 
     private bool isClassHandlerRegistered;
-    private bool modalHostPanelHitTestVisible; 
+    private bool modalHostPanelHitTestVisible;
     private Panel? modalHostPanel;
     private ModalHostControl? modalHostControl;
     private UserControl? modalUserControl;
@@ -20,7 +18,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     {
         try
         {
-            Panel panel = this.Guard(maybePanel);
+            Panel panel = this.GuardPanel(maybePanel);
             var viewModel = new ConfirmActionViewModel(parameters);
             viewModel.CreateViewAndBind();
             this.ShowInternal(panel, viewModel.View);
@@ -71,6 +69,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         }
     }
 
+    /// <summary> Run a view/view model modally, when no other is doing so. </summary>
     public void RunModal<TDialog, TParameters>(
         object maybePanel,
         DialogBindable<TDialog, TParameters> viewModel,
@@ -81,7 +80,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     {
         try
         {
-            Panel panel = this.Guard(maybePanel);
+            Panel panel = this.GuardPanel(maybePanel, isReplace: false);
             viewModel.CreateViewAndBind();
             viewModel.Initialize(onClose, parameters);
             this.ShowInternal(panel, viewModel.View);
@@ -98,6 +97,42 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
             throw;
         }
     }
+
+    /// <summary> Run a view/view model modally, when there is another on doing so. </summary>
+    public void ReplaceRunModal<TDialog, TParameters>(
+        DialogBindable<TDialog, TParameters> viewModel,
+        Action<object, bool>? onClose = null,
+        TParameters? parameters = null)
+        where TDialog : UserControl, new()
+        where TParameters : class
+    {
+        try
+        {
+            if ((this.modalUserControl is not null) &&
+                (this.modalUserControl.DataContext is Bindable bindable))
+            {
+                // This will try to invoke an OnClose delegate if any is defined 
+                bindable.CancelViewModel();
+            }
+
+            _ = this.GuardPanel(null, isReplace: true);
+            viewModel.CreateViewAndBind();
+            viewModel.Initialize(onClose, parameters);
+            this.ShowInternalReplace(viewModel.View);
+            if (!this.isClassHandlerRegistered)
+            {
+                ApplicationBase.MainWindow.AddHandler(
+                    InputElement.KeyDownEvent, this.OnKeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
+                this.isClassHandlerRegistered = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.Error("Failed to launch dialog, exception thrown: \n" + ex.ToString());
+            throw;
+        }
+    }
+
 
     private void OnKeyDown(object? _, KeyEventArgs args)
     {
@@ -194,7 +229,7 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
     private void ShowInternal(Panel panel, UserControl dialog)
     {
         this.modalHostPanelHitTestVisible = panel.IsHitTestVisible;
-        panel.IsHitTestVisible = true; 
+        panel.IsHitTestVisible = true;
         var host = new ModalHostControl();
         panel.Children.Add(host);
         host.ContentGrid.Children.Add(dialog);
@@ -204,20 +239,65 @@ public sealed class DialogService(IMessenger messenger, ILogger logger) : IDialo
         this.modalUserControl = dialog;
     }
 
-    private Panel Guard(object maybePanel)
+    private void ShowInternalReplace(UserControl dialog)
     {
-        if (this.IsModal)
+        if (this.modalUserControl is not null && this.modalHostControl is not null)
         {
-            // You should have checked if the service was modal, and if so, first
-            // invoke 'Dismiss' before launching a new dialog 
-            this.logger.Error("Already showing a modal");
-            throw new InvalidOperationException("Already showing a modal");
-        }
+            // #1 - Remove user control from the modal host control 
+            bool removedDialog = this.modalHostControl.ContentGrid.Children.Remove(this.modalUserControl);
+            if (!removedDialog)
+            {
+                if (Debugger.IsAttached) { Debugger.Break(); }
+                this.logger.Warning("Failed to remove user dialog from modal host ");
+            }
 
-        if (maybePanel is not Panel panel)
+            // #2 - Replace with the provided user control
+            this.modalHostControl.ContentGrid.Children.Add(dialog);
+            this.modalUserControl = dialog;
+        }
+    }
+
+    private Panel GuardPanel(object? maybePanel, bool isReplace = false)
+    {
+        Panel panel; 
+        if (isReplace)
         {
-            this.logger.Error("Must provide a host panel");
-            throw new InvalidOperationException("Must provide a host panel");
+            if (!this.IsModal)
+            {
+                // Nothing to replace: You should have checked if the service was modal
+                this.logger.Error("Not showing a modal");
+                throw new InvalidOperationException("Not showing a modal");
+            }
+
+            if ( this.modalHostPanel is not null )
+            {
+                panel = this.modalHostPanel;
+            }
+            else
+            {
+                this.logger.Error("No host panel");
+                throw new InvalidOperationException("No host panel");
+            }
+        }
+        else
+        {
+            if (this.IsModal)
+            {
+                // You should have checked if the service was modal, and if so, first
+                // invoke 'Dismiss' before launching a new dialog 
+                this.logger.Error("Already showing a modal");
+                throw new InvalidOperationException("Already showing a modal");
+            }
+
+            if (maybePanel is Panel p)
+            {
+                panel = p;
+            } 
+            else
+            {  
+                this.logger.Error("Must provide a host panel");
+                throw new InvalidOperationException("Must provide a host panel");
+            }
         }
 
         return panel;
