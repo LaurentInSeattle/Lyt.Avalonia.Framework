@@ -1,8 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Threading;
-using Lyt.Avalonia.Mvvm.Utilities;
-
-namespace Lyt.Validation;
+﻿namespace Lyt.Validation;
 
 public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
     where T : class, new()
@@ -10,7 +6,16 @@ public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
     private readonly FormValidatorParameters<T> parameters = parameters;
     private readonly List<FieldValidator> fieldValidators = new(parameters.FieldValidators);
 
+    private T? value; 
+
     public Type TargetType => typeof(T);
+
+    public bool HasValue {  get; private set; }
+
+    public T Value 
+        => this.HasValue && this.value is not null ? 
+            this.value : 
+            throw new InvalidOperationException("No value, should have checked 'HasValue'."); 
 
     public void Clear(Bindable viewModel)
     {
@@ -74,7 +79,10 @@ public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
 
             // Copy validated property value into new object 
             string propertyName = fieldValidator.Parameters.SourcePropertyName;
+#pragma warning disable CA1507 // Use nameof to express symbol names
+            // VS does not understand it...  AI, my ass... 
             object? propertyValue = result.InvokeGetProperty("Value");
+#pragma warning restore CA1507 
             formValue.InvokeSetProperty(propertyName, propertyValue);
         }
 
@@ -93,6 +101,8 @@ public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
 
         // All passed, fully validated 
         SetFormValidProperty(isValid: true);
+        this.HasValue = true;
+        this.value = formValue;
         return new FormValidatorResults<T>(IsValid: true, HasValue: true, Value: formValue);
     }
 

@@ -16,7 +16,12 @@ global using Lyt.Avalonia.Interfaces.Localization;
 global using Lyt.Avalonia.Interfaces.Logger;
 global using Lyt.Avalonia.Interfaces.Messenger;
 
+global using Avalonia.Controls;
+global using Avalonia.Threading;
+
 global using Lyt.Avalonia.Mvvm.Core;
+global using Lyt.Avalonia.Mvvm.Utilities;
+
 global using Lyt.Validation.Extensions;
 
 global using FluentValidation;
