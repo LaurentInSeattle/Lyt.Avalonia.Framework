@@ -10,7 +10,7 @@ public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
 
     public Type TargetType => typeof(T);
 
-    public bool HasValue {  get; private set; }
+    public bool HasValue { get; private set; }
 
     public T Value 
         => this.HasValue && this.value is not null ? 
