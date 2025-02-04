@@ -9,7 +9,7 @@
 	xmlns:glyphs="clr-namespace:Lyt.Avalonia.Controls.Glyphs;assembly=Lyt.Avalonia.Controls"
     Background="Transparent"
 	MaxWidth="820"
-	HorizontalAlignment="Left"
+	HorizontalAlignment="Right"
 	VerticalAlignment="Bottom"
 	Margin="12"
 	ZIndex="9999999"
