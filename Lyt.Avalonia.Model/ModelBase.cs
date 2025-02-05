@@ -74,7 +74,7 @@ public abstract class ModelBase(IMessenger messenger, ILogger logger) : IModel
         return this.properties.TryGetValue(name, out object? value) ? value == null ? default : (T)value : default;
     }
 
-    /// <summary> Sets the value of a property </summary>
+    /// <summary> Sets the value of a property, AND changes the dirty state of the model  </summary>
     /// <returns> True, if the value was changed, false otherwise. </returns>
     protected bool Set<T>(T? value, [CallerMemberName] string? name = null)
     {
@@ -89,9 +89,36 @@ public abstract class ModelBase(IMessenger messenger, ILogger logger) : IModel
             return false;
         }
 
+        return this.PrivateSet<T>(value, name, setDirty: true);
+    }
+
+    /// <summary> Sets the value of a property, without changing the dirty state of the model  </summary>
+    /// <returns> True, if the value was changed, false otherwise. </returns>
+    protected bool SetClean<T>(T? value, [CallerMemberName] string? name = null)
+    {
+        if (name is null)
+        {
+            this.Logger.Error("Set property: no name");
+            throw new Exception("Set property: no name");
+        }
+
+        if (Equals(value, this.Get<T>(name)))
+        {
+            return false;
+        }
+
+        return this.PrivateSet<T>(value, name, setDirty: false);
+    }
+
+    private bool PrivateSet<T>(T? value, string name, bool setDirty)
+    {
         this.properties[name] = value;
         this.NotifyUpdate(name);
-        this.IsDirty = true;
+        if (setDirty)
+        {
+            this.IsDirty = true;
+        } 
+
         if (!this.DisablePropertyChangedLogging)
         {
             this.LogPropertyChanged(name, value);
