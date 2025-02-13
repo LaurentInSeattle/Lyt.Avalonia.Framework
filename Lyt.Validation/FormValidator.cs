@@ -4,7 +4,7 @@ public sealed class FormValidator<T>(FormValidatorParameters<T> parameters)
     where T : class, new()
 {
     private readonly FormValidatorParameters<T> parameters = parameters;
-    private readonly List<FieldValidator> fieldValidators = new(parameters.FieldValidators);
+    private readonly List<FieldValidator> fieldValidators = [.. parameters.FieldValidators];
 
     private T? value; 
 

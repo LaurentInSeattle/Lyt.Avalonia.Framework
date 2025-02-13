@@ -71,7 +71,7 @@ public partial class LogViewerWindow : Window, ILogger, INotifyPropertyChanged
         this.ShowButton.Content = !this.showingAll ? "Show All Log" : "Warning and Errors Only";
         if (this.showingAll)
         {
-            this.ObservableLogEntries = new ObservableCollection<LogEntry>(this.AllLogEntries);
+            this.ObservableLogEntries = [.. this.AllLogEntries];
         }
         else
         {
@@ -79,7 +79,7 @@ public partial class LogViewerWindow : Window, ILogger, INotifyPropertyChanged
                 (from entry in this.AllLogEntries
                  where (entry.LogLevel == LogLevel.Warning) || (entry.LogLevel == LogLevel.Error)
                  select entry).ToList();
-            this.ObservableLogEntries = new ObservableCollection<LogEntry>(filtered);
+            this.ObservableLogEntries = [.. filtered];
         }
     }
 
