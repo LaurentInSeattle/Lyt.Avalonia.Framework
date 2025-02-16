@@ -1,4 +1,6 @@
-﻿namespace Lyt.Avalonia.Mvvm.Core;
+﻿// #define VERBOSE_Bindable
+
+namespace Lyt.Avalonia.Mvvm.Core;
 
 [AttributeUsage(AttributeTargets.All)]
 public class DoNotLogAttribute : Attribute { }
@@ -307,8 +309,10 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
             this.OnPropertyChanged(propertyName);
             if (!this.DisableAutomaticBindingsLogging)
             {
+#if VERBOSE_Bindable
                 this.Logger.Info(
                     string.Format("{0}: Command {1} has been bound to {2}", type.Name, propertyName, methodName));
+#endif
             }
         }
     }
@@ -352,8 +356,10 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
             this.actions.Add(propertyName, methodInfo);
             if (!this.DisableAutomaticBindingsLogging)
             {
+#if VERBOSE_Bindable
                 this.Logger.Info(
                     string.Format("{0}: Changes of property {1} have been bound to {2}", type.Name, propertyName, methodName));
+#endif
             }
         }
     }

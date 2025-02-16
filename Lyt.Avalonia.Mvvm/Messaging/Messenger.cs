@@ -1,4 +1,6 @@
-﻿namespace Lyt.Avalonia.Mvvm.Messaging;
+﻿// #define VERBOSE_Messenger
+
+namespace Lyt.Avalonia.Mvvm.Messaging;
 
 /// <summary>
 /// The Messenger is a Singleton class allowing objects to exchange messages.
@@ -60,7 +62,9 @@ public sealed class Messenger : IMessenger
     {
         if (!this.recipients.TryGetValue(typeof(TMessage), out var weakActions))
         {
+#if VERBOSE_Messenger
             this.logger.Info( "No recipients for " + typeof(TMessage).Name);
+#endif 
             return;
         }
 
