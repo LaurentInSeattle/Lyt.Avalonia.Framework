@@ -321,3 +321,61 @@ public class ApplicationBase(
         // What can we do here ? 
     }
 }
+
+/*
+ * 
+
+Splash Screen Example 
+
+
+public partial class App : Application
+{
+    private Window? _splashWindow;
+
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            // Line below is needed to remove Avalonia data validation.
+            // Without this line you will get duplicate validations from both Avalonia and CT
+            BindingPlugins.DataValidators.RemoveAt(0);
+
+            // Show splash screen window
+            _splashWindow = new SplashWindow();
+            desktop.MainWindow = _splashWindow;
+
+            // Some heavy init tasks
+            AppState.Instance.Initialize()
+                .ContinueWith(_ => { Dispatcher.UIThread.Post(CompleteApplicationStart); });
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    private void CompleteApplicationStart()
+    {
+        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktopLifetime) return;
+
+        // create the window with its data context
+        var mainWindowViewModel = new MainWindowViewModel();
+        var mainWindow = new MainWindow()
+        {
+            DataContext = mainWindowViewModel,
+        };
+
+        desktopLifetime.MainWindow = mainWindow;
+
+        // Show main window to avoid framework shutdown when closing splash screen
+        mainWindow.Show();
+
+        // Finally, close the splash screen
+        _splashWindow!.Close();
+    }
+}
+
+*/
