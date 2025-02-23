@@ -11,7 +11,8 @@ public class ApplicationBase(
     List<Type> modelTypes,
     List<Type> singletonTypes,
     List<Tuple<Type, Type>> servicesInterfaceAndType,
-    bool singleInstanceRequested = false) : Application, IApplicationBase
+    bool singleInstanceRequested = false,
+    Uri? splashImageUri = null) : Application, IApplicationBase
 {
     public static Window MainWindow { get; private set; }
 
@@ -20,6 +21,9 @@ public class ApplicationBase(
 
     // Logger will never be null or else the app did not take off
     public ILogger Logger { get; private set; }
+
+    // Can be null ! 
+    private SplashWindow? splashWindow;
 
     // LATER, maybe, using Fluent theme for now
     // public StyleManager StyleManager { get; private set; }
@@ -42,27 +46,114 @@ public class ApplicationBase(
     private readonly List<Tuple<Type, Type>> servicesInterfaceAndType = servicesInterfaceAndType;
     private readonly List<Type> validatedModelTypes = [];
     private readonly bool isSingleInstanceRequested = singleInstanceRequested;
+    private readonly Uri? splashImageUri = splashImageUri;
 
     private IClassicDesktopStyleApplicationLifetime? desktop;
 
-    public override async void OnFrameworkInitializationCompleted()
+    public static T GetRequiredService<T>() where T : notnull
+        => ApplicationBase.AppHost!.Services.GetRequiredService<T>();
+
+    public static object GetRequiredService(Type type)
+        => ApplicationBase.AppHost!.Services.GetRequiredService(type);
+
+    public static T? GetOptionalService<T>() where T : notnull
+        => ApplicationBase.AppHost!.Services.GetService<T>();
+
+    public static object? GetOptionalService(Type type)
+        => ApplicationBase.AppHost!.Services.GetService(type);
+
+    public static TModel GetModel<TModel>() where TModel : notnull
+    {
+        TModel? model = ApplicationBase.GetRequiredService<TModel>() ??
+            throw new ApplicationException("No model of type " + typeof(TModel).FullName);
+        bool isModel = typeof(IModel).IsAssignableFrom(typeof(TModel));
+        if (!isModel)
+        {
+            throw new ApplicationException(typeof(TModel).FullName + "  is not a IModel");
+        }
+
+        return model;
+    }
+
+    public IEnumerable<IModel> GetModels()
+    {
+        List<IModel> models = [];
+        foreach (Type type in this.validatedModelTypes)
+        {
+            object model = ApplicationBase.AppHost!.Services.GetRequiredService(type);
+            bool isModel = typeof(IModel).IsAssignableFrom(model.GetType());
+            if (isModel)
+            {
+                models.Add((model as IModel)!);
+            }
+        }
+
+        return models;
+    }
+
+    public async Task Shutdown()
+    {
+        this.Logger.Info("***   Shutdown   ***");
+        await this.OnShutdownBegin();
+
+        //startupWindow.Closing += (_, _) => { this.logViewer?.Close(); };
+        IApplicationModel applicationModel = ApplicationBase.GetRequiredService<IApplicationModel>();
+        await applicationModel.Shutdown();
+        await ApplicationBase.AppHost!.StopAsync();
+        await this.OnShutdownComplete();
+
+        this.ForceShutdown();
+    }
+
+    public override void OnFrameworkInitializationCompleted()
     {
         // Try to catch all exceptions, missing the ones on the main thread at this time 
         TaskScheduler.UnobservedTaskException += this.OnTaskSchedulerUnobservedTaskException;
         AppDomain.CurrentDomain.UnhandledException += this.OnCurrentDomainUnhandledException;
+        Dispatcher.UIThread.ShutdownStarted += this.OnDispatcherShutdownStarted;
 
         if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
         {
             this.desktop = lifetime;
+
+            if (this.desktop is null)
+            {
+                throw new InvalidOperationException("Desktop should not be null.");
+            }
+
+            // Enforce single instance if requested 
+            if (this.isSingleInstanceRequested && this.IsAlreadyRunning())
+            {
+                this.ForceShutdown();
+                return;
+            }
+
+            if (this.splashImageUri is not null)
+            {
+                // Show splash screen window
+                this.splashWindow = new SplashWindow(this.splashImageUri);
+                this.desktop.MainWindow = this.splashWindow;
+            }
         }
 
-        // Enforce single instance if requested 
-        if (this.isSingleInstanceRequested && this.IsAlreadyRunning() && (this.desktop is not null))
-        {
-            this.ForceShutdown();
-            return;
-        }
+        // Let Avalonia complete its own startup and show us the splash.
+        // Note: Base class doing nothing, but keep: may change in the future 
+        base.OnFrameworkInitializationCompleted();
 
+        // Launch the actual init of the app, delay just a bit to ensure the splash shows up
+        Schedule.OnUiThread(50, this.InitializeApplication, DispatcherPriority.ApplicationIdle);
+    }
+
+    protected virtual Task OnStartupBegin() => Task.CompletedTask;
+
+    protected virtual Task OnStartupComplete() => Task.CompletedTask;
+
+    protected virtual Task OnShutdownBegin() => Task.CompletedTask;
+
+    protected virtual Task OnShutdownComplete() => Task.CompletedTask;
+
+    private async void InitializeApplication()
+    {
         this.InitializeHosting();
 
         if (Design.IsDesignMode)
@@ -80,10 +171,21 @@ public class ApplicationBase(
             var startupWindow = ApplicationBase.GetRequiredService<Window>();
             if (startupWindow is Window window)
             {
+                // Create the main window without showing it 
                 ApplicationBase.MainWindow = window;
-                this.desktop.MainWindow = window;
+
                 // LATER, maybe, using Fluent theme for now
                 // this.StyleManager = new StyleManager(window);
+
+                // Start and wait for startup to complete
+                await this.Startup();
+
+                // Show the main window once init is fully complete 
+                this.desktop.MainWindow = ApplicationBase.MainWindow;
+                ApplicationBase.MainWindow.Show();
+
+                // Close the splash screen if any was created 
+                this.splashWindow!.Close();
             }
             else
             {
@@ -92,24 +194,9 @@ public class ApplicationBase(
         }
         else
         {
-            // Should not be in designer mode
-            throw new NotImplementedException("Unsupported Application Lifetime");
+            // Still in designer mode ? 
+            throw new InvalidOperationException("Desktop should not be null.");
         }
-
-        base.OnFrameworkInitializationCompleted();
-        await this.Startup();
-    }
-
-    private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-    {
-        var exception = e.ExceptionObject as Exception;
-        this.GlobalExceptionHandler(exception);
-    }
-
-    private void OnTaskSchedulerUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
-    {
-        var exception = e.Exception;
-        this.GlobalExceptionHandler(exception);
     }
 
     private void InitializeHosting()
@@ -160,55 +247,6 @@ public class ApplicationBase(
                 }).Build();
     }
 
-    public static T GetRequiredService<T>() where T : notnull
-        => ApplicationBase.AppHost!.Services.GetRequiredService<T>();
-
-    public static object GetRequiredService(Type type)
-        => ApplicationBase.AppHost!.Services.GetRequiredService(type);
-
-    public static T? GetOptionalService<T>() where T : notnull
-        => ApplicationBase.AppHost!.Services.GetService<T>();
-
-    public static object? GetOptionalService(Type type)
-        => ApplicationBase.AppHost!.Services.GetService(type);
-
-    public static TModel GetModel<TModel>() where TModel : notnull
-    {
-        TModel? model = ApplicationBase.GetRequiredService<TModel>() ??
-            throw new ApplicationException("No model of type " + typeof(TModel).FullName);
-        bool isModel = typeof(IModel).IsAssignableFrom(typeof(TModel));
-        if (!isModel)
-        {
-            throw new ApplicationException(typeof(TModel).FullName + "  is not a IModel");
-        }
-
-        return model;
-    }
-
-    public IEnumerable<IModel> GetModels()
-    {
-        List<IModel> models = [];
-        foreach (Type type in this.validatedModelTypes)
-        {
-            object model = ApplicationBase.AppHost!.Services.GetRequiredService(type);
-            bool isModel = typeof(IModel).IsAssignableFrom(model.GetType());
-            if (isModel)
-            {
-                models.Add((model as IModel)!);
-            }
-        }
-
-        return models;
-    }
-
-    protected virtual Task OnStartupBegin() => Task.CompletedTask;
-
-    protected virtual Task OnStartupComplete() => Task.CompletedTask;
-
-    protected virtual Task OnShutdownBegin() => Task.CompletedTask;
-
-    protected virtual Task OnShutdownComplete() => Task.CompletedTask;
-
     private async Task Startup()
     {
         await ApplicationBase.AppHost.StartAsync();
@@ -230,14 +268,6 @@ public class ApplicationBase(
 
         // Warming up the models: 
         // This ensures that the Application Model and all listed models are constructed.
-        this.WarmupModels();
-        IApplicationModel applicationModel = ApplicationBase.GetRequiredService<IApplicationModel>();
-        await applicationModel.Initialize();
-        await this.OnStartupComplete();
-    }
-
-    private void WarmupModels()
-    {
         foreach (Type type in this.validatedModelTypes)
         {
             object model = ApplicationBase.AppHost!.Services.GetRequiredService(type);
@@ -246,20 +276,10 @@ public class ApplicationBase(
                 throw new ApplicationException("Failed to warmup model: " + type.FullName);
             }
         }
-    }
 
-    public async Task Shutdown()
-    {
-        this.Logger.Info("***   Shutdown   ***");
-        await this.OnShutdownBegin();
-
-        //startupWindow.Closing += (_, _) => { this.logViewer?.Close(); };
         IApplicationModel applicationModel = ApplicationBase.GetRequiredService<IApplicationModel>();
-        await applicationModel.Shutdown();
-        await ApplicationBase.AppHost!.StopAsync();
-        await this.OnShutdownComplete();
-
-        this.ForceShutdown();
+        await applicationModel.Initialize();
+        await this.OnStartupComplete();
     }
 
     private void ForceShutdown()
@@ -298,7 +318,7 @@ public class ApplicationBase(
                     return false;
                 }
             }
-            catch 
+            catch
             {
                 // Swallow and assume we are permitted to run 
                 return false;
@@ -307,6 +327,23 @@ public class ApplicationBase(
             return true;
         }
     }
+
+    private void OnDispatcherShutdownStarted(object? sender, EventArgs e)
+    {
+        if (Debugger.IsAttached)
+        {
+            // Use this break to debug issues at startup, if needed 
+            // Debugger.Break();
+        }
+
+        this.Logger.Info("***   Shutdown Started   ***");
+    }
+
+    private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        => this.GlobalExceptionHandler(e.ExceptionObject as Exception);
+
+    private void OnTaskSchedulerUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+        => this.GlobalExceptionHandler(e.Exception);
 
     private void GlobalExceptionHandler(Exception? exception)
     {
@@ -321,61 +358,3 @@ public class ApplicationBase(
         // What can we do here ? 
     }
 }
-
-/*
- * 
-
-Splash Screen Example 
-
-
-public partial class App : Application
-{
-    private Window? _splashWindow;
-
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
-
-    public override void OnFrameworkInitializationCompleted()
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            // Line below is needed to remove Avalonia data validation.
-            // Without this line you will get duplicate validations from both Avalonia and CT
-            BindingPlugins.DataValidators.RemoveAt(0);
-
-            // Show splash screen window
-            _splashWindow = new SplashWindow();
-            desktop.MainWindow = _splashWindow;
-
-            // Some heavy init tasks
-            AppState.Instance.Initialize()
-                .ContinueWith(_ => { Dispatcher.UIThread.Post(CompleteApplicationStart); });
-        }
-
-        base.OnFrameworkInitializationCompleted();
-    }
-
-    private void CompleteApplicationStart()
-    {
-        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktopLifetime) return;
-
-        // create the window with its data context
-        var mainWindowViewModel = new MainWindowViewModel();
-        var mainWindow = new MainWindow()
-        {
-            DataContext = mainWindowViewModel,
-        };
-
-        desktopLifetime.MainWindow = mainWindow;
-
-        // Show main window to avoid framework shutdown when closing splash screen
-        mainWindow.Show();
-
-        // Finally, close the splash screen
-        _splashWindow!.Close();
-    }
-}
-
-*/

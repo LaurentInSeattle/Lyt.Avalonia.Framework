@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Lyt.Avalonia.Controls\Lyt.Avalonia.Controls.csproj" />
     <ProjectReference Include="..\Lyt.Avalonia.Interfaces\Lyt.Avalonia.Interfaces.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Splash\SplashWindow.axaml.cs">
+      <DependentUpon>SplashWindow.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
