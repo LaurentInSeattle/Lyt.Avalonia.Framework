@@ -12,7 +12,8 @@ public class ApplicationBase(
     List<Type> singletonTypes,
     List<Tuple<Type, Type>> servicesInterfaceAndType,
     bool singleInstanceRequested = false,
-    Uri? splashImageUri = null) : Application, IApplicationBase
+    Uri? splashImageUri = null, 
+    Window? appSplashWindow =null) : Application, IApplicationBase
 {
     public static Window MainWindow { get; private set; }
 
@@ -23,7 +24,7 @@ public class ApplicationBase(
     public ILogger Logger { get; private set; }
 
     // Can be null ! 
-    private SplashWindow? splashWindow;
+    private Window? splashWindow;
 
     // LATER, maybe, using Fluent theme for now
     // public StyleManager StyleManager { get; private set; }
@@ -47,6 +48,7 @@ public class ApplicationBase(
     private readonly List<Type> validatedModelTypes = [];
     private readonly bool isSingleInstanceRequested = singleInstanceRequested;
     private readonly Uri? splashImageUri = splashImageUri;
+    private readonly Window? appSplashWindow = appSplashWindow; 
 
     private IClassicDesktopStyleApplicationLifetime? desktop;
 
@@ -128,10 +130,22 @@ public class ApplicationBase(
                 return;
             }
 
+            if ((this.splashImageUri is not null)&& (this.appSplashWindow is not null))
+            {
+                throw new InvalidOperationException("Cannot have two splash windows.");
+            }
+            
             if (this.splashImageUri is not null)
             {
-                // Show splash screen window
-                this.splashWindow = new SplashWindow(this.splashImageUri);
+                // Show default splash window
+                this.splashWindow = new ImageSplashWindow(this.splashImageUri);
+                this.desktop.MainWindow = this.splashWindow;
+            }
+
+            if (this.appSplashWindow is not null)
+            {
+                // Show app provided splash screen window
+                this.splashWindow = this.appSplashWindow;
                 this.desktop.MainWindow = this.splashWindow;
             }
         }

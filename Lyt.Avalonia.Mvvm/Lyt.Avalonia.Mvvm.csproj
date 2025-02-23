@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Splash\SplashWindow.axaml.cs">
-      <DependentUpon>SplashWindow.axaml</DependentUpon>
+    <Compile Update="Splash\ImageSplashWindow.axaml.cs">
+      <DependentUpon>ImageSplashWindow.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

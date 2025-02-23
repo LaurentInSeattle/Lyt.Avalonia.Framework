@@ -1,11 +1,11 @@
 namespace Lyt.Avalonia.Mvvm.Splash;
 
-public partial class SplashWindow : Window
+public partial class ImageSplashWindow : Window
 {
-    public SplashWindow()
+    public ImageSplashWindow()
         => this.InitializeComponent();
 
-    public SplashWindow(Uri resourceUri)
+    public ImageSplashWindow(Uri resourceUri)
     {
         this.InitializeComponent();
         var image = new Bitmap(AssetLoader.Open(resourceUri));
