@@ -4,13 +4,13 @@ public partial class LogViewerWindow : Window, ILogger, INotifyPropertyChanged
 {
     public new event PropertyChangedEventHandler? PropertyChanged;
 
+    private static DateTime last = DateTime.Now;
+
     private readonly SolidColorBrush greenBrushDebug;
     private readonly SolidColorBrush greenBrushInfo;
     private readonly SolidColorBrush orangeBrush;
     private readonly SolidColorBrush redBrush;
     private ObservableCollection<LogEntry> observableLogEntries;
-
-    private List<LogEntry> AllLogEntries { get; set; }
     private bool showingAll;
 
     public LogViewerWindow()
@@ -26,6 +26,8 @@ public partial class LogViewerWindow : Window, ILogger, INotifyPropertyChanged
         this.redBrush = new SolidColorBrush(Colors.Orchid);
     }
 
+    public bool BreakOnError { get; set; } = true;
+
     public ObservableCollection<LogEntry> ObservableLogEntries
     {
         get => this.observableLogEntries;
@@ -36,7 +38,7 @@ public partial class LogViewerWindow : Window, ILogger, INotifyPropertyChanged
         }
     }
 
-    private static DateTime last = DateTime.Now;
+    private List<LogEntry> AllLogEntries { get; set; }
 
     public static string ShortTimeString()
     {

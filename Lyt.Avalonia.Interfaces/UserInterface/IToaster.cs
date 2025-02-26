@@ -2,6 +2,8 @@
 
 public interface IToaster
 {
+    bool BreakOnError { get; set; } 
+
     object? Host { get; set; }
 
     object? View { get; }

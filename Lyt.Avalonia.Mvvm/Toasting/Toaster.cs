@@ -15,6 +15,8 @@ public sealed class Toaster : IToaster
         this.messenger.Subscribe<ToastMessage.Dismiss>(this.OnDismiss, withUiDispatch: true);
     }
 
+    public bool BreakOnError { get; set; } = true;
+
     // The host panel that will show the toasts 
     public object? Host
     {
@@ -45,8 +47,15 @@ public sealed class Toaster : IToaster
     }
 
     public void Show(string title, string message, int dismissDelay = 10, InformationLevel toastLevel = InformationLevel.Info)
-        => this.messenger.Publish(
+    {
+        if (this.BreakOnError && toastLevel == InformationLevel.Error && Debugger.IsAttached)
+        {
+            Debugger.Break();
+        }
+
+        this.messenger.Publish(
             new ToastMessage.Show { Title = title, Message = message, Delay = dismissDelay, Level = toastLevel });
+    } 
 
     public void Dismiss()
     {

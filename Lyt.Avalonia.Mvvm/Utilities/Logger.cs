@@ -4,13 +4,23 @@ public sealed class Logger : ILogger
 {
     private static DateTime last = DateTime.Now;
 
+    public bool BreakOnError { get; set; } = true; 
+
     public void Debug(string message) => System.Diagnostics.Debug.WriteLine(ShortTimeString() + message);
 
     public void Info(string message) => Trace.TraceInformation(ShortTimeString() + message);
 
     public void Warning(string message) => Trace.TraceWarning(ShortTimeString() + message);
 
-    public void Error(string message) => Trace.TraceError(ShortTimeString() + message);
+    public void Error(string message)
+    {
+        if ( this.BreakOnError && Debugger.IsAttached)
+        {
+            Debugger.Break(); 
+        }
+
+        Trace.TraceError(ShortTimeString() + message);
+    } 
 
     public void Fatal(string message)
     {

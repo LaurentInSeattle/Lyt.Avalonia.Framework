@@ -2,6 +2,7 @@
 
 public interface ILogger
 {
+    bool BreakOnError { get; set; } 
     void Debug(string message);
     void Info(string message);
     void Warning(string message);
