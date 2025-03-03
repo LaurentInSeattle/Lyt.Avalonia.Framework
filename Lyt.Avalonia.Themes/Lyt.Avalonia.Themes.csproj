@@ -125,8 +125,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.4" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="11.2.4" />
+    <PackageReference Include="Avalonia" Version="11.2.5" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.2.5" />
   </ItemGroup>
 
 </Project>

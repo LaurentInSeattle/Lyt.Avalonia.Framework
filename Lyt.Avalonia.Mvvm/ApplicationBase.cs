@@ -199,7 +199,7 @@ public class ApplicationBase(
                 ApplicationBase.MainWindow.Show();
 
                 // Close the splash screen if any was created 
-                this.splashWindow!.Close();
+                this.splashWindow?.Close();
             }
             else
             {
