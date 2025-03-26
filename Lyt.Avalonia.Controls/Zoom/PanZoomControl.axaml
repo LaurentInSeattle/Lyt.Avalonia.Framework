@@ -20,12 +20,13 @@
 			>
 			<Viewbox
 				x:Name="Viewbox"
+				HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+				MinWidth="8" MinHeight="8"
 				>
 				<ContentPresenter
 					x:Name="ZoomContentPresenter"
 					ClipToBounds="False"
-					HorizontalAlignment="Stretch"
-					VerticalAlignment="Stretch"
+					HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
 					/>
 			</Viewbox>
 		</Grid>

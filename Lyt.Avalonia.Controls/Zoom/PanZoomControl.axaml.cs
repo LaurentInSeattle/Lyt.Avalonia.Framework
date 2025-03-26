@@ -2,7 +2,7 @@ namespace Lyt.Avalonia.Controls.PanZoom;
 
 public partial class PanZoomControl : UserControl
 {
-    public const double DragStrength = 1.35;
+    public const double DragStrength = 1.1;
     public const double MaxZoom = 8.0;
 
     private Size contentSize;
@@ -80,6 +80,7 @@ public partial class PanZoomControl : UserControl
     {
         this.ZoomContentPresenter.Content = control;
         this.AdjustContentSize(control);
+        this.ZoomToFit();
     }
 
     private void UpdateZoom(double zoom)

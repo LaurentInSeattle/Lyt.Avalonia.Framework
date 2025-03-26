@@ -36,7 +36,7 @@ public partial class PanZoomControl : UserControl
             }
             else
             {
-                Debug.WriteLine("Zoom: " + newContent.ToString());
+                // Debug.WriteLine("Zoom: " + newContent.ToString());
                 zoomControl.UpdateContent(newContent);
                 return newContent;
             }
@@ -64,7 +64,7 @@ public partial class PanZoomControl : UserControl
             double minZoom = zoomControl.GetFitZoomFactor();
             double maxZoom = PanZoomControl.MaxZoom;
             double oldValue = zoomControl.GetValue(ZoomProperty);
-            Debug.WriteLine("Zoom: " + oldValue.ToString("F3") + " - > " + newZoom.ToString("F3"));
+            // Debug.WriteLine("Zoom: " + oldValue.ToString("F3") + " - > " + newZoom.ToString("F3"));
 
             if ( newZoom < 0.000_1)
             {
@@ -107,7 +107,7 @@ public partial class PanZoomControl : UserControl
             double maxZoom = PanZoomControl.MaxZoom;
             double newZoom = minZoom * newZoomFactor;
             double oldValue = zoomControl.GetValue(ZoomFactorProperty);
-            Debug.WriteLine("Zoom: " + oldValue.ToString("F3") + " - > " + newZoomFactor.ToString("F3"));
+            // Debug.WriteLine("Zoom: " + oldValue.ToString("F3") + " - > " + newZoomFactor.ToString("F3"));
 
             if (newZoomFactor < 1.000)
             {
