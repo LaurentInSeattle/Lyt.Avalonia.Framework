@@ -10,7 +10,7 @@
 		x:Name="ScrollViewer"
 		HorizontalScrollBarVisibility="Visible"
 		VerticalScrollBarVisibility="Visible"
-		Background="DarkGray"
+		Background="{Binding}"
 		Margin="0"
 		>
 		<Grid
