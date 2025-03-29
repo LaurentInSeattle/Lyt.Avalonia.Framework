@@ -116,7 +116,7 @@ public partial class PanZoomControl : UserControl
 
     private void ZoomToFit()
     {
-        Debug.WriteLine("Executing Request: ZoomToFit");
+        // Debug.WriteLine("Executing Request: ZoomToFit");
         double zoom = this.GetFitZoomFactor();
         this.Zoom = zoom;
         this.Grid.Width = this.contentSize.Width * zoom;
@@ -133,7 +133,7 @@ public partial class PanZoomControl : UserControl
 
     private void ZoomToOne()
     {
-        Debug.WriteLine("Executing Request: Zoom To One");
+        // Debug.WriteLine("Executing Request: Zoom To One");
         this.Zoom = 1.0;
         this.Grid.Width = this.contentSize.Width;
         this.Grid.Height = this.contentSize.Height;
