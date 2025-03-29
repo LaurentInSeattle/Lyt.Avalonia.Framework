@@ -122,7 +122,6 @@ public class Bindable : NotifyPropertyChanged, ISupportBehaviors
     public List<object> Behaviors { get; private set; } = [];
 
     /// <summary> Binds a control and setup callbacks. </summary>
-    /// 
     public void BindOnDataContextChanged(Control control)
     {
         this.Control = control;

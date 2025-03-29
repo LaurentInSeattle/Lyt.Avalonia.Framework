@@ -48,6 +48,31 @@ public static class Utilities
         return false;
     }
 
+    public static T FindResource<T>(string resourceName)
+    {
+        try
+        {
+            if (Application.Current is null)
+            {
+                throw new Exception("No application");
+            }
+
+            bool found = Application.Current.TryFindResource(resourceName, out object? resourceObject);
+            if (found && resourceObject is T resourceTypeT)
+            {
+                return resourceTypeT;
+            }
+
+            throw new Exception( resourceName + " not found");
+        }
+        catch (Exception ex)
+        {
+            if (Debugger.IsAttached) { Debugger.Break(); }
+            Debug.WriteLine(ex);
+            throw;
+        }
+    }
+
     public static bool IsPointerInside(this Control control, PointerEventArgs args)
     {
         PointerPoint pp = args.GetCurrentPoint(control);

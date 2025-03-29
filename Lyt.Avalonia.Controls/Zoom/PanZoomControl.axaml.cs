@@ -9,9 +9,11 @@ public partial class PanZoomControl : UserControl
     private bool isDragging;
     private Point startDragPoint;
     private Point currentDragPoint;
+    private bool shiftToDrag;
 
     public PanZoomControl()
     {
+        this.shiftToDrag = true ; 
         this.InitializeComponent();
 
         this.Loaded += this.OnLoaded;
@@ -139,7 +141,7 @@ public partial class PanZoomControl : UserControl
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs args)
     {
-        if (!args.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        if ( this.shiftToDrag && !args.KeyModifiers.HasFlag(KeyModifiers.Shift))
         {
             return;
         }
@@ -160,8 +162,7 @@ public partial class PanZoomControl : UserControl
             return;
         }
 
-        // CONSIDER: Creare a property to select the KeyModifier allowing drag 
-        if (!args.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        if (this.shiftToDrag && !args.KeyModifiers.HasFlag(KeyModifiers.Shift))
         {
             this.isDragging = false;
             return;

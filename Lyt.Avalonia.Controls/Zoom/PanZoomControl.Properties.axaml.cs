@@ -1,4 +1,6 @@
-﻿namespace Lyt.Avalonia.Controls.PanZoom;
+﻿using Lyt.Avalonia.Controls.Glyphs;
+
+namespace Lyt.Avalonia.Controls.PanZoom;
 
 public partial class PanZoomControl : UserControl
 {
@@ -7,6 +9,34 @@ public partial class PanZoomControl : UserControl
         None, 
         Fit, 
         One,
+    }
+
+    /// <summary> ShiftToDrag Styled Property </summary>
+    public static readonly StyledProperty<bool> ShiftToDragProperty =
+        AvaloniaProperty.Register<PanZoomControl, bool>(
+            nameof(ShiftToDrag),
+            defaultValue: false,
+            inherits: false,
+            defaultBindingMode: BindingMode.OneWay,
+            validate: null,
+            coerce: CoerceIsDisabled,
+            enableDataValidation: false);
+
+    /// <summary> Gets or sets the ShiftToDrag property.</summary>
+    public bool ShiftToDrag
+    {
+        get => this.GetValue(ShiftToDragProperty);
+        set => this.SetValue(ShiftToDragProperty, value);
+    }
+
+    private static bool CoerceIsDisabled(AvaloniaObject sender, bool newShiftToDrag)
+    {
+        if (sender is PanZoomControl panZoomControl)
+        {
+            panZoomControl.shiftToDrag = newShiftToDrag;
+        }
+
+        return newShiftToDrag;
     }
 
     /// <summary> Zoomable content  </summary>
