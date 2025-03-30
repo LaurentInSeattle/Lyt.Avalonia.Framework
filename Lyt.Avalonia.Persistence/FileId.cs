@@ -1,6 +1,5 @@
-﻿namespace Lyt.Avalonia.Persistence; 
+﻿namespace Lyt.Avalonia.Persistence;
 
-public sealed record class FileId ( 
-    FileManagerModel.Area Area, 
-    FileManagerModel.Kind Kind, 
-    string Filename );
+using static FileManagerModel;
+
+public sealed record class FileId(Area Area, Kind Kind, string Filename);

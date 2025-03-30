@@ -16,6 +16,7 @@ public sealed class FileManagerModel : ModelBase, IModel
         Json,
         Text,
         Binary,
+        BinaryNoExtension,
     }
 
     public const string Wildcard = "*";
@@ -305,7 +306,7 @@ public sealed class FileManagerModel : ModelBase, IModel
         }
     }
 
-    private string PathFromArea(Area area)
+    public string PathFromArea(Area area)
     {
         return area switch
         {
@@ -317,15 +318,22 @@ public sealed class FileManagerModel : ModelBase, IModel
         };
     }
 
-    private static string ExtensionFromKind(Kind kind)
+    public static string ExtensionFromKind(Kind kind)
     {
         return kind switch
         {
             Kind.Json => JsonExtension,
             Kind.Text => TextExtension,
             Kind.Binary => BinaryExtension,
+            Kind.BinaryNoExtension => string.Empty,
             _ => throw new ArgumentException("Unknown kind", nameof(kind)),
         };
+    }
+
+    public string MakePath(FileId fileId)
+    {
+        fileId.Deconstruct(out Area area, out Kind kind, out string name);
+        return this.MakePath(area, kind, name);
     }
 
     public string MakePath(Area area, Kind kind, string name)
@@ -480,7 +488,17 @@ public sealed class FileManagerModel : ModelBase, IModel
                     break;
 
                 case Kind.Binary:
-                    throw new NotSupportedException("No binaries for now");
+                case Kind.BinaryNoExtension:
+                    if (content is byte[] data)
+                    {
+                        File.WriteAllBytes(path, data);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Unsupported binary format: byte[] required.");
+                    }
+
+                    break;
             }
         }
         catch (Exception ex)
