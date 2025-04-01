@@ -9,6 +9,7 @@ public sealed class FileManagerModel : ModelBase, IModel
         Configuration,
         User,
         Resources,
+        Desktop,
     }
 
     public enum Kind
@@ -314,6 +315,7 @@ public sealed class FileManagerModel : ModelBase, IModel
             Area.Settings => this.ApplicationUserFolderPath,
             Area.User => this.ApplicationUserFolderPath,
             Area.Configuration => this.ApplicationConfigurationFolderPath,
+            Area.Desktop => Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
             _ => throw new ArgumentException("Unknown area", nameof(area)),
         };
     }
