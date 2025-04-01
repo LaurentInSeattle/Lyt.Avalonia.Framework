@@ -391,12 +391,18 @@ public sealed class FileManagerModel : ModelBase, IModel
             }
 
             string extension = FileManagerModel.ExtensionFromKind(kind);
-            if (name.EndsWith(extension))
+            if (kind != Kind.BinaryNoExtension)
             {
-                name = name.Replace(extension, string.Empty);
-            }
+                if (name.EndsWith(extension))
+                {
+                    name = name.Replace(extension, string.Empty);
+                }
+            } 
 
-            string path = Path.Combine(this.PathFromArea(area), string.Concat(name, extension));
+            string path = 
+                kind == Kind.BinaryNoExtension ?
+                    Path.Combine(this.PathFromArea(area), name):
+                    Path.Combine(this.PathFromArea(area), string.Concat(name, extension));
             switch (kind)
             {
                 default:
@@ -407,7 +413,7 @@ public sealed class FileManagerModel : ModelBase, IModel
                         return (content as T)!;
                     }
 
-                    throw new NotSupportedException("string type mismatch");
+                    throw new NotSupportedException("Type mismatch: expected 'string'");
 
                 case Kind.Json:
                     string serialized = File.ReadAllText(path);
@@ -415,12 +421,19 @@ public sealed class FileManagerModel : ModelBase, IModel
                     return deserialized;
 
                 case Kind.Binary:
-                    throw new NotSupportedException("No binaries for now");
+                case Kind.BinaryNoExtension:
+                    if (typeof(T) == typeof(byte[]))
+                    {
+                        byte[] data = File.ReadAllBytes(path);
+                        return (data as T)!;
+                    }
+
+                    throw new NotSupportedException("Type mismatch: expected 'byte[]'");
             }
         }
         catch (Exception ex)
         {
-            string msg = "Failed to load " + area.ToString() + " - " + name + kind.ToString();
+            string msg = "Failed to load " + area.ToString() + " - " + name + " - " + kind.ToString();
             this.Logger.Fatal(msg);
             throw new Exception(msg, ex);
         }
