@@ -1,4 +1,7 @@
-﻿namespace Lyt.Avalonia.Mvvm;
+﻿using Lyt.Avalonia.Mvvm.Extensions;
+using System.Runtime.InteropServices;
+
+namespace Lyt.Avalonia.Mvvm;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
@@ -260,6 +263,51 @@ public class ApplicationBase(
 
                 }).Build();
     }
+
+    protected static Tuple<Type, Type> OsSpecificService<TInterface>(string implementationName)
+    {
+        // Only Windows and MacOS for now 
+        try
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
+            {
+                // OSPlatform.Linux is NOT supported, at least for now, no way to test it here
+                throw new ArgumentException("Unsupported platform: " + RuntimeInformation.OSDescription);
+            }
+
+            var maybeAssembly = Assembly.GetEntryAssembly();
+            if (maybeAssembly is Assembly assembly)
+            {
+                // Type? maybeType = assembly.GetType("WallpaperService");
+                var typeInfos = assembly.DefinedTypes;
+                TypeInfo? maybeTypeInfo =
+                    (from typeInfo in typeInfos 
+                     where typeInfo.Name == implementationName 
+                     select typeInfo)
+                    .FirstOrDefault();
+                if (maybeTypeInfo is not null && maybeTypeInfo.AsType() is Type type)
+                {
+                    if (type.Implements<TInterface>())
+                    {
+                        object? instance = Activator.CreateInstance(type);
+                        if (instance is TInterface service)
+                        {
+                            return new Tuple<Type, Type>(typeof(TInterface), instance.GetType());
+                        }
+                    }
+                }
+            }
+
+            throw new ArgumentException(
+                "Failed to create instance of service " + implementationName + " for " + RuntimeInformation.OSDescription);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.ToString());
+            throw;
+        }
+    }
+
 
     private async Task Startup()
     {
