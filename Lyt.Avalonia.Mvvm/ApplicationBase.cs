@@ -278,7 +278,6 @@ public class ApplicationBase(
             var maybeAssembly = Assembly.GetEntryAssembly();
             if (maybeAssembly is Assembly assembly)
             {
-                // Type? maybeType = assembly.GetType("WallpaperService");
                 var typeInfos = assembly.DefinedTypes;
                 TypeInfo? maybeTypeInfo =
                     (from typeInfo in typeInfos 
@@ -307,7 +306,6 @@ public class ApplicationBase(
             throw;
         }
     }
-
 
     private async Task Startup()
     {
