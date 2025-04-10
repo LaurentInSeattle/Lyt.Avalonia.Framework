@@ -39,9 +39,9 @@ public sealed class FileManagerModel : ModelBase, IModel
     public FileManagerModel(IMessenger messenger, ILogger logger) : base(messenger, logger)
     {
         this.Configuration = new FileManagerConfiguration(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-        this.jsonSerializerOptions = 
-            new JsonSerializerOptions 
-            { 
+        this.jsonSerializerOptions =
+            new JsonSerializerOptions
+            {
                 AllowTrailingCommas = true,
                 WriteIndented = true,
                 ReadCommentHandling = JsonCommentHandling.Skip,
@@ -399,11 +399,11 @@ public sealed class FileManagerModel : ModelBase, IModel
                 {
                     name = name.Replace(extension, string.Empty);
                 }
-            } 
+            }
 
-            string path = 
+            string path =
                 kind == Kind.BinaryNoExtension ?
-                    Path.Combine(this.PathFromArea(area), name):
+                    Path.Combine(this.PathFromArea(area), name) :
                     Path.Combine(this.PathFromArea(area), string.Concat(name, extension));
             switch (kind)
             {
@@ -570,5 +570,32 @@ public sealed class FileManagerModel : ModelBase, IModel
             this.Logger.Error(ex.ToString());
             return [];
         }
+    }
+
+    public DriveInfo? DriveInfo(Area area)
+    {
+        string documentFolder = this.PathFromArea(area);
+        if (Directory.Exists(documentFolder))
+        {
+            var directoryInfo = new DirectoryInfo(documentFolder);
+            string root = directoryInfo.Root.ToString();
+            if (root.EndsWith('\\'))
+            {
+                string driveName = root.Replace("\\", string.Empty);
+                return new DriveInfo(driveName);
+            }
+        }
+
+        return null;
+    }
+
+    public long AvailableFreeSpace(Area area)
+    {
+        if (this.DriveInfo(area) is DriveInfo driveInfo)
+        {
+            return driveInfo.AvailableFreeSpace;
+        }
+
+        return 0;
     }
 }
