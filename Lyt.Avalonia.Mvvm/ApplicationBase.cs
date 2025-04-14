@@ -256,9 +256,23 @@ public class ApplicationBase(
                     // Services, all must comply to a specific interface 
                     foreach (var serviceType in this.servicesInterfaceAndType)
                     {
-                        var interfaceType = serviceType.Item1;
-                        var implementationType = serviceType.Item2;
-                        _ = services.AddSingleton(interfaceType, implementationType);
+                        try
+                        {
+                            var interfaceType = serviceType.Item1;
+                            var implementationType = serviceType.Item2;
+                            _ = services.AddSingleton(interfaceType, implementationType);
+                        }
+                        catch (Exception )
+                        {
+                            if (Design.IsDesignMode)
+                            {
+                                // Silently swallow to please the XAML editor / designer 
+                            }
+                            else
+                            {
+                                throw;
+                            } 
+                        } 
                     }
 
                 }).Build();
@@ -297,8 +311,17 @@ public class ApplicationBase(
                 }
             }
 
-            throw new ArgumentException(
-                "Failed to create instance of service " + implementationName + " for " + RuntimeInformation.OSDescription);
+            if (Design.IsDesignMode)
+            {
+                // To please the XAML editor/compiler
+                return new Tuple<Type, Type>(typeof(TInterface), typeof(TInterface));
+            }
+            else
+            { 
+                throw new ArgumentException(
+                    "Failed to create instance of service " + implementationName + " for " + RuntimeInformation.OSDescription);
+            } 
+
         }
         catch (Exception ex)
         {
