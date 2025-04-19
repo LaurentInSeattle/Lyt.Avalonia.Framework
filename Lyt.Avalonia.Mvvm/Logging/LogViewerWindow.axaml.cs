@@ -65,7 +65,10 @@ public partial class LogViewerWindow : Window, ILogger, INotifyPropertyChanged
     }
 
     private void Log(LogLevel logLevel, string message)
-        => Dispatcher.UIThread.Post(() => { this.Update(logLevel, message); }, DispatcherPriority.Background);
+    {
+        System.Diagnostics.Debug.WriteLine(message);
+        Dispatcher.UIThread.Post(() => { this.Update(logLevel, message); }, DispatcherPriority.Background);
+    } 
 
     private void OnShowButtonClick(object sender, RoutedEventArgs e)
     {
@@ -93,7 +96,6 @@ public partial class LogViewerWindow : Window, ILogger, INotifyPropertyChanged
         if (logLevel == LogLevel.Debug)
         {
             brush = this.greenBrushDebug;
-            System.Diagnostics.Debug.WriteLine(message);
         }
         else if (logLevel == LogLevel.Info)
         {
