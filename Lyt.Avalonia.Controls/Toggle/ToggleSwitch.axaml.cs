@@ -247,7 +247,7 @@ public partial class ToggleSwitch : UserControl
         // Debug.WriteLine("Up");
         if (!this.eventingRectangle.IsPointerInside(args))
         {
-            Debug.WriteLine("Pointer outside : leave");
+            // Debug.WriteLine("Pointer outside : leave");
             this.Leave();
         }
         else
