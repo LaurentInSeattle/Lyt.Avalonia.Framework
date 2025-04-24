@@ -11,6 +11,8 @@ public partial class PanZoomControl : UserControl
     private Point currentDragPoint;
     private bool shiftToDrag;
 
+    private SizeChangedEventArgs? lastSizeChangedEventArgs;
+
     public PanZoomControl()
     {
         this.shiftToDrag = true ; 
@@ -53,7 +55,22 @@ public partial class PanZoomControl : UserControl
     }
 
     private void OnScrollViewerSizeChanged(object? sender, SizeChangedEventArgs e)
-        => this.ZoomToFit();
+    {
+        if (this.lastSizeChangedEventArgs != null)
+        {
+            var delta = this.lastSizeChangedEventArgs.NewSize - e.NewSize;
+            Debug.WriteLine(
+                "OnScrollViewerSizeChanged: " + delta.Height.ToString("F1") + " " + delta.Width.ToString("F1"));
+            if ((delta.Height < 1.0) && (delta.Width < 1.0))
+            {
+                this.lastSizeChangedEventArgs = e;
+                return; 
+            }
+        }
+
+        this.lastSizeChangedEventArgs = e;
+        this.ZoomToFit();
+    } 
 
     private void OnZoomContentPresenterSizeChanged(object? sender, SizeChangedEventArgs e)
         => this.AdjustContentSize(this.ZoomContentPresenter.Content);
