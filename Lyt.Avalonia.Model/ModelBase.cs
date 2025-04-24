@@ -35,6 +35,11 @@ public abstract class ModelBase(IMessenger messenger, ILogger logger) : IModel
         get => this.isDirty;
         protected set
         {
+            if ( this.IsInitializing)
+            {
+                return;
+            }
+
             this.isDirty = value;
             if (value)
             {
@@ -45,6 +50,9 @@ public abstract class ModelBase(IMessenger messenger, ILogger logger) : IModel
 
     [JsonIgnore]
     public bool ShouldAutoSave { get; protected set; }
+
+    [JsonIgnore]
+    public bool IsInitializing { get; set; }
 
     /// <summary> Allows to disable logging when properties are changing so that we do not flood the logs. </summary>
     /// <remarks> Use for quickly changing properties, mouse, sliders, etc.</remarks>

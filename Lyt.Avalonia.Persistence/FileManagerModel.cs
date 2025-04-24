@@ -465,6 +465,28 @@ public sealed class FileManagerModel : ModelBase, IModel
         }
     }
 
+    public void Duplicate(FileId fileId) 
+    {
+        fileId.Deconstruct(out Area area, out Kind kind, out string name);
+        this.Duplicate(area, kind, name);
+    }
+
+    public void Duplicate(Area area, Kind kind, string name)
+    {
+        string sourcePath = this.MakePath(area, kind, name);
+        string duplicatePath = this.MakePath(area, kind, name + "_" + TimestampString());
+        try
+        {
+            File.Copy(sourcePath, duplicatePath);
+        }
+        catch (Exception ex)
+        {
+            string msg = "Swallowed: Failed to duplicate " + sourcePath + " to " + duplicatePath;
+            this.Logger.Warning(msg);
+            Debug.WriteLine(ex);
+        }
+    }
+
     public void Save<T>(FileId fileId, T content) where T : class
     {
         fileId.Deconstruct(out Area area, out Kind kind, out string name);
