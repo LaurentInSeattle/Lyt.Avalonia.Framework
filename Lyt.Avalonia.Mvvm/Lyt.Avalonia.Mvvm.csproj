@@ -8,9 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.6" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.3" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.4" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.4" />
   </ItemGroup>
 
   <ItemGroup>
