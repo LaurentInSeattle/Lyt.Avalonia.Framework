@@ -59,9 +59,9 @@ public partial class PanZoomControl : UserControl
         if (this.lastSizeChangedEventArgs != null)
         {
             var delta = this.lastSizeChangedEventArgs.NewSize - e.NewSize;
-            Debug.WriteLine(
-                "OnScrollViewerSizeChanged: " + delta.Height.ToString("F1") + " " + delta.Width.ToString("F1"));
-            if ((delta.Height < 1.0) && (delta.Width < 1.0))
+            //Debug.WriteLine(
+            //    "OnScrollViewerSizeChanged: " + delta.Height.ToString("F1") + " " + delta.Width.ToString("F1"));
+            if ((Math.Abs(delta.Height) <= 1.0) && (Math.Abs(delta.Width) <= 1.0))
             {
                 this.lastSizeChangedEventArgs = e;
                 return; 
