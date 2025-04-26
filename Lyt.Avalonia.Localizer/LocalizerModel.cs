@@ -27,13 +27,8 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
 
     public override Task Initialize() => Task.CompletedTask;
 
-    public override Task Configure(object? modelConfiguration)
+    public Task Configure(LocalizerConfiguration configuration)
     {
-        if (modelConfiguration is not LocalizerConfiguration configuration)
-        {
-            throw new ArgumentNullException(nameof(modelConfiguration));
-        }
-
         if (configuration.IsLikelyValid)
         {
             this.configuration = configuration;
@@ -50,8 +45,9 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
     public bool DetectAvailableLanguages()
     {
         // Returns nothing :(   Possible bug ? 
+        // Stupid Avalonia AssetLoader is filtering out all axaml files... 
         string uriString = this.configuration.ResourceFolderUriString();
-        _ = AssetLoader.GetAssets(new Uri(uriString), null).ToList();
+        /* var assets */ _ = AssetLoader.GetAssets(new Uri(uriString), null).ToList();
         return false;
     }
 
@@ -106,7 +102,7 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
         if (string.IsNullOrWhiteSpace(this.currentLanguage) || this.currentLanguageResource is null)
         {
             this.Logger.Warning("No language loaded");
-            return string.Empty;
+            return localizationKey;
         }
 
         if (this.currentLanguageResource.TryGetResource(localizationKey, this.application.ActualThemeVariant, out object? resource))

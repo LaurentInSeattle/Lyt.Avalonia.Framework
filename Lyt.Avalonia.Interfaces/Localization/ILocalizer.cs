@@ -2,10 +2,14 @@
 
 public interface ILocalizer
 {
+    /// <summary> Configures the localizer </summary>
+    Task Configure(LocalizerConfiguration localizerConfiguration); 
+
     /// <summary> Returns true if the requested language exists and gets selected </summary>
     bool SelectLanguage(string targetLanguage); 
 
     /// <summary> Returns a localized string from the provided key </summary>
+    /// <remarks> Returns the key if no translation can be found. </remarks>
     string Lookup(string localizationKey);
 
     /// <summary> 

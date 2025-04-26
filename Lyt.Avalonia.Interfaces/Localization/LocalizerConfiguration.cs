@@ -1,4 +1,4 @@
-﻿namespace Lyt.Avalonia.Localizer;
+﻿namespace Lyt.Avalonia.Interfaces.Localization;
 
 public sealed class LocalizerConfiguration
 {
