@@ -36,7 +36,7 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
         }
         else
         {
-            this.Logger.Fatal("Invalid configuration object");
+            this.Logger.Fatal("Invalid configuration");
         } 
 
         return Task.CompletedTask;
