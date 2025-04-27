@@ -10,7 +10,7 @@ public interface ILocalizer
 
     /// <summary> Returns a localized string from the provided key </summary>
     /// <remarks> Returns the key if no translation can be found. </remarks>
-    string Lookup(string localizationKey);
+    string Lookup(string localizationKey, bool failSilently = false);
 
     /// <summary> 
     /// Returns a (potentially long) localized string from the provided key, 

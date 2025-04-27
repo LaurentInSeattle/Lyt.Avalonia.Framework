@@ -22,7 +22,7 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
 
         this.application = avaloniaApplication;
         this.fileManagerModel = fileManagerModel;
-        this.configuration = new ();
+        this.configuration = new();
     }
 
     public override Task Initialize() => Task.CompletedTask;
@@ -37,7 +37,7 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
         else
         {
             this.Logger.Fatal("Invalid configuration");
-        } 
+        }
 
         return Task.CompletedTask;
     }
@@ -47,7 +47,8 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
         // Returns nothing :(   Possible bug ? 
         // Stupid Avalonia AssetLoader is filtering out all axaml files... 
         string uriString = this.configuration.ResourceFolderUriString();
-        /* var assets */ _ = AssetLoader.GetAssets(new Uri(uriString), null).ToList();
+        /* var assets */
+        _ = AssetLoader.GetAssets(new Uri(uriString), null).ToList();
         return false;
     }
 
@@ -81,6 +82,7 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
 
         try
         {
+            string? oldLanguageKey = this.currentLanguage;
             string uriString = this.configuration.ResourceFileUriString(targetLanguage);
             var uri = new Uri(uriString);
             var newLanguage = new ResourceInclude(uri) { Source = uri };
@@ -88,6 +90,7 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
             this.currentLanguageResource = newLanguage;
             this.currentLanguage = targetLanguage;
             this.Logger.Info("Added new language: " + targetLanguage);
+            this.Messenger.Publish(new LanguageChangedMessage(oldLanguageKey, this.currentLanguage));
             return true;
         }
         catch (Exception ex)
@@ -97,7 +100,7 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
         }
     }
 
-    public string Lookup(string localizationKey)
+    public string Lookup(string localizationKey, bool failSilently = false)
     {
         if (string.IsNullOrWhiteSpace(this.currentLanguage) || this.currentLanguageResource is null)
         {
@@ -113,7 +116,11 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
             }
         }
 
-        this.Logger.Warning("Failed to translate: " + localizationKey + " for language: " + this.currentLanguage);
+        if (!failSilently)
+        {
+            this.Logger.Warning("Failed to translate: " + localizationKey + " for language: " + this.currentLanguage);
+        }
+
         return localizationKey;
     }
 
@@ -127,16 +134,16 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
 
         try
         {
-            string name = 
+            string name =
                 string.Format(
                     "{0}/{1}/{1}_{2}.txt", this.configuration.LanguagesSubFolder, localizationKey, this.currentLanguage);
             string uriString = string.Format("{0}{1}", this.fileManagerModel.Configuration.AvaresUriString(), name);
             var streamReader = new StreamReader(AssetLoader.Open(new Uri(uriString)));
-            string localized = 
+            string localized =
                 this.fileManagerModel.LoadResourceFromStream<string>(FileManagerModel.Kind.Text, streamReader);
-            if (string.IsNullOrWhiteSpace(localized)) 
+            if (string.IsNullOrWhiteSpace(localized))
             {
-                throw new Exception("No localized data"); 
+                throw new Exception("No localized data");
             }
 
             return localized;
