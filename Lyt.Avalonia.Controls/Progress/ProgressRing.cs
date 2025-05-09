@@ -2,6 +2,13 @@
 
 public sealed class ProgressRing : TemplatedControl
 {
+    // Important: Do not forget to include this style in App.Xaml
+    //
+    // 		<StyleInclude Source="avares://Lyt.Avalonia.Controls/Progress/ProgressRing.axaml"/>
+    //
+    // or else nothing will show up :( 
+
+
     private const string LargeState = ":large";
     private const string SmallState = ":small";
 
