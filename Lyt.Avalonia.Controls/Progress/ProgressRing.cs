@@ -7,7 +7,8 @@ public sealed class ProgressRing : TemplatedControl
     // 		<StyleInclude Source="avares://Lyt.Avalonia.Controls/Progress/ProgressRing.axaml"/>
     //
     // or else nothing will show up :( 
-
+    //
+    // Original code by https://github.com/Deadpikle  ( MIT License ) 
 
     private const string LargeState = ":large";
     private const string SmallState = ":small";
@@ -18,12 +19,6 @@ public sealed class ProgressRing : TemplatedControl
     private double maxSideLength;
     private double ellipseDiameter;
     private Thickness ellipseOffset;
-
-    static ProgressRing()
-    {
-        //DefaultStyleKeyProperty.OverrideMetadata(typeof(ProgressRing),
-        //    new FrameworkPropertyMetadata(typeof(ProgressRing)));
-    }
 
     public ProgressRing()
     {
