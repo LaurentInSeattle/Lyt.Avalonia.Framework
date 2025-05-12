@@ -45,6 +45,7 @@
     <ProjectReference Include="..\Lyt.Avalonia.Persistence\Lyt.Avalonia.Persistence.csproj" />
     <ProjectReference Include="..\Lyt.Avalonia.Themes\Lyt.Avalonia.Themes.csproj" />
     <ProjectReference Include="..\Lyt.Avalonia.UserAdministration\Lyt.Avalonia.UserAdministration.csproj" />
+    <ProjectReference Include="..\Lyt.Reflector\Lyt.Reflector.csproj" />
     <ProjectReference Include="..\Lyt.StateMachine\Lyt.StateMachine.csproj" />
   </ItemGroup>
 </Project>
