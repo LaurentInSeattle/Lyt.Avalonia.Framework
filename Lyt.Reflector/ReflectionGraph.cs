@@ -1,59 +1,108 @@
 ﻿namespace Lyt.Reflector;
 
-public sealed class ReflectionGraph
+public sealed class ReflectionGraph(Assembly rootAssembly)
 {
-    private readonly Assembly rootAssembly;
-    private readonly Dictionary<string, Assembly> assemblies;
-
-    // Broken: Not the Droid Structure we are looking for, need a graph 
-    private readonly Dictionary<string, string> assemblyDependencies;
-
-    public ReflectionGraph(Assembly assembly)
-    {
-        this.rootAssembly = assembly;
-        this.assemblies = [];
-        this.assemblyDependencies = [];
-    }
+    private readonly Assembly rootAssembly = rootAssembly;
+    public readonly Graph<string, AssemblyVertex> assemblies = new (64);
 
     public void BuildGraph()
     {
-        string assemblyName = this.rootAssembly.GetName()!.Name!;
-        Debug.WriteLine(assemblyName);
+        // Root vertex 
+        var assemblyName = this.rootAssembly.GetName();
+        var assemblyVertex = new AssemblyVertex(assemblyName);
+        if (!assemblyVertex.Load())
+        {
+            // Failed to load the root assembly !
+            throw new Exception("Failed to load the specified root assembly.");
+        }
+        
+        this.assemblies.AddVertex(assemblyVertex);
+        string assemblyShortName = assemblyName!.Name!;
+        Debug.WriteLine(assemblyShortName);
+
         Debug.Indent();
-        this.LoadAssemblyRecursive(this.rootAssembly);
+        this.LoadAssemblyRecursive(assemblyVertex);
         Debug.Unindent();
-        Debug.WriteLine("Assembly loaded: " + this.assemblies.Count);
-        Debug.WriteLine("Dependencies: " + this.assemblyDependencies.Count);
+
+        var list = this.assemblies.Vertices;
+        var sorted = (from v in list orderby v.Value.Key ascending select v).ToList();
+        var loaded = (from v in sorted
+                      where v.Value.IsLoaded
+                      orderby v.Value.Key ascending select v)
+                      .ToList();
+
+        Debug.WriteLine("");
+        Debug.WriteLine("Assembly referenced: " + sorted.Count);
+        foreach (var v in sorted)
+        {
+            Debug.WriteLine(v.Value.Key);
+        }
+
+        Debug.WriteLine("");
+        Debug.WriteLine("Assembly loaded: " + loaded.Count);
+        foreach (var v in loaded)
+        {
+            Debug.WriteLine(v.Value.Key);
+        }
+
+        if ( this.assemblies.HasCycle() )
+        {
+            Debug.WriteLine("Cycle Detected !!!");
+        }
     }
 
-    private void LoadAssemblyRecursive(Assembly assembly)
+    private void LoadAssemblyRecursive(AssemblyVertex assemblyVertex)
     {
-        string assemblyName = assembly.GetName()!.Name!;
+        if (assemblyVertex.Assembly is null)
+        {
+            return; 
+        } 
+
+        Assembly assembly = assemblyVertex.Assembly; 
         AssemblyName[] referencedAssemblyNames = assembly.GetReferencedAssemblies();
         foreach (var referencedAssemblyName in referencedAssemblyNames)
         {
             string referencedShortName = referencedAssemblyName.Name!;
             Debug.WriteLine(referencedShortName);
 
-            // No good here ! 
-            _ = this.assemblyDependencies.TryAdd(assemblyName, referencedShortName);
+            var referencedAssemblyVertex = new AssemblyVertex(referencedAssemblyName);
+
+            // Add vertex if we do not have it yet 
+            if ( !this.assemblies.ContainsVertex(referencedAssemblyVertex))
+            {
+                this.assemblies.AddVertex(referencedAssemblyVertex); 
+            }
+
+            // Add Edge if we dont have it already 
+            if (!this.assemblies.HasEdge(assemblyVertex, referencedAssemblyVertex))
+            {
+                this.assemblies.AddEdge(assemblyVertex, referencedAssemblyVertex);
+            } 
 
             // If we have a system or 'do not load' assembly, do not load and do not recurse 
-            // TODO better than this hack !!!
             if (referencedShortName.StartsWith("System.") ||
                 referencedShortName.StartsWith("Microsoft.") ||
                 referencedShortName.StartsWith("Avalonia."))
             {
+                // TODO: Parametrize that better !
+                // System assembly or spec'd to skip (Ex: Avalonia.) 
+                // Do not recurse 
                 continue;
             }
-
-            var referencedAssembly = Assembly.Load(referencedAssemblyName);
-            bool added = this.assemblies.TryAdd(referencedShortName, referencedAssembly);
-            if (added)
+            else
             {
-                Debug.Indent();
-                this.LoadAssemblyRecursive(referencedAssembly);
-                Debug.Unindent();
+                if (!referencedAssemblyVertex.Load())
+                {
+                    // Failed to load : Do not recurse because we can't
+                    continue; 
+                }
+                else
+                {
+                    // Recurse 
+                    Debug.Indent();
+                    this.LoadAssemblyRecursive(referencedAssemblyVertex);
+                    Debug.Unindent();
+                }
             }
         }
     }
