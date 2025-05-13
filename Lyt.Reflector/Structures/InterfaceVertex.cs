@@ -1,15 +1,9 @@
 ﻿namespace Lyt.Reflector.Structures;
 
-public sealed class InterfaceVertex : IKeyProvider<string>
+public sealed class InterfaceVertex(AssemblyVertex assemblyVertex, Type type) : IKeyProvider<string>
 {
-    private readonly AssemblyVertex assemblyVertex;
-    private readonly Type type;
-
-    public InterfaceVertex(AssemblyVertex assemblyVertex, Type type)
-    {
-        this.assemblyVertex = assemblyVertex;
-        this.type = type;
-    }
+    private readonly AssemblyVertex assemblyVertex = assemblyVertex;
+    private readonly Type type = type;
 
     public Type InterfaceType => this.type;
 

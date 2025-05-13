@@ -1,13 +1,11 @@
-﻿using System;
-
-namespace Lyt.Reflector;
+﻿namespace Lyt.Reflector;
 
 public sealed class ReflectionGraph(Assembly rootAssembly)
 {
     private readonly Assembly rootAssembly = rootAssembly;
     public readonly Graph<string, AssemblyVertex> assemblyDependenciesGraph = new(64);
-    public readonly Graph<string, ClassVertex> classDependenciesGraph = new(256);
-    public readonly Graph<string, InterfaceVertex> interfaceDependenciesGraph = new(256);
+    public readonly Graph<string, ClassVertex> classInheritanceGraph = new(256);
+    public readonly Graph<string, InterfaceVertex> interfaceInheritanceGraph = new(32);
 
     public void BuildGraph()
     {
@@ -67,30 +65,30 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
             this.LoadClassesAndInterfaces(vertexAssemblyVertex.Value);
         }
 
-        Debug.WriteLine("Found classes: " + this.classDependenciesGraph.Vertices.Count);
+        Debug.WriteLine("Found classes: " + this.classInheritanceGraph.Vertices.Count);
         Debug.Indent();
-        foreach (var v in this.classDependenciesGraph.Vertices)
+        foreach (var v in this.classInheritanceGraph.Vertices)
         {
             Debug.WriteLine(v.Value.Key);
         }
         Debug.Unindent();
 
-        if (this.classDependenciesGraph.HasCycle())
+        if (this.classInheritanceGraph.HasCycle())
         {
             Debug.WriteLine("");
             Debug.WriteLine("*** Classes:  Cycle Detected !!!");
             Debug.WriteLine("");
         }
 
-        Debug.WriteLine("Found interfaces: " + this.interfaceDependenciesGraph.Vertices.Count);
+        Debug.WriteLine("Found interfaces: " + this.interfaceInheritanceGraph.Vertices.Count);
         Debug.Indent();
-        foreach (var v in this.interfaceDependenciesGraph.Vertices)
+        foreach (var v in this.interfaceInheritanceGraph.Vertices)
         {
             Debug.WriteLine(v.Value.Key);
         }
         Debug.Unindent();
 
-        if (this.interfaceDependenciesGraph.HasCycle())
+        if (this.interfaceInheritanceGraph.HasCycle())
         {
             Debug.WriteLine("");
             Debug.WriteLine("*** Interfaces:  Cycle Detected !!!");
@@ -98,7 +96,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         }
 
         this.ResolveClassInheritance();
-        this.ResolveInterfaceInheritance(); 
+        this.ResolveInterfaceInheritance();
     }
 
     private void LoadAssemblyRecursive(AssemblyVertex assemblyVertex)
@@ -167,11 +165,6 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         Type[] types = assemblyVertex.Assembly.GetTypes();
         foreach (var type in types)
         {
-            if ( type.ToString() == "Lyt.Avalonia.Controls.PanZoom.PanZoomControl")
-            {
-                // Debugger.Break();
-            }
-
             if (type.ShouldBeIgnored())
             {
                 // Special characters in type name: Computer generated class 
@@ -199,24 +192,24 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
                     continue;
                 }
-            } 
+            }
 
             if (type.IsClass)
             {
                 // Add vertex if we do not have it yet 
                 ClassVertex classVertex = new(assemblyVertex, type);
-                if (!this.classDependenciesGraph.ContainsVertex(classVertex))
+                if (!this.classInheritanceGraph.ContainsVertex(classVertex))
                 {
-                    this.classDependenciesGraph.AddVertex(classVertex);
+                    this.classInheritanceGraph.AddVertex(classVertex);
                 }
             }
             else if (type.IsInterface)
             {
                 // Add vertex if we do not have it yet 
                 InterfaceVertex interfaceVertex = new(assemblyVertex, type);
-                if (!this.interfaceDependenciesGraph.ContainsVertex(interfaceVertex))
+                if (!this.interfaceInheritanceGraph.ContainsVertex(interfaceVertex))
                 {
-                    this.interfaceDependenciesGraph.AddVertex(interfaceVertex);
+                    this.interfaceInheritanceGraph.AddVertex(interfaceVertex);
                 }
             }
             else
@@ -229,7 +222,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
     private void ResolveClassInheritance()
     {
-        var classVertices = this.classDependenciesGraph.Vertices;
+        var classVertices = this.classInheritanceGraph.Vertices;
         foreach (var classVertex in classVertices)
         {
             Type? maybeBaseType = classVertex.Value.ClassType.BaseType;
@@ -244,11 +237,11 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
                     // We may not have it if this something from a non-loaded assembly 
                     string key = baseType.SafeFullName();
-                    if (this.classDependenciesGraph.ContainsVertex(key))
+                    if (this.classInheritanceGraph.ContainsVertex(key))
                     {
                         // We have a base type: Create an edge in the graph 
-                        var baseClassVertex = this.classDependenciesGraph.GetVertex(key);
-                        this.classDependenciesGraph.AddEdge(classVertex.Value, baseClassVertex.Value);
+                        var baseClassVertex = this.classInheritanceGraph.GetVertex(key);
+                        this.classInheritanceGraph.AddEdge(classVertex.Value, baseClassVertex.Value);
                         Debug.WriteLine(
                             classVertex.Value.Key.ToString() + " -> " +
                             baseClassVertex.Value.Key.ToString());
@@ -260,34 +253,32 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
     private void ResolveInterfaceInheritance()
     {
-        // TODO 
-        //
-        //var classVertices = this.classDependenciesGraph.Vertices;
-        //foreach (var classVertex in classVertices)
-        //{
-        //    Type? maybeBaseType = classVertex.Value.ClassType.BaseType;
-        //    if ((maybeBaseType is Type baseType) && (baseType != typeof(object)))
-        //    {
-        //        if (baseType.IsClass)
-        //        {
-        //            if (baseType.HasNoSafeFullName())
-        //            {
-        //                continue;
-        //            }
+        var interfaceVertices = this.interfaceInheritanceGraph.Vertices;
+        foreach (var interfaceVertex in interfaceVertices)
+        {
+            Type[] interfaces = interfaceVertex.Value.InterfaceType.GetInterfaces();
+            if (interfaces.Length> 0)
+            {
+                foreach ( Type interfaceType in interfaces)
+                {
+                    if (interfaceType.HasNoSafeFullName())
+                    {
+                        continue;
+                    }
 
-        //            // We may not have it if this something from a non-loaded assembly 
-        //            string key = baseType.SafeFullName();
-        //            if (this.classDependenciesGraph.ContainsVertex(key))
-        //            {
-        //                // We have a base type: Create an edge in the graph 
-        //                var baseClassVertex = this.classDependenciesGraph.GetVertex(key);
-        //                this.classDependenciesGraph.AddEdge(classVertex.Value, baseClassVertex.Value);
-        //                Debug.WriteLine(
-        //                    classVertex.Value.Key.ToString() + " -> " +
-        //                    baseClassVertex.Value.Key.ToString());
-        //            }
-        //        }
-        //    }
-        //}
+                    // We may not have it if this something from a non-loaded assembly 
+                    string key = interfaceType.SafeFullName();
+                    if (this.interfaceInheritanceGraph.ContainsVertex(key))
+                    {
+                        // We have a base type: Create an edge in the graph 
+                        var baseInterfaceVertex = this.interfaceInheritanceGraph.GetVertex(key);
+                        this.interfaceInheritanceGraph.AddEdge(interfaceVertex.Value, baseInterfaceVertex.Value);
+                        Debug.WriteLine(
+                            interfaceVertex.Value.Key.ToString() + "  ->  " +
+                            baseInterfaceVertex.Value.Key.ToString());
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Lyt.Reflector.Structures; 
+﻿namespace Lyt.Reflector.Structures;
 
 public interface IKeyProvider<TKey> where TKey : IEquatable<TKey> 
 {
