@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Lyt.Reflector.Structures;
+﻿namespace Lyt.Reflector.Structures;
 
 public static class ReflectionUtilities
 {
@@ -52,5 +50,35 @@ public static class ReflectionUtilities
         }
 
         return type.FullName; 
+    }
+
+    public static bool ShouldBeIgnored( this Type type )
+    {
+        char[] specialChars = ['<', '!', '>', '+',];
+        foreach (char special in specialChars)
+        {
+            if (type.Name.Contains(special))
+            {
+                // Computer generated class 
+                Debug.WriteLine("Excluded: " + special + "  " + type.ToString());
+                return true;
+            }
+        }
+
+        if (!type.HasNoSafeFullName())
+        {
+            string fullName = type.SafeFullName();
+            foreach (char special in specialChars)
+            {
+                if (fullName.Contains(special))
+                {
+                    // Computer generated class 
+                    Debug.WriteLine("Excluded: " + special + "  " + type.ToString());
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

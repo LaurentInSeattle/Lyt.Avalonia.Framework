@@ -1,4 +1,6 @@
-﻿namespace Lyt.Reflector;
+﻿using System;
+
+namespace Lyt.Reflector;
 
 public sealed class ReflectionGraph(Assembly rootAssembly)
 {
@@ -96,6 +98,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         }
 
         this.ResolveClassInheritance();
+        this.ResolveInterfaceInheritance(); 
     }
 
     private void LoadAssemblyRecursive(AssemblyVertex assemblyVertex)
@@ -164,10 +167,39 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         Type[] types = assemblyVertex.Assembly.GetTypes();
         foreach (var type in types)
         {
-            if (type.IsCompilerGenerated() || type.HasNoSafeFullName())
+            if ( type.ToString() == "Lyt.Avalonia.Controls.PanZoom.PanZoomControl")
             {
+                // Debugger.Break();
+            }
+
+            if (type.ShouldBeIgnored())
+            {
+                // Special characters in type name: Computer generated class 
                 continue;
             }
+
+            if (type.Attributes.HasFlag(TypeAttributes.Public))
+            {
+                // View and controls are 'IsCompilerGenerated' for Avalonia 
+                // Need to check for WPF 
+            }
+            else
+            {
+                if (type.IsCompilerGenerated() || type.HasNoSafeFullName())
+                {
+                    Debug.WriteLine("Excluded: " + type.ToString());
+                    //var attributes = type.CustomAttributes;
+                    //Debug.Indent();
+                    //Debug.WriteLine(type.Attributes.ToString());
+                    //foreach (var attribute in attributes)
+                    //{
+                    //    Debug.WriteLine(attribute.ToString());
+                    //}
+                    //Debug.Unindent();
+
+                    continue;
+                }
+            } 
 
             if (type.IsClass)
             {
@@ -224,5 +256,38 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
                 }
             }
         }
+    }
+
+    private void ResolveInterfaceInheritance()
+    {
+        // TODO 
+        //
+        //var classVertices = this.classDependenciesGraph.Vertices;
+        //foreach (var classVertex in classVertices)
+        //{
+        //    Type? maybeBaseType = classVertex.Value.ClassType.BaseType;
+        //    if ((maybeBaseType is Type baseType) && (baseType != typeof(object)))
+        //    {
+        //        if (baseType.IsClass)
+        //        {
+        //            if (baseType.HasNoSafeFullName())
+        //            {
+        //                continue;
+        //            }
+
+        //            // We may not have it if this something from a non-loaded assembly 
+        //            string key = baseType.SafeFullName();
+        //            if (this.classDependenciesGraph.ContainsVertex(key))
+        //            {
+        //                // We have a base type: Create an edge in the graph 
+        //                var baseClassVertex = this.classDependenciesGraph.GetVertex(key);
+        //                this.classDependenciesGraph.AddEdge(classVertex.Value, baseClassVertex.Value);
+        //                Debug.WriteLine(
+        //                    classVertex.Value.Key.ToString() + " -> " +
+        //                    baseClassVertex.Value.Key.ToString());
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
