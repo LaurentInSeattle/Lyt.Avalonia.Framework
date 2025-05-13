@@ -83,6 +83,7 @@ public sealed class ShellViewModel : Bindable<ShellView>
         var reflector = new Reflector.ReflectionGraph(Assembly.GetExecutingAssembly()); 
         reflector.BuildGraph();
 
+        this.timingModel.Stop();
         //this.timingModel.Start();
         //this.SetupWorkflow();
         //if (this.Workflow is not null)
