@@ -79,16 +79,17 @@ public sealed class ShellViewModel : Bindable<ShellView>
     protected override /* async */ void OnViewLoaded()
     {
         base.OnViewLoaded();
-        this.timingModel.Start();
-        this.SetupWorkflow();
-        if (this.Workflow is not null)
-        {
-            //await this.Workflow.Initialize();
-            //_ = this.Workflow.Start();
-        }
 
         var reflector = new Reflector.ReflectionGraph(Assembly.GetExecutingAssembly()); 
         reflector.BuildGraph();
+
+        //this.timingModel.Start();
+        //this.SetupWorkflow();
+        //if (this.Workflow is not null)
+        //{
+        //    //await this.Workflow.Initialize();
+        //    //_ = this.Workflow.Start();
+        //}
     }
 
     private void OnTimingModelUpdated(ModelUpdateMessage _)

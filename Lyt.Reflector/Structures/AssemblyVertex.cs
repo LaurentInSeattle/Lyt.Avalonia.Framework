@@ -1,13 +1,8 @@
 ﻿namespace Lyt.Reflector.Structures; 
 
-public sealed class AssemblyVertex : IKeyProvider<string>
+public sealed class AssemblyVertex(AssemblyName assemblyName) : IKeyProvider<string>
 {
-    public readonly AssemblyName AssemblyName;
-
-    public AssemblyVertex(AssemblyName assemblyName)
-    {
-        this.AssemblyName = assemblyName;        
-    }
+    public readonly AssemblyName AssemblyName = assemblyName;
 
     public string Key => this.AssemblyName.Name!;
 

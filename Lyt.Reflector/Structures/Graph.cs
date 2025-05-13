@@ -12,9 +12,14 @@ public sealed class Graph<TKey, T>(int capacity = 16)
 {
     private readonly Dictionary<TKey, Vertex<T>> vertices = new(capacity);
 
+    public Vertex<T> GetVertex(TKey key) => this.vertices[key];
+
     public Vertex<T> GetVertex(T value) => this.vertices[value.Key];
 
     public List<Vertex<T>> Vertices => [.. this.vertices.Values];
+
+    /// <summary> Returns true if we already have a vertex with the provided key. </summary>
+    public bool ContainsVertex(TKey key) => this.vertices.ContainsKey(key);
 
     /// <summary> Returns true if we already have the provided vertex. </summary>
     public bool ContainsVertex(T value) => this.vertices.ContainsKey(value.Key);
