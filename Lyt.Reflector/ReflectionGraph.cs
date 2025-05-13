@@ -56,7 +56,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         if (this.assemblyDependenciesGraph.HasCycle())
         {
             Debug.WriteLine("");
-            Debug.WriteLine("*** Cycle Detected !!!");
+            Debug.WriteLine("*** Assemblies:  Cycle Detected !!!");
             Debug.WriteLine("");
         }
 
@@ -73,6 +73,13 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         }
         Debug.Unindent();
 
+        if (this.classDependenciesGraph.HasCycle())
+        {
+            Debug.WriteLine("");
+            Debug.WriteLine("*** Classes:  Cycle Detected !!!");
+            Debug.WriteLine("");
+        }
+
         Debug.WriteLine("Found interfaces: " + this.interfaceDependenciesGraph.Vertices.Count);
         Debug.Indent();
         foreach (var v in this.interfaceDependenciesGraph.Vertices)
@@ -80,6 +87,13 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
             Debug.WriteLine(v.Value.Key);
         }
         Debug.Unindent();
+
+        if (this.interfaceDependenciesGraph.HasCycle())
+        {
+            Debug.WriteLine("");
+            Debug.WriteLine("*** Interfaces:  Cycle Detected !!!");
+            Debug.WriteLine("");
+        }
 
         this.ResolveClassInheritance();
     }
@@ -142,7 +156,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
     private void LoadClassesAndInterfaces(AssemblyVertex assemblyVertex)
     {
-        if (assemblyVertex.Assembly is not Assembly assembly)
+        if (assemblyVertex.Assembly is null)
         {
             throw new Exception("Assembly not loaded");
         }

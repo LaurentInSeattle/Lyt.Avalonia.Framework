@@ -137,7 +137,7 @@ public sealed class Graph<TKey, T>(int capacity = 16)
     /// </remarks>
     public bool HasCycle()
     {
-        bool DepthFirstTraversal(Vertex<T> current, HashSet<T> visited, HashSet<T> visiting)
+        static bool DepthFirstTraversal(Vertex<T> current, HashSet<T> visited, HashSet<T> visiting)
         {
             visiting.Add(current.Value);
             foreach (var edge in current.OutEdges)
