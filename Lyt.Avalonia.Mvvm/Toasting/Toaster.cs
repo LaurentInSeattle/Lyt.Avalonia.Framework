@@ -6,7 +6,7 @@ public sealed class Toaster : IToaster
     private ToastViewModel? current;
     private bool hostPanelHitTestVisibility;
 
-    public Panel? hostPanel;
+    public Panel? HostPanel;
 
     public Toaster(IMessenger messenger)
     {
@@ -20,7 +20,7 @@ public sealed class Toaster : IToaster
     // The host panel that will show the toasts 
     public object? Host
     {
-        get => this.hostPanel;
+        get => this.HostPanel;
         set
         {
             if (value is not Panel panel)
@@ -28,7 +28,7 @@ public sealed class Toaster : IToaster
                 throw new Exception("The Toaster Host must be a panel.");
             }
 
-            this.hostPanel = panel;
+            this.HostPanel = panel;
         }
     }
 

@@ -80,7 +80,8 @@ public sealed class ShellViewModel : Bindable<ShellView>
     {
         base.OnViewLoaded();
 
-        var reflector = new Reflector.ReflectionGraph(Assembly.GetExecutingAssembly()); 
+        List<string> excludedNamespaces =["System.", "Microsoft.", "Avalonia."]; 
+        var reflector = new Reflector.ReflectionGraph(Assembly.GetExecutingAssembly(), excludedNamespaces); 
         reflector.BuildGraph();
 
         this.timingModel.Stop();

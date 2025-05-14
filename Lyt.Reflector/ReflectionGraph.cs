@@ -1,14 +1,17 @@
 ﻿namespace Lyt.Reflector;
 
-public sealed class ReflectionGraph(Assembly rootAssembly)
+public sealed class ReflectionGraph(Assembly rootAssembly, List<string> excludedNamespaces)
 {
     private readonly Assembly rootAssembly = rootAssembly;
-    public readonly Graph<string, AssemblyVertex> assemblyDependenciesGraph = new(64);
-    public readonly Graph<string, ClassVertex> classInheritanceGraph = new(256);
-    public readonly Graph<string, InterfaceVertex> interfaceInheritanceGraph = new(32);
+    private readonly List<string> excludedNamespaces = excludedNamespaces;
+    public readonly Graph<string, AssemblyVertex> AssemblyDependenciesGraph = new(64);
+    public readonly Graph<string, ClassVertex> ClassInheritanceGraph = new(512);
+    public readonly Graph<string, InterfaceVertex> InterfaceInheritanceGraph = new(64);
 
     public void BuildGraph()
     {
+        ReflectionUtilities.SetExcludedNamespaces(this.excludedNamespaces); 
+
         // Root vertex 
         var assemblyName = this.rootAssembly.GetName();
         var assemblyVertex = new AssemblyVertex(assemblyName);
@@ -18,7 +21,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
             throw new Exception("Failed to load the specified root assembly.");
         }
 
-        this.assemblyDependenciesGraph.AddVertex(assemblyVertex);
+        this.AssemblyDependenciesGraph.AddVertex(assemblyVertex);
         string assemblyShortName = assemblyName!.Name!;
         Debug.WriteLine(assemblyShortName);
 
@@ -26,7 +29,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         this.LoadAssemblyRecursive(assemblyVertex);
         Debug.Unindent();
 
-        var list = this.assemblyDependenciesGraph.Vertices;
+        var list = this.AssemblyDependenciesGraph.Vertices;
         var sortedAssemblies = (from v in list orderby v.Value.Key ascending select v).ToList();
         var loadedAssemblies =
             (from v in sortedAssemblies
@@ -53,7 +56,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
         }
         Debug.Unindent();
 
-        if (this.assemblyDependenciesGraph.HasCycle())
+        if (this.AssemblyDependenciesGraph.HasCycle())
         {
             Debug.WriteLine("");
             Debug.WriteLine("*** Assemblies:  Cycle Detected !!!");
@@ -65,30 +68,30 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
             this.LoadClassesAndInterfaces(vertexAssemblyVertex.Value);
         }
 
-        Debug.WriteLine("Found classes: " + this.classInheritanceGraph.Vertices.Count);
+        Debug.WriteLine("Found classes: " + this.ClassInheritanceGraph.Vertices.Count);
         Debug.Indent();
-        foreach (var v in this.classInheritanceGraph.Vertices)
+        foreach (var v in this.ClassInheritanceGraph.Vertices)
         {
             Debug.WriteLine(v.Value.Key);
         }
         Debug.Unindent();
 
-        if (this.classInheritanceGraph.HasCycle())
+        if (this.ClassInheritanceGraph.HasCycle())
         {
             Debug.WriteLine("");
             Debug.WriteLine("*** Classes:  Cycle Detected !!!");
             Debug.WriteLine("");
         }
 
-        Debug.WriteLine("Found interfaces: " + this.interfaceInheritanceGraph.Vertices.Count);
+        Debug.WriteLine("Found interfaces: " + this.InterfaceInheritanceGraph.Vertices.Count);
         Debug.Indent();
-        foreach (var v in this.interfaceInheritanceGraph.Vertices)
+        foreach (var v in this.InterfaceInheritanceGraph.Vertices)
         {
             Debug.WriteLine(v.Value.Key);
         }
         Debug.Unindent();
 
-        if (this.interfaceInheritanceGraph.HasCycle())
+        if (this.InterfaceInheritanceGraph.HasCycle())
         {
             Debug.WriteLine("");
             Debug.WriteLine("*** Interfaces:  Cycle Detected !!!");
@@ -97,6 +100,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
         this.ResolveClassInheritance();
         this.ResolveInterfaceInheritance();
+        this.ReflectIntoClasses(); 
     }
 
     private void LoadAssemblyRecursive(AssemblyVertex assemblyVertex)
@@ -116,23 +120,20 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
             var referencedAssemblyVertex = new AssemblyVertex(referencedAssemblyName);
 
             // Add vertex if we do not have it yet 
-            if (!this.assemblyDependenciesGraph.ContainsVertex(referencedAssemblyVertex))
+            if (!this.AssemblyDependenciesGraph.ContainsVertex(referencedAssemblyVertex))
             {
-                this.assemblyDependenciesGraph.AddVertex(referencedAssemblyVertex);
+                this.AssemblyDependenciesGraph.AddVertex(referencedAssemblyVertex);
             }
 
             // Add Edge if we dont have it already 
-            if (!this.assemblyDependenciesGraph.HasEdge(assemblyVertex, referencedAssemblyVertex))
+            if (!this.AssemblyDependenciesGraph.HasEdge(assemblyVertex, referencedAssemblyVertex))
             {
-                this.assemblyDependenciesGraph.AddEdge(assemblyVertex, referencedAssemblyVertex);
+                this.AssemblyDependenciesGraph.AddEdge(assemblyVertex, referencedAssemblyVertex);
             }
 
             // If we have a system or 'do not load' assembly, do not load and do not recurse 
-            if (referencedShortName.StartsWith("System.") ||
-                referencedShortName.StartsWith("Microsoft.") ||
-                referencedShortName.StartsWith("Avalonia."))
+            if (referencedShortName.IsExcludedNamespace())
             {
-                // TODO: Parametrize that better !
                 // System assembly or spec'd to skip (Ex: Avalonia.) 
                 // Do not recurse 
                 continue;
@@ -198,18 +199,18 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
             {
                 // Add vertex if we do not have it yet 
                 ClassVertex classVertex = new(assemblyVertex, type);
-                if (!this.classInheritanceGraph.ContainsVertex(classVertex))
+                if (!this.ClassInheritanceGraph.ContainsVertex(classVertex))
                 {
-                    this.classInheritanceGraph.AddVertex(classVertex);
+                    this.ClassInheritanceGraph.AddVertex(classVertex);
                 }
             }
             else if (type.IsInterface)
             {
                 // Add vertex if we do not have it yet 
                 InterfaceVertex interfaceVertex = new(assemblyVertex, type);
-                if (!this.interfaceInheritanceGraph.ContainsVertex(interfaceVertex))
+                if (!this.InterfaceInheritanceGraph.ContainsVertex(interfaceVertex))
                 {
-                    this.interfaceInheritanceGraph.AddVertex(interfaceVertex);
+                    this.InterfaceInheritanceGraph.AddVertex(interfaceVertex);
                 }
             }
             else
@@ -217,12 +218,11 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
                 // MORE here! 
             }
         }
-
     }
 
     private void ResolveClassInheritance()
     {
-        var classVertices = this.classInheritanceGraph.Vertices;
+        var classVertices = this.ClassInheritanceGraph.Vertices;
         foreach (var classVertex in classVertices)
         {
             Type? maybeBaseType = classVertex.Value.ClassType.BaseType;
@@ -237,11 +237,11 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
                     // We may not have it if this something from a non-loaded assembly 
                     string key = baseType.SafeFullName();
-                    if (this.classInheritanceGraph.ContainsVertex(key))
+                    if (this.ClassInheritanceGraph.ContainsVertex(key))
                     {
                         // We have a base type: Create an edge in the graph 
-                        var baseClassVertex = this.classInheritanceGraph.GetVertex(key);
-                        this.classInheritanceGraph.AddEdge(classVertex.Value, baseClassVertex.Value);
+                        var baseClassVertex = this.ClassInheritanceGraph.GetVertex(key);
+                        this.ClassInheritanceGraph.AddEdge(classVertex.Value, baseClassVertex.Value);
                         Debug.WriteLine(
                             classVertex.Value.Key.ToString() + " -> " +
                             baseClassVertex.Value.Key.ToString());
@@ -253,7 +253,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
     private void ResolveInterfaceInheritance()
     {
-        var interfaceVertices = this.interfaceInheritanceGraph.Vertices;
+        var interfaceVertices = this.InterfaceInheritanceGraph.Vertices;
         foreach (var interfaceVertex in interfaceVertices)
         {
             Type[] interfaces = interfaceVertex.Value.InterfaceType.GetInterfaces();
@@ -268,17 +268,27 @@ public sealed class ReflectionGraph(Assembly rootAssembly)
 
                     // We may not have it if this something from a non-loaded assembly 
                     string key = interfaceType.SafeFullName();
-                    if (this.interfaceInheritanceGraph.ContainsVertex(key))
+                    if (this.InterfaceInheritanceGraph.ContainsVertex(key))
                     {
                         // We have a base type: Create an edge in the graph 
-                        var baseInterfaceVertex = this.interfaceInheritanceGraph.GetVertex(key);
-                        this.interfaceInheritanceGraph.AddEdge(interfaceVertex.Value, baseInterfaceVertex.Value);
+                        var baseInterfaceVertex = this.InterfaceInheritanceGraph.GetVertex(key);
+                        this.InterfaceInheritanceGraph.AddEdge(interfaceVertex.Value, baseInterfaceVertex.Value);
                         Debug.WriteLine(
                             interfaceVertex.Value.Key.ToString() + "  ->  " +
                             baseInterfaceVertex.Value.Key.ToString());
                     }
                 }
             }
+        }
+    }
+
+    private void ReflectIntoClasses ()
+    {
+        List<Vertex<ClassVertex>> classVertices = this.ClassInheritanceGraph.Vertices;
+        foreach (var item in classVertices)
+        {
+            ClassVertex classVertex = item.Value;
+            classVertex.Load(); 
         }
     }
 }

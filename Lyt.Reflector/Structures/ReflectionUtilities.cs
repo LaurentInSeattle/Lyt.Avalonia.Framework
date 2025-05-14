@@ -2,6 +2,13 @@
 
 public static class ReflectionUtilities
 {
+    private static List<string> excludedNamespaces = [];
+
+    public static void SetExcludedNamespaces(List<string> excludedNamespaces)
+        => ReflectionUtilities.excludedNamespaces = excludedNamespaces;
+
+    public static List<string> SetExcludedNamespaces() => ReflectionUtilities.excludedNamespaces ;
+
     public static bool IsCompilerGenerated(this Type type)
     {
         if (type.GetCustomAttribute<CompilerGeneratedAttribute>() is not null ||
@@ -76,6 +83,31 @@ public static class ReflectionUtilities
                     Debug.WriteLine("Excluded: " + special + "  " + type.ToString());
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    public static bool HasExcludedNamespace (this Type type)
+    {
+        if ( type.HasNoSafeFullName())
+        {
+            return true; 
+        }
+
+        string safeFullName = type.SafeFullName();
+        return IsExcludedNamespace(safeFullName); 
+    }
+
+    public static bool IsExcludedNamespace(this string namespaceString)
+    {
+        foreach (string excluded in ReflectionUtilities.excludedNamespaces)
+        {
+            if (namespaceString.StartsWith(excluded, StringComparison.InvariantCultureIgnoreCase))
+            {
+                // System assembly or spec'd to skip (Ex: Avalonia.) 
+                return true;
             }
         }
 
