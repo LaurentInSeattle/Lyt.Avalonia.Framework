@@ -289,7 +289,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly, List<string> excluded
         {
             ClassVertex classVertex = item.Value;
 
-            if ( classVertex.ClassType.SafeFullName() == "Lyt.Reflector.ReflectionGraph")
+            if ( classVertex.ClassType.SafeFullName().StartsWith ( "Lyt.Reflector.Graph"))
             {
                 Debugger.Break(); 
             }

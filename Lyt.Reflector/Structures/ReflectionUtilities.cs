@@ -7,46 +7,63 @@ public static class ReflectionUtilities
     public static void SetExcludedNamespaces(List<string> excludedNamespaces)
         => ReflectionUtilities.excludedNamespaces = excludedNamespaces;
 
-    public static List<string> SetExcludedNamespaces() => ReflectionUtilities.excludedNamespaces ;
+    public static List<string> SetExcludedNamespaces() => ReflectionUtilities.excludedNamespaces;
 
-    public static Tuple<bool, List<Type>> AnalyseType(this Type type)
+    public static Tuple<bool, List<Type>> AnalyseType(this Type sourceType)
     {
-        // ==> BROKEN : Should recurse into Generic types 
-        // 
-        // Should be able to handle stuff like List<Tuple<bool,StuffClass>> and return StuffClass
-        // 
-
         List<Type> dependantTypes = [];
         var ignoreType = Tuple.Create(false, new List<Type>());
         var relevantType = Tuple.Create(true, dependantTypes);
-        if (type.IsPrimitive)
+        if (sourceType.IsPrimitive)
         {
             // Primitive types do not create dependencies, we ignore them 
             return ignoreType;
         }
 
-        if (type.IsGenericType)
+        void RecurseAnalyseType(Type type)
         {
-            // Need to check generic types 
-            Type[] typeParameters = type.GetGenericArguments();
-            foreach (Type typeParameter in typeParameters)
+            if (type.IsPrimitive)
             {
-                if (typeParameter.ShouldBeIgnored() || (typeParameter == type) )
+                // Primitive types do not create dependencies, we ignore them 
+                return;
+            }
+
+            if (type.IsGenericType)
+            {
+                // Need to check generic types 
+                Type[] typeParameters = type.GetGenericArguments();
+                foreach (Type typeParameter in typeParameters)
                 {
-                    // Example : 
-                    // Class: Lyt.Avalonia.Controls.Progress.ProgressRing
-                    //   Static Field: MaxSideLengthProperty
-                    //   Type: Avalonia.DirectProperty`2[Lyt.Avalonia.Controls.Progress.ProgressRing, System.Double]
-                    continue;
+                    if (typeParameter.ShouldBeIgnored() || (typeParameter == sourceType))
+                    {
+                        // Example : 
+                        // Class: Lyt.Avalonia.Controls.Progress.ProgressRing
+                        //   Static Field: MaxSideLengthProperty
+                        //   Type: Avalonia.DirectProperty`2[Lyt.Avalonia.Controls.Progress.ProgressRing, System.Double]
+                        continue;
+                    }
+
+                    dependantTypes.Add(typeParameter);
+                    RecurseAnalyseType(typeParameter);
                 }
 
-                dependantTypes.Add(typeParameter);
+                return;
+            }
+        }
+
+        if (sourceType.IsGenericType)
+        {
+            // Need to check generic types 
+            Type[] typeParameters = sourceType.GetGenericArguments();
+            foreach (Type typeParameter in typeParameters)
+            {
+                RecurseAnalyseType(typeParameter);
             }
 
             if (dependantTypes.Count == 0)
             {
                 // Example: Static Field: Throw Type: System.Action`1[System.Exception]
-                if (type.HasExcludedNamespace())
+                if (sourceType.HasExcludedNamespace())
                 {
                     // Dependency to an ignore assembly: we can ignore 
                     return ignoreType;
@@ -57,7 +74,7 @@ public static class ReflectionUtilities
         }
         else
         {
-            if (type.ShouldBeIgnored())
+            if (sourceType.ShouldBeIgnored())
             {
                 return ignoreType;
             }
@@ -78,7 +95,7 @@ public static class ReflectionUtilities
         // HasNameWithSpecialCharacters: Most likely Compiler or tool generated 
         //
         // HasExcludedNamespace: Dependency to an ignore assembly: we can ignore 
-        if (type.IsPrimitive  ||  type.HasNameWithSpecialCharacters() || type.HasExcludedNamespace())
+        if (type.IsPrimitive || type.HasNameWithSpecialCharacters() || type.HasExcludedNamespace())
         {
             return true;
         }
@@ -109,9 +126,9 @@ public static class ReflectionUtilities
     }
 
     public static bool HasNoSafeFullName(this Type type)
-        => type.FullName is null && !type.IsGenericType ; 
+        => type.FullName is null && !type.IsGenericType;
 
-    public static string SafeFullName (this Type type)
+    public static string SafeFullName(this Type type)
     {
         // FullName return null if the current instance represents a generic type parameter, an array
         // type based on a type parameter, pointer type based on a type parameter, or byreftype based
@@ -123,7 +140,7 @@ public static class ReflectionUtilities
         if (type.IsGenericType)
         {
             var assemblyName = type.Assembly.GetName();
-            return string.Concat( assemblyName.Name , "." , type.Name );
+            return string.Concat(assemblyName.Name, ".", type.Name);
         }
 
         if (type.FullName is null)
@@ -133,10 +150,10 @@ public static class ReflectionUtilities
             throw new Exception("Invoke HasNoSafeFullName");
         }
 
-        return type.FullName; 
+        return type.FullName;
     }
 
-    public static bool HasNameWithSpecialCharacters( this Type type )
+    public static bool HasNameWithSpecialCharacters(this Type type)
     {
         char[] specialChars = ['<', '!', '>', '+',];
         foreach (char special in specialChars)
@@ -166,15 +183,15 @@ public static class ReflectionUtilities
         return false;
     }
 
-    public static bool HasExcludedNamespace (this Type type)
+    public static bool HasExcludedNamespace(this Type type)
     {
-        if ( type.HasNoSafeFullName())
+        if (type.HasNoSafeFullName())
         {
-            return true; 
+            return true;
         }
 
         string safeFullName = type.SafeFullName();
-        return IsExcludedNamespace(safeFullName); 
+        return IsExcludedNamespace(safeFullName);
     }
 
     public static bool IsExcludedNamespace(this string namespaceString)
