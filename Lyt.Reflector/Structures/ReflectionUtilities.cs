@@ -9,6 +9,83 @@ public static class ReflectionUtilities
 
     public static List<string> SetExcludedNamespaces() => ReflectionUtilities.excludedNamespaces ;
 
+    public static Tuple<bool, List<Type>> AnalyseType(this Type type)
+    {
+        // ==> BROKEN : Should recurse into Generic types 
+        // 
+        // Should be able to handle stuff like List<Tuple<bool,StuffClass>> and return StuffClass
+        // 
+
+        List<Type> dependantTypes = [];
+        var ignoreType = Tuple.Create(false, new List<Type>());
+        var relevantType = Tuple.Create(true, dependantTypes);
+        if (type.IsPrimitive)
+        {
+            // Primitive types do not create dependencies, we ignore them 
+            return ignoreType;
+        }
+
+        if (type.IsGenericType)
+        {
+            // Need to check generic types 
+            Type[] typeParameters = type.GetGenericArguments();
+            foreach (Type typeParameter in typeParameters)
+            {
+                if (typeParameter.ShouldBeIgnored() || (typeParameter == type) )
+                {
+                    // Example : 
+                    // Class: Lyt.Avalonia.Controls.Progress.ProgressRing
+                    //   Static Field: MaxSideLengthProperty
+                    //   Type: Avalonia.DirectProperty`2[Lyt.Avalonia.Controls.Progress.ProgressRing, System.Double]
+                    continue;
+                }
+
+                dependantTypes.Add(typeParameter);
+            }
+
+            if (dependantTypes.Count == 0)
+            {
+                // Example: Static Field: Throw Type: System.Action`1[System.Exception]
+                if (type.HasExcludedNamespace())
+                {
+                    // Dependency to an ignore assembly: we can ignore 
+                    return ignoreType;
+                }
+            }
+
+            return relevantType;
+        }
+        else
+        {
+            if (type.ShouldBeIgnored())
+            {
+                return ignoreType;
+            }
+
+            // No dependant types, but still relevant by itself 
+            return relevantType;
+        }
+    }
+
+    public static bool ShouldBeIgnored(this Type type)
+    {
+        // IsPrimitive: The primitive types are Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64,
+        // UInt64, IntPtr, UIntPtr, Char, Double, and Single.
+        // If the current Type represents a generic type, or a type parameter in the definition of a generic type
+        // or generic method, this IsPrimitive always returns false.
+        // Primitive types do not create dependencies, we ignore them 
+        //
+        // HasNameWithSpecialCharacters: Most likely Compiler or tool generated 
+        //
+        // HasExcludedNamespace: Dependency to an ignore assembly: we can ignore 
+        if (type.IsPrimitive  ||  type.HasNameWithSpecialCharacters() || type.HasExcludedNamespace())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static bool IsCompilerGenerated(this Type type)
     {
         if (type.GetCustomAttribute<CompilerGeneratedAttribute>() is not null ||
@@ -59,7 +136,7 @@ public static class ReflectionUtilities
         return type.FullName; 
     }
 
-    public static bool ShouldBeIgnored( this Type type )
+    public static bool HasNameWithSpecialCharacters( this Type type )
     {
         char[] specialChars = ['<', '!', '>', '+',];
         foreach (char special in specialChars)

@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Reflection;
-using System.Reflection.Metadata;
-
-namespace Lyt.Reflector.Structures; 
+﻿namespace Lyt.Reflector.Structures;
 
 public sealed class ClassVertex : IKeyProvider<string>
 {
@@ -14,6 +10,7 @@ public sealed class ClassVertex : IKeyProvider<string>
         this.assemblyVertex = assemblyVertex;
         this.classType = type;
 
+        // Remove that later when everything is peachy 
         if (type.Name.StartsWith('<'))
         {
             // All computer generated classes should have been filtered out 
@@ -23,12 +20,14 @@ public sealed class ClassVertex : IKeyProvider<string>
         this.Key = type.SafeFullName();
         this.EventDescriptors = new(8);
         this.FieldDescriptors = new(8);
+        this.PropertyDescriptors = new(16);
+        this.MethodDescriptors = new(16);
 
         if (type.IsGenericType)
         {
             // Debug.WriteLine("Generic: " + type.Name);
             // FullName is null for generics so we figure our way to provide a key for generics
-            this.Key = string.Concat( assemblyVertex.Key + "." + type.Name) ; 
+            this.Key = string.Concat(assemblyVertex.Key + "." + type.Name);
         }
         else
         {
@@ -42,9 +41,10 @@ public sealed class ClassVertex : IKeyProvider<string>
     public Type ClassType => this.classType;
 
     public string Key { get; private set; }
-
     public List<EventDescriptor> EventDescriptors { get; private set; }
     public List<FieldDescriptor> FieldDescriptors { get; private set; }
+    public List<PropertyDescriptor> PropertyDescriptors { get; private set; }
+    public List<MethodDescriptor> MethodDescriptors { get; private set; }
 
     public void Load() => this.Load(this.classType);
 
@@ -59,7 +59,7 @@ public sealed class ClassVertex : IKeyProvider<string>
         this.LoadNestedTypes(type);
         Debug.Unindent();
     }
-    
+
     private void LoadEvents(Type type)
     {
         void Load(BindingFlags bindingFlag, string debugString)
@@ -87,35 +87,58 @@ public sealed class ClassVertex : IKeyProvider<string>
             {
                 string fieldName = fieldInfo.Name;
                 Type fieldType = fieldInfo.FieldType;
-                if (fieldType.IsPrimitive)
+                (bool relevantType , List<Type> dependantTypes) = fieldType.AnalyseType();
+                if (relevantType)
                 {
-                    // The primitive types are Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr,
-                    // Char, Double, and Single.
-                    // If the current Type represents a generic type, or a type parameter in the definition of a generic type
-                    // or generic method, this IsPrimitive always returns false.
-                    // Primitive types do not create dependencies, we ignore them 
-                    continue;
-                }
-
-                if (fieldType.IsGenericType)
-                {
-                    // TODO: Need to check generic types 
-                }
-                else
-                {
-                    if (fieldType.HasExcludedNamespace())
+                    FieldDescriptor fieldDescriptor = new(IsStatic: true, fieldType, dependantTypes, fieldName);
+                    this.FieldDescriptors.Add(fieldDescriptor);
+                    Debug.WriteLine(debugString + " Field: " + fieldName + "   Type: " + fieldType.ToString());
+                    if (dependantTypes.Count > 0)
                     {
-                        // Dependency to an ignore assembly: we can ignore 
-                        continue;
+                        Debug.Indent();
+                        foreach (var dependantType in dependantTypes)
+                        {
+                            Debug.WriteLine("Dependant Type: " + dependantType.ToString());
+                        }
+                        Debug.Unindent();
                     }
-                } 
-                
-
-                FieldDescriptor fieldDescriptor = new(IsStatic: true, fieldType, fieldName);
-                this.FieldDescriptors.Add(fieldDescriptor);
-                Debug.WriteLine( debugString + " Field: " + fieldName + "   Type: " + fieldType.ToString());
+                }
             }
-        } 
+        }
+
+        Load(BindingFlags.Static, "Static");
+        Load(BindingFlags.Instance, "Instance");
+    }
+
+    private void LoadProperties(Type type)
+    {
+        void Load(BindingFlags bindingFlag, string debugString)
+        {
+            PropertyInfo[] propertyInfos = 
+                type.GetProperties(bindingFlag | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            foreach (PropertyInfo propertyInfo in propertyInfos)
+            {
+                string propertyName = propertyInfo.Name;
+                Type propertyType = propertyInfo.PropertyType;
+                (bool relevantType, List<Type> dependantTypes) = propertyType.AnalyseType();
+                if (relevantType)
+                {
+                    PropertyDescriptor propertyDescriptor = 
+                        new(IsStatic: true, propertyType, dependantTypes, propertyName);
+                    this.PropertyDescriptors.Add(propertyDescriptor);
+                    Debug.WriteLine(debugString + " Property: " + propertyName + "   Type: " + propertyType.ToString());
+                    if (dependantTypes.Count > 0)
+                    {
+                        Debug.Indent();
+                        foreach (var dependantType in dependantTypes)
+                        {
+                            Debug.WriteLine("Dependant Type: " + dependantType.ToString());
+                        }
+                        Debug.Unindent();
+                    }
+                }
+            }
+        }
 
         Load(BindingFlags.Static, "Static");
         Load(BindingFlags.Instance, "Instance");
@@ -125,16 +148,43 @@ public sealed class ClassVertex : IKeyProvider<string>
     {
         void Load(BindingFlags bindingFlag, string debugString)
         {
-        } 
-        
-        Load(BindingFlags.Static, "Static");
-        Load(BindingFlags.Instance, "Instance");
-    }
+            MethodInfo[] methodInfos =
+                type.GetMethods(bindingFlag | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            foreach (MethodInfo methodInfo in methodInfos)
+            {
+                string methodName = methodInfo.Name;
+                Type returnType = methodInfo.ReturnType;
+                if ( returnType != typeof(void))
+                {
 
-    private void LoadProperties(Type type)
-    {
-        void Load(BindingFlags bindingFlag, string debugString)
-        {
+                }
+
+                ParameterInfo [] parameterInfos = methodInfo.GetParameters(); 
+                if ( parameterInfos.Length > 0)
+                {
+
+                }
+
+                //Type propertyType = propertyInfo.PropertyType;
+                //(bool relevantType, List<Type> dependantTypes) = propertyType.AnalyseType();
+                //if (relevantType)
+                //{
+                //    PropertyDescriptor propertyDescriptor =
+                //        new(IsStatic: true, propertyType, dependantTypes, methodName);
+                //    this.PropertyDescriptors.Add(propertyDescriptor);
+                //    Debug.WriteLine(debugString + " Method: " + methodName + "   Type: " + propertyType.ToString());
+                //    if (dependantTypes.Count > 0)
+                //    {
+                //        Debug.Indent();
+                //        foreach (var dependantType in dependantTypes)
+                //        {
+                //            Debug.WriteLine("Dependant Type: " + dependantType.ToString());
+                //        }
+                //        Debug.Unindent();
+                //    }
+                //}
+            }
+
         }
 
         Load(BindingFlags.Static, "Static");

@@ -166,7 +166,7 @@ public sealed class ReflectionGraph(Assembly rootAssembly, List<string> excluded
         Type[] types = assemblyVertex.Assembly.GetTypes();
         foreach (var type in types)
         {
-            if (type.ShouldBeIgnored())
+            if (type.HasNameWithSpecialCharacters())
             {
                 // Special characters in type name: Computer generated class 
                 continue;
@@ -288,6 +288,12 @@ public sealed class ReflectionGraph(Assembly rootAssembly, List<string> excluded
         foreach (var item in classVertices)
         {
             ClassVertex classVertex = item.Value;
+
+            if ( classVertex.ClassType.SafeFullName() == "Lyt.Reflector.ReflectionGraph")
+            {
+                Debugger.Break(); 
+            }
+
             classVertex.Load(); 
         }
     }
