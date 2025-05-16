@@ -2,14 +2,24 @@
 
 public static class ReflectionUtilities
 {
+    public static readonly List<string> IgnorableMethodNames =
+        [
+            "ToString",
+            "GetHashCode",
+            "Equals",
+            "Deconstruct",
+            "GetType",
+            "Finalize",
+        ];
+
+    public static List<string> GetExcludedNamespaces() => ReflectionUtilities.excludedNamespaces;
+
     private static List<string> excludedNamespaces = [];
 
     public static void SetExcludedNamespaces(List<string> excludedNamespaces)
         => ReflectionUtilities.excludedNamespaces = excludedNamespaces;
 
-    public static List<string> SetExcludedNamespaces() => ReflectionUtilities.excludedNamespaces;
-
-    public static Tuple<bool, List<Type>> AnalyseType(this Type sourceType)
+    public static Tuple<bool, List<Type>> Analyse(this Type sourceType)
     {
         List<Type> dependantTypes = [];
         var ignoreType = Tuple.Create(false, new List<Type>());
@@ -28,9 +38,23 @@ public static class ReflectionUtilities
                 return;
             }
 
-            if (type.IsGenericType)
+            if (type.IsArray)
             {
-                // Need to check generic types 
+                Type? elementType = type.GetElementType();
+                if (elementType is not null)
+                {
+                    RecurseAnalyseType(elementType);
+                }
+
+                return;
+            }
+            else if (type.IsGenericType)
+            {
+                if (!type.ShouldBeIgnored())
+                {
+                    dependantTypes.Add(type);
+                }
+
                 Type[] typeParameters = type.GetGenericArguments();
                 foreach (Type typeParameter in typeParameters)
                 {
@@ -43,7 +67,6 @@ public static class ReflectionUtilities
                         continue;
                     }
 
-                    dependantTypes.Add(typeParameter);
                     RecurseAnalyseType(typeParameter);
                 }
 
@@ -51,37 +74,25 @@ public static class ReflectionUtilities
             }
         }
 
-        if (sourceType.IsGenericType)
+        RecurseAnalyseType(sourceType);
+
+        if (sourceType.ShouldBeIgnored())
         {
-            // Need to check generic types 
-            Type[] typeParameters = sourceType.GetGenericArguments();
-            foreach (Type typeParameter in typeParameters)
-            {
-                RecurseAnalyseType(typeParameter);
-            }
-
-            if (dependantTypes.Count == 0)
-            {
-                // Example: Static Field: Throw Type: System.Action`1[System.Exception]
-                if (sourceType.HasExcludedNamespace())
-                {
-                    // Dependency to an ignore assembly: we can ignore 
-                    return ignoreType;
-                }
-            }
-
-            return relevantType;
+            return ignoreType;
         }
-        else
+
+        if (dependantTypes.Count == 0)
         {
-            if (sourceType.ShouldBeIgnored())
+            // Example: Static Field: Throw Type: System.Action`1[System.Exception]
+            if (sourceType.HasExcludedNamespace())
             {
+                // Dependency to an ignore assembly: we can ignore 
                 return ignoreType;
             }
-
-            // No dependant types, but still relevant by itself 
-            return relevantType;
         }
+
+        // No dependant types, but still relevant by itself 
+        return relevantType;
     }
 
     public static bool ShouldBeIgnored(this Type type)
@@ -207,4 +218,30 @@ public static class ReflectionUtilities
 
         return false;
     }
+
+    public static bool IsIgnorableMethodName(this string methodName)
+    {
+        foreach (string excluded in ReflectionUtilities.IgnorableMethodNames)
+        {
+            if (methodName.StartsWith(excluded, StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Low level methods  
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static bool IsCompilerGenerated(this string methodName)
+        // get or set: Parts of a property: ignore
+        // op : Operators 
+        // add remove : Events  
+        // <clone> : ??? 
+        => methodName.StartsWith("get_") ||
+           methodName.StartsWith("set_") ||
+           methodName.StartsWith("op_") ||
+           methodName.StartsWith("add_") ||
+           methodName.StartsWith("remove_") ||
+           methodName.StartsWith("<Clone>");
 }
