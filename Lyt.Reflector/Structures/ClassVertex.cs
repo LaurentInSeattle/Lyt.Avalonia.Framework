@@ -201,6 +201,12 @@ public sealed class ClassVertex : IKeyProvider<string>
                     }
                 }
 
+                MethodBody? methodBody = methodInfo.GetMethodBody();
+                if (methodBody != null)
+                {
+                    methodBody.Analyse(methodInfo.Module); 
+                } 
+
                 MethodDescriptor methodDescriptor =
                     new(
                         isStatic,
