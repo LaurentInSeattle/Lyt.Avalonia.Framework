@@ -15,7 +15,7 @@ public class MemberInstruction : Instruction<Token, MemberInfo>
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	private MemberInstruction(IInstructionList parent, int offset, OpCode opCode,
+	private MemberInstruction(InstructionList parent, int offset, OpCode opCode,
 		Token token)
 		: base(parent, offset, opCode, token)
 	{
@@ -31,26 +31,30 @@ public class MemberInstruction : Instruction<Token, MemberInfo>
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public static IInstruction Create(IInstructionList parent, int offset, OpCode opCode,
+	public static IInstruction Create(InstructionList parent, int offset, OpCode opCode,
 		Token token)
 	{
 		MemberInfo member = parent.ResolveMember(token);
 
 		if (member is MethodBase method)
-			return new MethodInstruction(parent, offset, opCode, token, method);
+        {
+            return new MethodInstruction(parent, offset, opCode, token, method);
+        }
 
-		if (member is FieldInfo field)
-			return new FieldInstruction(parent, offset, opCode, token, field);
+        if (member is FieldInfo field)
+        {
+            return new FieldInstruction(parent, offset, opCode, token, field);
+        }
 
-		if (member is Type type)
-			return new TypeInstruction(parent, offset, opCode, token, type);
+        if (member is Type type)
+        {
+            return new TypeInstruction(parent, offset, opCode, token, type);
+        }
 
-		return new MemberInstruction(parent, offset, opCode, token);
+        return new MemberInstruction(parent, offset, opCode, token);
 	}
 
-	/// <summary>
-	/// Resolve the member for this instructon.
-	/// </summary>
+	/// <summary> Resolve the member for this instructon. </summary>
 	/// <exception cref="System.ArgumentException">
 	/// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a member within the scope
 	/// of <see cref="IInstruction.Parent"/>.
@@ -62,10 +66,7 @@ public class MemberInstruction : Instruction<Token, MemberInfo>
 	public override void Resolve() =>
 		Value = Value ?? Parent.ResolveMember(Operand);
 
-	/// <summary>
-	/// Format the value.
-	/// </summary>
+	/// <summary> Format the value. </summary>
 	/// <returns>The formatted value.</returns>
-	protected override string FormatValue() =>
-		$"0x{Operand:X}";
+	protected override string FormatValue() => $"0x{Operand:X}";
 }

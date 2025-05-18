@@ -15,10 +15,10 @@ public class FieldInstruction : Instruction<Token, FieldInfo>
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public FieldInstruction(IInstructionList parent, int offset, OpCode opCode,
+	public FieldInstruction(InstructionList parent, int offset, OpCode opCode,
 		Token token, FieldInfo field = null)
 		: base(parent, offset, opCode, token) =>
-		Value = field;
+        this.Value = field;
 
 	/// <summary> Resolve the field for this instructon. </summary>
 	/// <exception cref="System.ArgumentException">
@@ -30,20 +30,24 @@ public class FieldInstruction : Instruction<Token, FieldInfo>
 	/// the scope of <see cref="IInstruction.Parent"/>.
 	/// </exception>
 	public override void Resolve() =>
-		Value = Value ?? Parent.ResolveField(Operand);
+        this.Value = this.Value ?? Parent.ResolveField(Operand);
 
 	/// <summary> Format the value. </summary>
 	/// <returns>The formatted value.</returns>
 	protected override string FormatValue()
 	{
 		if (Value == null)
-			return InvalidValue;
+        {
+            return InvalidValue;
+        }
 
-		var builder = new StringBuilder(1024);
+        var builder = new StringBuilder(1024);
 		if (OpCode.OperandType == OperandType.InlineTok)
-			builder.Append("field ");
+        {
+            builder.Append("field ");
+        }
 
-		AppendType(builder, Value.FieldType);
+        AppendType(builder, Value.FieldType);
 		builder.Append(' ');
 		AppendType(builder, Value.DeclaringType);
 		builder.Append("::");

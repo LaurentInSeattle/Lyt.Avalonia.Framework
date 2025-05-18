@@ -14,7 +14,7 @@
 /// <param name="opCode">The operation code (opcode) for this instruction.</param>
 /// <param name="operand">The operand for this instruction.</param>
 public class Instruction<TOperand, TValue>(
-    IInstructionList parent, int offset, OpCode opCode, TOperand operand) 
+    InstructionList parent, int offset, OpCode opCode, TOperand operand) 
     : Instruction(parent, offset, opCode), IInstruction<TOperand, TValue>
         where TOperand : struct
 {

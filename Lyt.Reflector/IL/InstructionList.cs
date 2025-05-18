@@ -1,12 +1,12 @@
 ﻿namespace Lyt.Reflector.IL;
 
 /// <summary> A list of instructions. </summary>
-public abstract class InstructionList : IInstructionList
+public abstract class InstructionList 
 {
 	/// <summary> Create an instance for the specified byte data. </summary>
 	/// <param name="data">The byte data containing the instructions.</param>
 	protected InstructionList(byte[] data) =>
-		Data = new ReadOnlyCollection<byte>(data ??
+        this.Data = new ReadOnlyCollection<byte>(data ??
 			throw new ArgumentNullException(nameof(data)));
 
 	private static readonly Dictionary<OpCode, byte> impliedParameters =
@@ -31,7 +31,7 @@ public abstract class InstructionList : IInstructionList
 		{ OpCodes.Stloc_3, 3 }
 	};
 
-	private List<IInstruction> instructions = new();
+	private readonly List<IInstruction> instructions = [];
 
 	/// <summary>
 	/// Gets the instruction at the specified zero-based index.
@@ -204,19 +204,20 @@ public abstract class InstructionList : IInstructionList
 		int offset = 0;
 
 		while (offset < count)
-			if (TryCreate(ref offset, out IInstruction instruction))
-				instructions.Add(instruction);
-			else
+        {
+            if (TryCreate(ref offset, out IInstruction instruction))
+            {
+                instructions.Add(instruction);
+            }
+            else
 			{
 				IsInvalidData = true;
 				break;
 			}
+        }
 
-		Resolve();
+        Resolve();
 	}
-
-	IEnumerator IEnumerable.GetEnumerator() =>
-		GetEnumerator();
 
 	// Create a switch instruction
 	private IInstruction CreateSwitch(int offset, OpCode opCode, ref int operandOffset)
@@ -225,7 +226,7 @@ public abstract class InstructionList : IInstructionList
 		if (length < 0)
 			throw new ArgumentException(null, nameof(Data));
 
-		var branches = new int[length];
+        int[] branches = new int[length];
 		operandOffset += sizeof(int);
 
 		for (int index = 0; index < length; index++)
@@ -345,16 +346,22 @@ public abstract class InstructionList : IInstructionList
 
 				case OperandType.InlineNone:
 					if (impliedParameters.TryGetValue(opCode, out byte operand))
-						instruction = new ParameterInstruction<byte>(
+                    {
+                        instruction = new ParameterInstruction<byte>(
 							this, offset, opCode, operand);
-					else
+                    }
+                    else
 					{
 						if (impliedVariables.TryGetValue(opCode, out operand))
-							instruction = new VariableInstruction<byte>(
+                        {
+                            instruction = new VariableInstruction<byte>(
 								this, offset, opCode, operand);
-						else
-							instruction = new Instruction(this, offset, opCode);
-					}
+                        }
+                        else
+                        {
+                            instruction = new Instruction(this, offset, opCode);
+                        }
+                    }
 					break;
 
 				case OperandType.InlineR:

@@ -8,10 +8,10 @@
 /// <param name="parent">The set of instructions containing this instruction.</param>
 /// <param name="offset">The byte offset of this instruction.</param>
 /// <param name="opCode">The operation code (opcode) for this instruction.</param>
-public class Instruction(IInstructionList parent, int offset, OpCode opCode) : IInstruction
+public class Instruction(InstructionList parent, int offset, OpCode opCode) : IInstruction
 {
     /// <summary> Gets the set of instructions containing this instruction. </summary>
-    public IInstructionList Parent { get; } = parent;
+    public InstructionList Parent { get; } = parent;
 
     /// <summary> Gets the byte offset of this instruction. </summary>
     public int Offset { get; } = offset;

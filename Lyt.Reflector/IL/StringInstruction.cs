@@ -15,7 +15,7 @@ public class StringInstruction : Instruction<Token, string>
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public StringInstruction(IInstructionList parent, int offset, OpCode opCode,
+	public StringInstruction(InstructionList parent, int offset, OpCode opCode,
 		Token token)
 		: base(parent, offset, opCode, token)
 	{
@@ -83,8 +83,10 @@ public class StringInstruction : Instruction<Token, string>
 			}
 
 			if (asByteArray)
-				break;
-		}
+            {
+                break;
+            }
+        }
 
 		if (!asByteArray)
 		{
@@ -102,15 +104,19 @@ public class StringInstruction : Instruction<Token, string>
 		bool isFirstByte = true;
 
 		foreach (byte nextByte in Encoding.Unicode.GetBytes(Value))
-			if (isFirstByte)
+        {
+            if (isFirstByte)
 			{
 				builder.AppendFormat("{0:X2}", nextByte);
 				isFirstByte = false;
 			}
 			else
-				builder.AppendFormat(" {0:X2}", nextByte);
+            {
+                builder.AppendFormat(" {0:X2}", nextByte);
+            }
+        }
 
-		builder.Append(")");
+        builder.Append(")");
 		return builder.ToString();
 	}
 }

@@ -6,30 +6,36 @@ public class MethodSignature
 	/// <summary> Create an instance for the specified parent and signature data. </summary>
 	/// <param name="parent">The instructions containing the signature data.</param>
 	/// <param name="data">The signature data.</param>
-	public MethodSignature(IInstructionList parent, IReadOnlyList<byte> data)
+	public MethodSignature(InstructionList parent, IReadOnlyList<byte> data)
 	{
-		Parent = parent ?? throw new ArgumentNullException(nameof(parent));
-		Data = data ?? throw new ArgumentNullException(nameof(data));
+        this.Parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        this.Data = data ?? throw new ArgumentNullException(nameof(data));
 
 		int offset = 0;
-		CilCallingConvention = (CilCallingConvention)data.ReadByte(offset++);
+        this.CilCallingConvention = (CilCallingConvention)data.ReadByte(offset++);
 
-		if (!DecodeCallingConvention())
-			throw new ArgumentException(nameof(data));
+		if (!this.DecodeCallingConvention())
+        {
+            throw new ArgumentException(null, nameof(data));
+        }
 
-		int parameterCount = (int)data.ReadCompressedUInt32(offset, out int count);
+        int parameterCount = (int)data.ReadCompressedUInt32(offset, out int count);
 		offset += count;
 
 		bool isOptional = false;
-		ReturnType = DecodeType(offset, ref isOptional, out count);
+        this.ReturnType = this.DecodeType(offset, ref isOptional, out count);
 		offset += count;
 
-		if (ReturnType == null)
-			throw new ArgumentException(nameof(data));
+		if (this.ReturnType == null)
+        {
+            throw new ArgumentException(nameof(data));
+        }
 
-		if (!DecodeParameters(offset, parameterCount))
-			throw new ArgumentException(nameof(data));
-	}
+        if (!this.DecodeParameters(offset, parameterCount))
+        {
+            throw new ArgumentException(nameof(data));
+        }
+    }
 
 	/// <summary>
 	/// Gets the calling convention, if <see cref="IsUnmanaged"/> is <see cref="true"/>;
@@ -61,21 +67,17 @@ public class MethodSignature
 	/// <summary>
 	/// Gets the set of instructions containing this method signature.
 	/// </summary>
-	public IInstructionList Parent { get; }
+	public InstructionList Parent { get; }
 
 	/// <summary>
 	/// Gets the Common Intermediate Language (CIL) calling convention.
 	/// </summary>
 	public CilCallingConvention CilCallingConvention { get; }
 
-	/// <summary>
-	/// Gets the return type.
-	/// </summary>
+	/// <summary> Gets the return type. </summary>
 	public Type ReturnType { get; }
 
-	/// <summary>
-	/// Gets the types for the required parameters.
-	/// </summary>
+	/// <summary> Gets the types for the required parameters. </summary>
 	public IReadOnlyList<Type> RequiredParameters { get; private set; }
 
 	/// <summary>
@@ -115,11 +117,15 @@ public class MethodSignature
 	public static void AppendConventions(StringBuilder builder, CallingConventions conventions)
 	{
 		if ((conventions & CallingConventions.HasThis) != 0)
-			builder.Append("instance ");
+        {
+            builder.Append("instance ");
+        }
 
-		if ((conventions & CallingConventions.VarArgs) != 0)
-			builder.Append("vararg ");
-	}
+        if ((conventions & CallingConventions.VarArgs) != 0)
+        {
+            builder.Append("vararg ");
+        }
+    }
 
 	/// <summary>
 	/// Get a textual representation of this instance.
@@ -130,24 +136,32 @@ public class MethodSignature
 		var builder = new StringBuilder(1024);
 
 		if (IsUnmanaged)
-			AppendConvention(builder, CallingConvention);
-		else
-			AppendConventions(builder, CallingConventions);
+        {
+            AppendConvention(builder, CallingConvention);
+        }
+        else
+        {
+            AppendConventions(builder, CallingConventions);
+        }
 
-		AppendType(builder, ReturnType);
+        this.AppendType(builder, ReturnType);
 		bool isFirstType = true;
 		builder.Append('(');
 
-		AppendTypes(builder, RequiredParameters, ref isFirstType);
+        this.AppendTypes(builder, RequiredParameters, ref isFirstType);
 
 		if (OptionalParameters.Count > 0)
 		{
 			if (isFirstType)
-				isFirstType = false;
-			else
-				builder.Append(", ");
+            {
+                isFirstType = false;
+            }
+            else
+            {
+                builder.Append(", ");
+            }
 
-			builder.Append("...");
+            builder.Append("...");
 			AppendTypes(builder, OptionalParameters, ref isFirstType);
 		}
 
@@ -166,11 +180,15 @@ public class MethodSignature
 		foreach(Type type in types)
 		{
 			if (isFirstType)
-				isFirstType = false;
-			else
-				builder.Append(", ");
+            {
+                isFirstType = false;
+            }
+            else
+            {
+                builder.Append(", ");
+            }
 
-			AppendType(builder, type);
+            AppendType(builder, type);
 		}
 	}
 

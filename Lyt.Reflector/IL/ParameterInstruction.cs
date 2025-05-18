@@ -26,7 +26,7 @@ public class ParameterInstruction<TOperand> : Instruction<TOperand, ParameterInf
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public ParameterInstruction(IInstructionList parent, int offset, OpCode opCode,
+	public ParameterInstruction(InstructionList parent, int offset, OpCode opCode,
 		TOperand operand)
 		: base(parent, offset, opCode, operand)
 	{
@@ -54,12 +54,16 @@ public class ParameterInstruction<TOperand> : Instruction<TOperand, ParameterInf
 	public override void Resolve()
 	{
 		if (Value != null || IsThis)
-			return;
+        {
+            return;
+        }
 
-		Value = Parent.ResolveParameter(Operand.ToInt32(null));
+        Value = Parent.ResolveParameter(Operand.ToInt32(null));
 		if (Value == null)
-			IsThis = true;
-	}
+        {
+            IsThis = true;
+        }
+    }
 
 	/// <summary>
 	/// Format the value.
@@ -68,12 +72,16 @@ public class ParameterInstruction<TOperand> : Instruction<TOperand, ParameterInf
 	protected override string FormatValue()
 	{
 		if (Value != null)
-			return IsOperandImplied ? $"// {Value.Name}" : Value.Name;
+        {
+            return IsOperandImplied ? $"// {Value.Name}" : Value.Name;
+        }
 
-		if (IsOperandImplied)
-			return IsThis ? "// this" : "// ?";
+        if (IsOperandImplied)
+        {
+            return IsThis ? "// this" : "// ?";
+        }
 
-		return IsThis ? $"{Operand} // this" : $"{Operand} // ?";
+        return IsThis ? $"{Operand} // this" : $"{Operand} // ?";
 	}
 
 }

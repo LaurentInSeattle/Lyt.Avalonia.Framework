@@ -26,7 +26,7 @@ public class VariableInstruction<TOperand> : Instruction<TOperand, LocalVariable
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public VariableInstruction(IInstructionList parent, int offset, OpCode opCode, TOperand operand)
+	public VariableInstruction(InstructionList parent, int offset, OpCode opCode, TOperand operand)
 		: base(parent, offset, opCode, operand)
 	{
 	}
@@ -50,9 +50,11 @@ public class VariableInstruction<TOperand> : Instruction<TOperand, LocalVariable
 	protected override string FormatValue()
 	{
 		if (Value == null)
-			return InvalidValue;
+        {
+            return InvalidValue;
+        }
 
-		string type = FormatType(Value.LocalType);
+        string type = FormatType(Value.LocalType);
 		return IsOperandImplied ? $"// V_{Value.LocalIndex} {type}" :
 			$"V_{Value.LocalIndex} // {type}";
 	}

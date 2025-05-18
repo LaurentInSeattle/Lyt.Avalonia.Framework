@@ -1,19 +1,12 @@
 ﻿namespace Lyt.Reflector.IL;
 
-/// <summary>
-/// The instructions for a method body.
-/// </summary>
+/// <summary> The instructions for a method body. </summary>
 public class MethodIL : InstructionList
 {
-	/// <summary>
-	/// Create an instance for the specified method.
-	/// </summary>
+	/// <summary> Create an instance for the specified method. </summary>
 	/// <param name="method">The method containing the instructions.</param>
-	/// <exception cref="System.ArgumentNullException">
-	/// <paramref name="method"/> is null.
-	/// </exception>
 	public MethodIL(MethodBase method)
-		: base((method ?? throw new ArgumentNullException(nameof(method)))?
+		: base((method )?
 			  .GetMethodBody()?.GetILAsByteArray() ?? new byte[0])
 	{
 		Method = method ?? throw new ArgumentNullException(nameof(method));
@@ -22,19 +15,13 @@ public class MethodIL : InstructionList
 		DecodeInstructions();
 	}
 
-	/// <summary>
-	/// Gets the method containing these instructions.
-	/// </summary>
+	/// <summary>Gets the method containing these instructions.</summary>
 	public MethodBase Method { get; }
 
-	/// <summary>
-	/// Gets the body of the method containing these instructions.
-	/// </summary>
+	/// <summary> Gets the body of the method containing these instructions. </summary>
 	public MethodBody MethodBody { get; }
 
-	/// <summary>
-	/// Gets the module containing these instructions.
-	/// </summary>
+	/// <summary> Gets the module containing these instructions. </summary>
 	public Module Module { get; }
 
 	/// <summary>
@@ -105,14 +92,19 @@ public class MethodIL : InstructionList
 			}
 
 			if (low == high)
-				break;
+            {
+                break;
+            }
 
-			if (offset < candidateOffset)
-				high = mid - 1;
-			else
-				if (offset > candidateOffset)
-					low = mid + 1;
-		}
+            if (offset < candidateOffset)
+            {
+                high = mid - 1;
+            }
+            else if (offset > candidateOffset)
+            {
+                low = mid + 1;
+            }
+        }
 
 		throw new ArgumentOutOfRangeException(nameof(offset));
 	}
@@ -158,13 +150,17 @@ public class MethodIL : InstructionList
 	public override ParameterInfo ResolveParameter(int operand)
 	{
 		if ((Method.CallingConvention & CallingConventions.HasThis) != 0 && operand-- == 0)
-			return null; // The "this" argument
+        {
+            return null; // The "this" argument
+        }
 
-		ParameterInfo[] parameters = Method.GetParameters();
+        ParameterInfo[] parameters = Method.GetParameters();
 		if (operand < 0 || operand > parameters.Length)
-			throw new ArgumentOutOfRangeException(nameof(operand));
+        {
+            throw new ArgumentOutOfRangeException(nameof(operand));
+        }
 
-		return parameters[operand];
+        return parameters[operand];
 	}
 
 	/// <summary>
@@ -221,8 +217,10 @@ public class MethodIL : InstructionList
 	public override LocalVariableInfo ResolveVariable(int operand)
 	{
 		if (operand < 0 || operand > MethodBody.LocalVariables.Count)
-			throw new ArgumentOutOfRangeException(nameof(operand));
+        {
+            throw new ArgumentOutOfRangeException(nameof(operand));
+        }
 
-		return MethodBody.LocalVariables[operand];
+        return MethodBody.LocalVariables[operand];
 	}
 }

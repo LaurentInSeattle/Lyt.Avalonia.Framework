@@ -15,7 +15,7 @@ public class SignatureInstruction : Instruction<Token, MethodSignature>
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public SignatureInstruction(IInstructionList parent, int offset, OpCode opCode,
+	public SignatureInstruction(InstructionList parent, int offset, OpCode opCode,
 		Token token)
 		: base(parent, offset, opCode, token)
 	{

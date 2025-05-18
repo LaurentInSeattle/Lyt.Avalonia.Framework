@@ -1,5 +1,5 @@
 ﻿namespace Lyt.Reflector.IL;
-
+/*
 /// <summary> A list of instructions. </summary>
 public interface IInstructionList : IReadOnlyList<IInstruction>
 {
@@ -140,3 +140,4 @@ public interface IInstructionList : IReadOnlyList<IInstruction>
 	/// </exception>
 	LocalVariableInfo ResolveVariable(int operand);
 }
+*/

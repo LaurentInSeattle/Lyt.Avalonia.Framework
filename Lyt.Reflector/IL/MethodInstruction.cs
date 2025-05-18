@@ -17,7 +17,7 @@ public class MethodInstruction : Instruction<Token, MethodBase>
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public MethodInstruction(IInstructionList parent, int offset, OpCode opCode,
+	public MethodInstruction(InstructionList parent, int offset, OpCode opCode,
 		Token token, MethodBase method = null)
 		: base(parent, offset, opCode, token) =>
 		Value = method;
@@ -43,9 +43,11 @@ public class MethodInstruction : Instruction<Token, MethodBase>
 	protected override string FormatValue()
 	{
 		if (Value == null)
-			return InvalidValue;
+        {
+            return InvalidValue;
+        }
 
-		var builder = new StringBuilder(1024);
+        var builder = new StringBuilder(1024);
 		if (OpCode.OperandType == OperandType.InlineTok)
 			builder.Append("method ");
 
@@ -55,9 +57,11 @@ public class MethodInstruction : Instruction<Token, MethodBase>
 		AppendFullName(builder);
 
 		if (Value.IsGenericMethod)
-			AppendTypeParameters(builder, Value.GetGenericArguments());
+        {
+            this.AppendTypeParameters(builder, Value.GetGenericArguments());
+        }
 
-		AppendParameters(builder);
+        this.AppendParameters(builder);
 
 		return builder.ToString();
 	}
@@ -65,7 +69,7 @@ public class MethodInstruction : Instruction<Token, MethodBase>
 	// Append the full name of the method including the namespace and declaring type
 	private void AppendFullName(StringBuilder builder)
 	{
-		AppendType(builder, Value.DeclaringType);
+        this.AppendType(builder, Value.DeclaringType);
 		builder.Append("::");
 		builder.Append(Value.Name);
 	}
@@ -87,11 +91,15 @@ public class MethodInstruction : Instruction<Token, MethodBase>
 		foreach (ParameterInfo parameter in Value.GetParameters())
 		{
 			if (isFirstParameter)
-				isFirstParameter = false;
-			else
-				builder.Append(", ");
+            {
+                isFirstParameter = false;
+            }
+            else
+            {
+                builder.Append(", ");
+            }
 
-			AppendType(builder, parameter.ParameterType, true);
+            AppendType(builder, parameter.ParameterType, true);
 		}
 
 		builder.Append(')');

@@ -51,7 +51,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
     /// <param name="type">The type to format.</param>
     /// <param name="includeModifiers">A value indicating if type modifiers should be included.</param>
     public void AppendType(
-        StringBuilder builder, IInstructionList instructions,
+        StringBuilder builder, InstructionList instructions,
         Type type, bool includeModifiers = false)
     {
         if (types.TryGetValue(type, out string? value))
@@ -81,7 +81,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
     /// <param name="instructions">The list of instructions where the types are referenced.</param>
     /// <param name="types">The type parameters.</param>
     public void AppendTypeParameters(
-        StringBuilder builder, IInstructionList instructions, IEnumerable<Type> types)
+        StringBuilder builder, InstructionList instructions, IEnumerable<Type> types)
     {
         builder.Append('<');
 
@@ -116,7 +116,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
     /// <exception cref="System.ArgumentNullException">
     /// <paramref name="instructions"/> or <paramref name="type"/> is null.
     /// </exception>
-    public string FormatType(IInstructionList instructions, Type type, bool includeModifiers = false)
+    public string FormatType(InstructionList instructions, Type type, bool includeModifiers = false)
     {
 
         if (types.TryGetValue(type, out string? value))
@@ -163,7 +163,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
 
     // Append the assembly name if different from the assembly for the instructions
     private static void AppendAssemblyName(
-        IInstructionList instructions, StringBuilder builder, Type type)
+        InstructionList instructions, StringBuilder builder, Type type)
     {
         Assembly assembly = type.Assembly;
         if (instructions.IsSameAssembly(assembly))
@@ -178,7 +178,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
 
     // Append a type that has no direct CIL equivalent
     private void AppendNonCilType(
-        IInstructionList instructions, StringBuilder builder, Type type, bool includeModifiers)
+        InstructionList instructions, StringBuilder builder, Type type, bool includeModifiers)
     {
         if (includeModifiers)
         {

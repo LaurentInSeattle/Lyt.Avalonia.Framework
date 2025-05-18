@@ -23,7 +23,7 @@ public class BranchInstruction<TOperand> : Instruction<TOperand, IInstruction>
     /// <exception cref="System.ArgumentNullException">
     /// <paramref name="parent"/> is null.
     /// </exception>
-    public BranchInstruction(IInstructionList parent, int offset, OpCode opCode,
+    public BranchInstruction(InstructionList parent, int offset, OpCode opCode,
 		TOperand operand, byte operandSize)
 		: base(parent, offset, opCode, operand) =>
 		branchBase = offset + OpCode.Size + operandSize;

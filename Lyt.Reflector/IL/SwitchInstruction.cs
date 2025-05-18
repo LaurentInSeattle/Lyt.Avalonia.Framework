@@ -22,23 +22,27 @@ public class SwitchInstruction : Instruction<int, IReadOnlyList<IInstruction>>
 	/// <exception cref="System.ArgumentOutOfRangeException">
 	/// <paramref name="operand"/> is less than zero.
 	/// </exception>
-	public SwitchInstruction(IInstructionList parent, int offset, OpCode opCode,
+	public SwitchInstruction(InstructionList parent, int offset, OpCode opCode,
 		int operand, int[] branchOperands)
 		: base(parent, offset, opCode, operand)
 	{
 		if (operand < 0)
-			throw new ArgumentOutOfRangeException(nameof(operand));
+        {
+            throw new ArgumentOutOfRangeException(nameof(operand));
+        }
 
-		BranchOperands = new ReadOnlyCollection<int>(branchOperands ??
+        BranchOperands = new ReadOnlyCollection<int>(branchOperands ??
 			throw new ArgumentNullException(nameof(branchOperands)));
 
 		if (branchOperands.Length != operand)
-			throw new ArgumentException(null, nameof(branchOperands));
+        {
+            throw new ArgumentException(null, nameof(branchOperands));
+        }
 
-		branchBase = offset + opCode.Size + sizeof(int) * (operand + 1);
+        branchBase = offset + opCode.Size + sizeof(int) * (operand + 1);
 	}
 
-	private int branchBase;
+	private readonly int branchBase;
 
 	/// <summary>
 	/// Gets the branch operands for this instruction.
@@ -57,21 +61,22 @@ public class SwitchInstruction : Instruction<int, IReadOnlyList<IInstruction>>
 			.Select(operand => Parent.ResolveInstruction(branchBase + operand))
 			.ToList());
 
-	/// <summary>
-	/// Format the value.
-	/// </summary>
+	/// <summary> Format the value. </summary>
 	/// <returns>The formatted value.</returns>
 	protected override string FormatValue()
 	{
 		var builder = new StringBuilder(1024);
 		builder.Append('(');
-		foreach (var operand in BranchOperands)
+		foreach (int operand in BranchOperands)
 		{
 			if (builder.Length > 1)
-				builder.Append(", ");
+            {
+                builder.Append(", ");
+            }
 
-			builder.Append(FormatLabel(branchBase + operand));
+            builder.Append(FormatLabel(branchBase + operand));
 		}
+
 		builder.Append(')');
 		return builder.ToString();
 	}

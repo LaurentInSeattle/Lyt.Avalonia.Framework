@@ -17,7 +17,7 @@ public class TypeInstruction : Instruction<Token, Type>
 	/// <exception cref="System.ArgumentNullException">
 	/// <paramref name="parent"/> is null.
 	/// </exception>
-	public TypeInstruction(IInstructionList parent, int offset, OpCode opCode,
+	public TypeInstruction(InstructionList parent, int offset, OpCode opCode,
 		Token token, Type type = null)
 		: base(parent, offset, opCode, token) =>
         this.Value = type;
