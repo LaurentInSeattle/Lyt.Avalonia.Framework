@@ -7,5 +7,5 @@
 public class AssemblyAuthorAttribute(string author) : Attribute
 {
     /// <summary> Gets the author of the assembly. </summary>
-    public string Author { get; } = author ?? throw new ArgumentNullException(nameof(author));
+    public string Author { get; } = author ;
 }

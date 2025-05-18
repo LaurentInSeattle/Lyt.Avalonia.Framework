@@ -3,121 +3,75 @@
 /// <summary> A decorator pattern class to help obtain commonly displayed information about an assembly. </summary>
 /// <remarks> Create an instance for the specified assembly. </remarks>
 /// <param name="assembly">The assembly.</param>
-/// <exception cref="System.ArgumentNullException"> <paramref name="assembly"/> is null. </exception>
-public class AssemblyInformation(Assembly assembly)
+public class AssemblyInformation
 {
-    private string author;
-	private string company;
-	private string copyright;
-	private string description;
-	private string entryPoint;
-	private string location;
-	private string name;
-	private string product;
-	private string title;
-	private string version;
+	private readonly Assembly assembly;
+    private readonly string author;
+	private readonly string company;
+	private readonly string location;
+	private readonly string name;
+	private readonly string version;
+	private readonly string entryPoint;
+
+    public AssemblyInformation(Assembly assembly)
+    {
+		this.assembly = assembly;
+		this.author =
+			this.GetAttribute(out AssemblyAuthorAttribute? attributeAuthor) ?
+				attributeAuthor!.Author :
+				string.Empty;
+        this.company =
+            this.GetAttribute(out AssemblyCompanyAttribute? attributeCompany) ?
+                attributeCompany!.Company:
+                string.Empty;
+		this.location = this.assembly.Location;
+		string? maybeName = this.assembly.GetName().Name; 
+        this.name = maybeName is not null ? maybeName : string.Empty;
+		Version? maybeVersion = this.assembly.GetName().Version;
+        this.version = maybeVersion is not null ? maybeVersion.ToString() : string.Empty;
+
+        MethodInfo? method = this.assembly.EntryPoint;
+		if (method is null)
+		{
+			this.entryPoint = string.Empty;
+		}
+		else
+		{
+			Type? type = method.DeclaringType; 
+            this.entryPoint = 
+				 type is null ? 
+					method.Name : 
+					$"{type.Namespace}.{type.Name}.{method.Name}";
+		} 
+    }
 
     /// <summary> Gets the underlying assembly for this instance. </summary>
-    [Browsable(false)]
-    public Assembly Assembly { get; } = assembly ?? throw new ArgumentNullException(nameof(assembly));
+    public Assembly Assembly => this.assembly ;
+
+    /// <summary> Gets the full name of the assembly. </summary>
+    public string? FullName => this.Assembly.FullName;
+
+    /// <summary> Gets the name of the assembly. </summary>
+    public string Name => this.name;
+
+    /// <summary> Gets the name of the assembly. </summary>
+    public string Version => this.version;
 
     /// <summary> Gets the author of the assembly. </summary>
-    [Browsable(true)]
-	public string Author =>
-		author = author ?? (GetAttribute(out AssemblyAuthorAttribute attribute) ?
-				attribute.Author : string.Empty);
+	public string Author => this.author;
 
 	/// <summary> Gets the company that created the assembly. </summary>
-	[Browsable(true)]
-	public string Company =>
-		company = company ?? (GetAttribute(out AssemblyCompanyAttribute attribute) ?
-				attribute.Company : string.Empty);
+	public string Company => this.company;
 
-	/// <summary> Gets copyright information for the assembly. </summary>
-	[Browsable(true)]
-	public string Copyright =>
-		copyright = copyright ?? (GetAttribute(out AssemblyCopyrightAttribute attribute) ?
-			attribute.Copyright : string.Empty);
+	/// <summary> Gets the entry point (if any) for the assembly.</summary>
+	public string EntryPoint => this.entryPoint;
 
-	/// <summary>
-	/// Gets a description of the assembly.
-	/// </summary>
-	[Browsable(true)]
-	public string Description =>
-		description = description ?? (GetAttribute(out AssemblyDescriptionAttribute attribute) ?
-			attribute.Description : string.Empty);
+	/// <summary> Gets the location of the assembly. </summary>
+	public string Location => this.location;
 
-	/// <summary>
-	/// Gets the entry point (if any) for the assembly.
-	/// </summary>
-	[Browsable(true)]
-	public string EntryPoint
-	{
-		get
-		{
-			if (entryPoint != null)
-				return entryPoint;
-
-			MethodInfo method = Assembly.EntryPoint;
-			if (method == null)
-				return entryPoint = string.Empty;
-
-			Type type = method.DeclaringType;
-			if (type == null)
-				return entryPoint = method.Name;
-
-			return entryPoint = $"{type.Namespace}.{type.Name}.{method.Name}";
-		}
-	}
-
-	/// <summary>
-	/// Gets the full name of the assembly.
-	/// </summary>
-	[Browsable(true)]
-	public string FullName =>
-		Assembly.FullName;
-
-	/// <summary>
-	/// Gets the location of the assembly.
-	/// </summary>
-	public string Location =>
-		location = location ?? new Uri(Assembly.CodeBase).LocalPath;
-
-	/// <summary>
-	/// Gets the name of the assembly.
-	/// </summary>
-	[Browsable(false)]
-	public string Name =>
-		name = name ?? Assembly.GetName().Name;
-
-	/// <summary>
-	/// Gets the name of the product containing the assembly.
-	/// </summary>
-	[Browsable(true)]
-	public string Product =>
-		product = product ?? (GetAttribute(out AssemblyProductAttribute attribute) ?
-			attribute.Product : string.Empty);
-
-	/// <summary>
-	/// Gets the title of the assembly.
-	/// </summary>
-	[Browsable(true)]
-	public string Title =>
-		title = title ?? (GetAttribute(out AssemblyTitleAttribute attribute) &&
-				!string.IsNullOrEmpty(attribute.Title) ?
-			attribute.Title : Path.GetFileNameWithoutExtension(
-				Assembly.CodeBase));
-
-	/// <summary>
-	/// Gets the version of the assembly.
-	/// </summary>
-	[Browsable(true)]
-	public string Version =>
-		version = version ?? (Assembly.GetName().Version.ToString());
-
-	private bool GetAttribute<TAttribute>(out TAttribute attribute)
+	private bool GetAttribute<TAttribute>(out TAttribute? attribute)
 			where TAttribute : Attribute =>
-		(attribute = Assembly
+		(attribute = this.assembly
 			.GetCustomAttributes<TAttribute>()
 			.FirstOrDefault()) != null;
 }

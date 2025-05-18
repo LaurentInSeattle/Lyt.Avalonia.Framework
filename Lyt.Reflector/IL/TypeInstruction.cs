@@ -20,7 +20,7 @@ public class TypeInstruction : Instruction<Token, Type>
 	public TypeInstruction(IInstructionList parent, int offset, OpCode opCode,
 		Token token, Type type = null)
 		: base(parent, offset, opCode, token) =>
-		Value = type;
+        this.Value = type;
 
 	/// <summary> Resolve the type for this instructon. </summary>
 	/// <exception cref="System.ArgumentException">

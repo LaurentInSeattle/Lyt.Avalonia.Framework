@@ -12,10 +12,6 @@ public sealed class ReflectionGraph(Assembly rootAssembly, List<string> excluded
     {
         ReflectionUtilities.SetExcludedNamespaces(this.excludedNamespaces);
 
-        string path = "C:\\Users\\Laurent\\Desktop\\Parole\\WebView2Loader.dll";
-        // string path = "C:\\Users\\Laurent\\Desktop\\Translator\\Lyt.Avalonia.Translator.Desktop.exe"; 
-        var assemblyDefinition = Mono.Cecil.AssemblyDefinition.ReadAssembly(path); 
-
         // Root vertex 
         var assemblyName = this.rootAssembly.GetName();
         var assemblyVertex = new AssemblyVertex(assemblyName);
