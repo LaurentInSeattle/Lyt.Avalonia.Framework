@@ -1,14 +1,7 @@
 ﻿namespace Lyt.Reflector.IL;
 
-/// <summary> A list of instructions. </summary>
-public abstract class InstructionList 
+public sealed class MethodInstructionsList
 {
-    /// <summary> Create an instance for the specified byte data. </summary>
-    /// <param name="data">The byte data containing the instructions.</param>
-    protected InstructionList(byte[] data) =>
-        this.Data = new ReadOnlyCollection<byte>(data ??
-            throw new ArgumentNullException(nameof(data)));
-
     private static readonly Dictionary<OpCode, byte> impliedParameters =
         new()
     {
@@ -33,47 +26,78 @@ public abstract class InstructionList
 
     private readonly List<IInstruction> instructions = [];
 
-    /// <summary>
-    /// Gets the instruction at the specified zero-based index.
-    /// </summary>
+    /// <summary> Create an instance for the instruction of the provided method. </summary>
+    /// <param name="method">The method containing the instructions.</param>
+    public MethodInstructionsList(MethodBase method)
+    {
+        this.Method = method;
+        this.Module = method.Module;
+        var maybeMethodBody = method.GetMethodBody();
+        if (maybeMethodBody is not null)
+        {
+            this.MethodBody = maybeMethodBody;
+            byte[]? data = this.MethodBody.GetILAsByteArray();
+            if (data is not null)
+            {
+                this.Data = new ReadOnlyCollection<byte>(data);
+                // this.DecodeInstructions(); 
+            }
+            else
+            {
+                this.IsInvalidData = true;
+                throw new InvalidOperationException("Method has No IL"); 
+            }
+        }
+        else
+        {
+            this.IsInvalidData = true;
+            throw new InvalidOperationException("Method has No Method Body");
+        }
+    }
+
+    /// <summary>Gets the method containing these instructions.</summary>
+    public MethodBase Method { get; }
+
+    /// <summary> Gets the body of the method containing these instructions. </summary>
+    public MethodBody MethodBody {  get ; }
+
+    /// <summary> Gets the module containing these instructions. </summary>
+    public Module Module { get; }
+
+    /// <summary> Gets the byte data for these instructions. </summary>
+    public ReadOnlyCollection<byte> Data { get; }
+
+    /// <summary> Gets the count of instructions. </summary>
+    public int Count => this.instructions.Count;
+
+    /// <summary> Gets the instruction at the specified zero-based index. </summary>
     /// <param name="index">The zero-based index of the instruction.</param>
     /// <returns>The instruction at the specified zero-based index.</returns>
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="index"/> is less than zero or greater than or equal to
     /// the number of instructions.
     /// </exception>
-    public IInstruction this[int index] => instructions[index];
+    public IInstruction InstructionAt (int index) => this.instructions[index];
 
     /// <summary>
-    /// Gets the byte data for these instructions.
-    /// </summary>
-    public IReadOnlyList<byte> Data { get; }
-
-    /// <summary>
-    /// Gets the number of instructions.
-    /// </summary>
-    public int Count => instructions.Count;
-
-    /// <summary>
-    /// Gets a value indicating if any problems occurred decoding the byte
+    /// Gets a value indicating if any problems occurred while decoding the byte
     /// data (<see cref="Data"/>) for these instructions.
     /// </summary>
     public bool IsInvalidData { get; private set; }
 
-    /// <summary>
-    /// Get an enumerator for these instructions.
-    /// </summary>
+
+    /// <summary> Get an enumerator for these instructions. </summary>
     /// <returns>An enumerator for these instructions.</returns>
-    public IEnumerator<IInstruction> GetEnumerator() =>
-        instructions.GetEnumerator();
+    public IEnumerator<IInstruction> GetEnumerator() => this.instructions.GetEnumerator();
 
     /// <summary>
     /// Gets a value indicating if the specified instruction is contained
-    /// within an instance method.
+    /// within a method that has "this" as its first argument.
     /// </summary>
     /// <param name="instruction">The instruction to test.</param>
-    /// <returns>True, if the instruction is contained within an instanc method; otherwise, false.</returns>
-    public abstract bool HasThis(IInstruction instruction);
+    /// <returns>True, if the containing method has a "this" argument; otherwise, false.</returns>
+    public bool HasThis(IInstruction instruction) 
+        => (this.Method.CallingConvention & CallingConventions.HasThis) != 0;
 
     /// <summary>
     /// Gets a value indicating if the specified assembly is the same
@@ -81,14 +105,9 @@ public abstract class InstructionList
     /// </summary>
     /// <param name="assembly">The assembly to test.</param>
     /// <returns>True, if the assembly is the same; otherwise, false.</returns>
-    /// <exception cref="System.ArgumentNullException">
-    /// <paramref name="assembly"/> is null.
-    /// </exception>
-    public abstract bool IsSameAssembly(Assembly assembly);
+    public bool IsSameAssembly(Assembly assembly) => Module.Assembly == assembly;
 
-    /// <summary>
-    /// Resolve field information from a metadata token.
-    /// </summary>
+    /// <summary> Resolve field information from a metadata token. </summary>
     /// <param name="token">The metadata token.</param>
     /// <returns>The field information.</returns>
     /// <exception cref="System.ArgumentException">
@@ -97,22 +116,53 @@ public abstract class InstructionList
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="token"/> is not a valid field within this method's module.
     /// </exception>
-    public abstract FieldInfo ResolveField(Token token);
+    public FieldInfo ResolveField(Token token) =>
+        Module.ResolveField(token.Value, Method.DeclaringType.GetGenericArguments(),
+            Method.GetGenericArguments());
 
-    /// <summary>
-    /// Resolve an instruction for a byte offset.
-    /// </summary>
+    /// <summary> Resolve an instruction for a byte offset. </summary>
     /// <param name="offset">The byte offset of an instruction within this method body.</param>
     /// <returns>The instruction.</returns>
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="offset"/> does not specify the valid byte offset of an
     /// instruction within this method body.
     /// </exception>
-    public abstract IInstruction ResolveInstruction(int offset);
+    public IInstruction ResolveInstruction(int offset)
+    {
+        int high = Count - 1;
+        int low = 0;
 
-    /// <summary>
-    /// Resolve member information from a metadata token.
-    /// </summary>
+        while (low <= high)
+        {
+            int mid = (low + high) >> 1;
+            var candidate = (Instruction) this.InstructionAt(mid);
+            int candidateOffset = candidate.Offset;
+
+            if (offset == candidateOffset)
+            {
+                candidate.IsTarget = true;
+                return candidate;
+            }
+
+            if (low == high)
+            {
+                break;
+            }
+
+            if (offset < candidateOffset)
+            {
+                high = mid - 1;
+            }
+            else if (offset > candidateOffset)
+            {
+                low = mid + 1;
+            }
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(offset));
+    }
+
+    /// <summary> Resolve member information from a metadata token. </summary>
     /// <param name="token">The metadata token.</param>
     /// <returns>The member information.</returns>
     /// <exception cref="System.ArgumentException">
@@ -121,7 +171,9 @@ public abstract class InstructionList
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="token"/> is not a valid member within this method's module.
     /// </exception>
-    public abstract MemberInfo ResolveMember(Token token);
+    public MemberInfo ResolveMember(Token token) =>
+        Module.ResolveMember(token.Value, Method.DeclaringType.GetGenericArguments(),
+            Method.GetGenericArguments());
 
     /// <summary>
     /// Resolve method information from a metadata token.
@@ -134,17 +186,33 @@ public abstract class InstructionList
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="token"/> is not a valid method within this method's module.
     /// </exception>
-    public abstract MethodBase ResolveMethod(Token token);
+    public MethodBase ResolveMethod(Token token) =>
+        Module.ResolveMethod(token.Value, Method.DeclaringType.GetGenericArguments(),
+            Method.GetGenericArguments());
 
     /// <summary>
-    /// Resolve parameter information from the index of a parameter.
+    /// Resolve parameter information from the specified index.
     /// </summary>
-    /// <param name="operand">The zero-based index of the parameter.</param>
+    /// <param name="operand">The operand for the parameter.</param>
     /// <returns>The parameter information.</returns>
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="operand"/> does not identify a valid parameter for this method.
     /// </exception>
-    public abstract ParameterInfo ResolveParameter(int operand);
+    public ParameterInfo ResolveParameter(int operand)
+    {
+        if ((Method.CallingConvention & CallingConventions.HasThis) != 0 && operand-- == 0)
+        {
+            return null; // The "this" argument
+        }
+
+        ParameterInfo[] parameters = Method.GetParameters();
+        if (operand < 0 || operand > parameters.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(operand));
+        }
+
+        return parameters[operand];
+    }
 
     /// <summary>
     /// Resolve signature information from a metadata token.
@@ -157,7 +225,7 @@ public abstract class InstructionList
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="token"/> is not a valid signature within this method's module.
     /// </exception>
-    public abstract byte[] ResolveSignature(Token token);
+    public byte[] ResolveSignature(Token token) => this.Module.ResolveSignature(token.Value);
 
     /// <summary>
     /// Resolve string information from a metadata token.
@@ -170,7 +238,7 @@ public abstract class InstructionList
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="token"/> is not a valid string within this method's module.
     /// </exception>
-    public abstract string ResolveString(Token token);
+    public string ResolveString(Token token) => this.Module.ResolveString(token.Value);
 
     /// <summary>
     /// Resolve type information from a metadata token.
@@ -183,7 +251,9 @@ public abstract class InstructionList
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="token"/> is not a valid type within this method's module.
     /// </exception>
-    public abstract Type ResolveType(Token token);
+    public Type ResolveType(Token token) =>
+        Module.ResolveType(token.Value, Method.DeclaringType.GetGenericArguments(),
+            Method.GetGenericArguments());
 
     /// <summary>
     /// Resolve local variable information from the specified index.
@@ -193,45 +263,54 @@ public abstract class InstructionList
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="operand"/> does not identify a valid local variable for this method.
     /// </exception>
-    public abstract LocalVariableInfo ResolveVariable(int operand);
-
-    /// <summary>
-    /// Decode the instructions.
-    /// </summary>
-    protected void DecodeInstructions()
+    public LocalVariableInfo ResolveVariable(int operand)
     {
-        int count = Data.Count;
-        int offset = 0;
+        if (operand < 0 || operand > MethodBody.LocalVariables.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(operand));
+        }
 
+        return MethodBody.LocalVariables[operand];
+    }
+
+    /*
+
+    /// <summary> Decode the instructions. </summary>
+    private void DecodeInstructions()
+    {
+        int count = this.Data.Count;
+        int offset = 0;
         while (offset < count)
         {
-            if (TryCreate(ref offset, out IInstruction instruction))
+            if (this.TryCreate(ref offset, out IInstruction instruction))
             {
-                instructions.Add(instruction);
+                this.instructions.Add(instruction);
             }
             else
             {
-                IsInvalidData = true;
+                this.IsInvalidData = true;
                 break;
             }
         }
 
-        Resolve();
+        this.Resolve();
     }
 
+     
     // Create a switch instruction
     private IInstruction CreateSwitch(int offset, OpCode opCode, ref int operandOffset)
     {
-        int length = Data.ReadInt32(operandOffset);
+        int length = this.Data.ReadInt32(operandOffset);
         if (length < 0)
+        {
             throw new ArgumentException(null, nameof(Data));
+        }
 
         int[] branches = new int[length];
         operandOffset += sizeof(int);
-
         for (int index = 0; index < length; index++)
         {
-            branches[index] = Data.ReadInt32(operandOffset);
+            branches[index] = this.Data.ReadInt32(operandOffset);
             operandOffset += sizeof(int);
         }
 
@@ -241,7 +320,7 @@ public abstract class InstructionList
     // Try to create a token for the specified instruction
     private IInstruction CreateToken(int offset, OpCode opCode, int operandOffset)
     {
-        Token token = Data.ReadToken(operandOffset);
+        Token token = this.Data.ReadToken(operandOffset);
 
         switch (token.Type)
         {
@@ -274,10 +353,17 @@ public abstract class InstructionList
     // Resolve all of the instruction values
     private void Resolve()
     {
-        foreach (IInstruction instruction in instructions)
+        foreach (IInstruction instruction in this.instructions)
         {
-            try { instruction.Resolve(); }
-            catch { IsInvalidData = true; }
+            try 
+            { 
+                instruction.Resolve(); 
+            }
+            catch (Exception ex) 
+            { 
+                Debug.WriteLine("Failed to resolve instruction: " + ex);
+                this.IsInvalidData = true; 
+            }
         }
     }
 
@@ -285,14 +371,18 @@ public abstract class InstructionList
     private bool TryCreate(ref int offset, out IInstruction instruction)
     {
         instruction = null;
-        if (offset >= Data.Count)
+        if (offset >= this.Data.Count)
+        {
             return false;
+        }
 
         int index = offset;
-        short code = Data.ReadOpCode(ref index);
+        short code = this.Data.ReadOpCode(ref index);
 
         if (!AllOpCodes.Instance.TryGetValue(code, out OpCode opCode))
+        {
             return false;
+        }
 
         try
         {
@@ -300,47 +390,47 @@ public abstract class InstructionList
             {
                 case OperandType.InlineBrTarget:
                     instruction = new BranchInstruction<int>(this, offset, opCode,
-                        Data.ReadInt32(index), sizeof(int));
+                        this.Data.ReadInt32(index), sizeof(int));
                     index += sizeof(int);
                     break;
 
                 case OperandType.ShortInlineBrTarget:
                     instruction = new BranchInstruction<sbyte>(this, offset, opCode,
-                        Data.ReadSByte(index), sizeof(sbyte));
+                        this.Data.ReadSByte(index), sizeof(sbyte));
                     index += sizeof(sbyte);
                     break;
 
                 case OperandType.InlineField:
                     instruction = new FieldInstruction(this, offset, opCode,
-                        Data.ReadToken(index));
+                        this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineI:
                     instruction = new Instruction<int>(this, offset, opCode,
-                        Data.ReadInt32(index));
+                        this.Data.ReadInt32(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineI8:
                     instruction = new Instruction<long>(this, offset, opCode,
-                        Data.ReadInt64(index));
+                        this.Data.ReadInt64(index));
                     index += sizeof(long);
                     break;
 
                 case OperandType.ShortInlineI:
                     instruction = opCode == OpCodes.Ldc_I4_S ?
                         (IInstruction)new Instruction<sbyte>(this, offset, opCode,
-                            Data.ReadSByte(index)) :
+                            this.Data.ReadSByte(index)) :
                         new Instruction<byte>(this, offset, opCode,
-                            Data.ReadByte(index));
+                            this.Data.ReadByte(index));
                     index += sizeof(byte);
                     break;
 
 
                 case OperandType.InlineMethod:
                     instruction = new MethodInstruction(this, offset, opCode,
-                        Data.ReadToken(index));
+                        this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
@@ -366,34 +456,34 @@ public abstract class InstructionList
 
                 case OperandType.InlineR:
                     instruction = new Instruction<double>(this, offset, opCode,
-                        Data.ReadDouble(index));
+                        this.Data.ReadDouble(index));
                     index += sizeof(double);
                     break;
 
                 case OperandType.ShortInlineR:
                     instruction = new Instruction<float>(this, offset, opCode,
-                        Data.ReadSingle(index));
+                        this.Data.ReadSingle(index));
                     index += sizeof(float);
                     break;
 
                 case OperandType.InlineSig:
                     instruction = new SignatureInstruction(this, offset, opCode,
-                        Data.ReadToken(index));
+                        this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineString:
                     instruction = new StringInstruction(this, offset, opCode,
-                        Data.ReadToken(index));
+                        this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineSwitch:
-                    instruction = CreateSwitch(offset, opCode, ref index);
+                    instruction = this.CreateSwitch(offset, opCode, ref index);
                     break;
 
                 case OperandType.InlineTok:
-                    instruction = CreateToken(offset, opCode, index);
+                    instruction = this.CreateToken(offset, opCode, index);
                     index += sizeof(int);
                     break;
 
@@ -408,7 +498,7 @@ public abstract class InstructionList
                         (IInstruction)new ParameterInstruction<ushort>(
                             this, offset, opCode, Data.ReadUInt16(index)) :
                         new VariableInstruction<ushort>(this, offset, opCode,
-                            Data.ReadUInt16(index));
+                            this.Data.ReadUInt16(index));
                     index += sizeof(ushort);
                     break;
 
@@ -417,7 +507,7 @@ public abstract class InstructionList
                         (IInstruction)new ParameterInstruction<byte>(
                             this, offset, opCode, Data.ReadByte(index)) :
                         new VariableInstruction<byte>(this, offset, opCode,
-                            Data.ReadByte(index));
+                            this.Data.ReadByte(index));
                     index += sizeof(byte);
                     break;
 
@@ -434,4 +524,6 @@ public abstract class InstructionList
             return false;
         }
     }
+
+    */
 }
