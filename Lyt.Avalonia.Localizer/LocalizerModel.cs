@@ -27,6 +27,8 @@ public sealed class LocalizerModel : ModelBase, ILocalizer
 
     public override Task Initialize() => Task.CompletedTask;
 
+    public string? CurrentLanguage => this.currentLanguage; 
+
     public Task Configure(LocalizerConfiguration configuration)
     {
         if (configuration.IsLikelyValid)

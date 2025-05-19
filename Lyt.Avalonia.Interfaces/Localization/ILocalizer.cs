@@ -6,7 +6,10 @@ public interface ILocalizer
     Task Configure(LocalizerConfiguration localizerConfiguration); 
 
     /// <summary> Returns true if the requested language exists and gets selected </summary>
-    bool SelectLanguage(string targetLanguage); 
+    bool SelectLanguage(string targetLanguage);
+
+    /// <summary> Returns the current language, if one is selected </summary>
+    string? CurrentLanguage { get; }
 
     /// <summary> Returns a localized string from the provided key </summary>
     /// <remarks> Returns the key if no translation can be found. </remarks>
