@@ -1,9 +1,7 @@
 ﻿namespace Lyt.Reflector.IL;
 
-/// <summary>
-/// An instruction that references field information (<see cref="OperandType.InlineField"/>
-/// or <see cref="OperandType.InlineTok"/>).
-/// </summary>
+/// <summary> An instruction that references field information  </summary>
+/// <remarks>  (<see cref="OperandType.InlineField"/> or <see cref="OperandType.InlineTok"/>). </remarks>
 public class FieldInstruction : Instruction<Token, FieldInfo>
 {
 	/// <summary> Create an instance for the specified byte offset and operation code (opcode). </summary>
@@ -12,46 +10,44 @@ public class FieldInstruction : Instruction<Token, FieldInfo>
 	/// <param name="opCode">The operation code (opcode) for this instruction.</param>
 	/// <param name="token">The operand (token) for this instruction.</param>
 	/// <param name="field">The (optional) field for this instruction.</param>
-	/// <exception cref="System.ArgumentNullException">
-	/// <paramref name="parent"/> is null.
-	/// </exception>
-	public FieldInstruction(InstructionList parent, int offset, OpCode opCode,
-		Token token, FieldInfo field = null)
-		: base(parent, offset, opCode, token) =>
-        this.Value = field;
+	public FieldInstruction(
+		MethodInstructionsList parent, 
+		int offset, OpCode opCode, Token token, 
+		FieldInfo? field = null)
+		: base(parent, offset, opCode, token) 
+		=> this.Value = field;
 
 	/// <summary> Resolve the field for this instructon. </summary>
-	/// <exception cref="System.ArgumentException">
-	/// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a field within the scope
-	/// of <see cref="IInstruction.Parent"/>.
-	/// </exception>
-	/// <exception cref="System.ArgumentOutOfRangeException">
-	/// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a valid field within
-	/// the scope of <see cref="IInstruction.Parent"/>.
-	/// </exception>
-	public override void Resolve() =>
-        this.Value = this.Value ?? Parent.ResolveField(Operand);
+	public override void Resolve() => this.Value ??= this.Parent.ResolveField(this.Operand);
 
-	/// <summary> Format the value. </summary>
-	/// <returns>The formatted value.</returns>
-	protected override string FormatValue()
+    /// <summary> Returns the formatted value. </summary>
+    protected override string FormatValue()
 	{
-		if (Value == null)
+		if (this.Value == null)
         {
             return InvalidValue;
         }
 
         var builder = new StringBuilder(1024);
-		if (OpCode.OperandType == OperandType.InlineTok)
+		if (this.OpCode.OperandType == OperandType.InlineTok)
         {
             builder.Append("field ");
         }
 
-        AppendType(builder, Value.FieldType);
+        this.AppendType(builder, this.Value.FieldType);
 		builder.Append(' ');
-		AppendType(builder, Value.DeclaringType);
-		builder.Append("::");
-		builder.Append(Value.Name);
+		Type? maybeType = this.Value.DeclaringType;
+		if (maybeType is Type declaringType)
+		{
+			this.AppendType(builder, declaringType);
+		}
+		else
+		{
+            _ = builder.Append(InvalidValue);
+        }
+
+        builder.Append("::");
+		builder.Append(this.Value.Name);
 		return builder.ToString();
 	}
 }

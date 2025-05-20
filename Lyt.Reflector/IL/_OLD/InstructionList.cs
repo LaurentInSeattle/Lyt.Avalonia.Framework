@@ -1,5 +1,7 @@
 ﻿namespace Lyt.Reflector.IL;
 
+/*
+ 
 /// <summary> A list of instructions. </summary>
 public abstract class InstructionList 
 {
@@ -434,4 +436,7 @@ public abstract class InstructionList
             return false;
         }
     }
+
 }
+
+*/

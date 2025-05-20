@@ -1,7 +1,4 @@
-﻿using System.Reflection.Emit;
-using System.Text;
-
-namespace Lyt.Reflector.Structures;
+﻿namespace Lyt.Reflector.Structures;
 
 public static class ReflectionUtilities
 {
@@ -14,6 +11,9 @@ public static class ReflectionUtilities
             "GetType",
             "Finalize",
         ];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ToInt32<T>(this T operand) => Convert.ToInt32(operand);
 
     public static List<string> GetExcludedNamespaces() => ReflectionUtilities.excludedNamespaces;
 
@@ -275,8 +275,6 @@ public static class ReflectionUtilities
            methodName.StartsWith("add_") ||
            methodName.StartsWith("remove_") ||
            methodName.StartsWith("<Clone>");
-
-
 
     public static string Analyse(this byte[] il, Module module)
     {

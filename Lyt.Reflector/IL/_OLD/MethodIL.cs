@@ -1,5 +1,7 @@
 ﻿namespace Lyt.Reflector.IL;
 
+/*
+ * 
 /// <summary> The instructions for a method body. </summary>
 public class MethodIL : InstructionList
 {
@@ -224,3 +226,4 @@ public class MethodIL : InstructionList
         return MethodBody.LocalVariables[operand];
     }
 }
+*/

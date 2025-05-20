@@ -6,10 +6,9 @@
 /// </summary>
 /// <typeparam name="TOperand">The type of operand for this instruction.</typeparam>
 public class BranchInstruction<TOperand> : Instruction<TOperand, IInstruction>
-	where TOperand : struct, IComparable, IFormattable, IConvertible,
-		IComparable<TOperand>, IEquatable<TOperand>
+    where TOperand : struct, IBinaryInteger<TOperand>
 {
-    private int branchBase;
+    private readonly int branchBase;
 
     /// <summary>
     /// Create an instance for the specified byte offset, operation code (opcode),
@@ -23,24 +22,26 @@ public class BranchInstruction<TOperand> : Instruction<TOperand, IInstruction>
     /// <exception cref="System.ArgumentNullException">
     /// <paramref name="parent"/> is null.
     /// </exception>
-    public BranchInstruction(InstructionList parent, int offset, OpCode opCode,
-		TOperand operand, byte operandSize)
-		: base(parent, offset, opCode, operand) =>
-		branchBase = offset + OpCode.Size + operandSize;
+    public BranchInstruction(MethodInstructionsList parent, int offset, OpCode opCode,
+        TOperand operand, byte operandSize)
+        : base(parent, offset, opCode, operand) 
+        => this.branchBase = offset + this.OpCode.Size + operandSize;
 
-	/// <summary> Resolve the branch for this instructon. </summary>
-	/// <exception cref="System.ArgumentOutOfRangeException">
-	/// <see cref="Instruction{TOperand, TValue}.Operand"/> does not resolve to the byte
-	/// offset of an instruction within the scope of <see cref="IInstruction.Parent"/>.
-	/// </exception>
-	public override void Resolve() =>
-		Value = Value ?? Parent.ResolveInstruction(branchBase + Operand.ToInt32(null));
+    /// <summary> Resolve the branch for this instructon. </summary>
+    /// <exception cref="System.ArgumentOutOfRangeException">
+    /// <see cref="Instruction{TOperand, TValue}.Operand"/> does not resolve to the byte
+    /// offset of an instruction within the scope of <see cref="IInstruction.Parent"/>.
+    /// </exception>
+    public override void Resolve() =>
+        this.Value ??= this.Parent.ResolveInstruction(this.branchBase + this.Operand.ToInt32());
 
-	/// <summary> Format the value. </summary>
-	/// <returns>The formatted value.</returns>
-	protected override string FormatValue()
-	{
-		string targetLabel = FormatLabel(branchBase + Operand.ToInt32(null));
-		return Value == null ? $"{InvalidValue} // {targetLabel}" : targetLabel;
-	}
+    /// <summary> Returns the formatted value. </summary>
+    protected override string FormatValue()
+    {
+        string targetLabel = FormatLabel(this.branchBase + this.Operand.ToInt32());
+        return 
+            this.Value == null ? 
+                $"{InvalidValue} // {targetLabel}" : 
+                targetLabel;
+    }
 }

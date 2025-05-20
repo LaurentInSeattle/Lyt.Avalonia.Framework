@@ -13,8 +13,7 @@
 /// references.
 /// </remarks>
 public class ParameterInstruction<TOperand> : Instruction<TOperand, ParameterInfo>
-	where TOperand : struct, IComparable, IFormattable, IConvertible,
-		IComparable<TOperand>, IEquatable<TOperand>
+	where TOperand : struct, IBinaryInteger<TOperand>
 {
 	/// <summary>
 	/// Create an instance for the specified byte offset and operation code (opcode).
@@ -23,52 +22,36 @@ public class ParameterInstruction<TOperand> : Instruction<TOperand, ParameterInf
 	/// <param name="offset">The byte offset of this instruction.</param>
 	/// <param name="opCode">The operation code (opcode) for this instruction.</param>
 	/// <param name="operand">The operand for this instruction.</param>
-	/// <exception cref="System.ArgumentNullException">
-	/// <paramref name="parent"/> is null.
-	/// </exception>
-	public ParameterInstruction(InstructionList parent, int offset, OpCode opCode,
-		TOperand operand)
-		: base(parent, offset, opCode, operand)
-	{
-	}
+	public ParameterInstruction(
+		MethodInstructionsList parent, int offset, OpCode opCode, TOperand operand)
+		: base(parent, offset, opCode, operand) { }
 
-	/// <summary>
-	/// Gets a value indicating if the parameter is the "this" argument.
-	/// </summary>
+	/// <summary> Gets a value indicating if the parameter is the "this" argument. </summary>
 	public bool IsThis { get; private set; }
 
-	/// <summary>
-	/// Gets a value indicating if the operand and resulting value are implied (as opposed to
-	/// explicit).
-	/// </summary>
-	public bool IsOperandImplied =>
-		OpCode.OperandType == OperandType.InlineNone;
+	/// <summary> Gets a value indicating if the operand and resulting value are implied (as opposed to explicit).</summary>
+	public bool IsOperandImplied => OpCode.OperandType == OperandType.InlineNone;
 
-	/// <summary>
-	/// Resolve the parameter for this instructon.
-	/// </summary>
+	/// <summary> Resolve the parameter for this instructon. </summary>
 	/// <exception cref="System.ArgumentOutOfRangeException">
 	/// <see cref="Instruction{TOperand, TValue}.Operand"/> does not identify a valid
 	/// parameter within the scope of <see cref="IInstruction.Parent"/>.
 	/// </exception>
 	public override void Resolve()
 	{
-		if (Value != null || IsThis)
+		if (this.Value != null || this.IsThis)
         {
             return;
         }
 
-        Value = Parent.ResolveParameter(Operand.ToInt32(null));
-		if (Value == null)
+        this.Value = this.Parent.ResolveParameter(this.Operand.ToInt32());
+		if (this.Value == null)
         {
-            IsThis = true;
+            this.IsThis = true;
         }
     }
 
-	/// <summary>
-	/// Format the value.
-	/// </summary>
-	/// <returns>The formatted value.</returns>
+    /// <summary> Returns the formatted value. </summary>
 	protected override string FormatValue()
 	{
 		if (Value != null)

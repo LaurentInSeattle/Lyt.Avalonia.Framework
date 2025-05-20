@@ -12,10 +12,7 @@ public class SignatureInstruction : Instruction<Token, MethodSignature>
 	/// <param name="offset">The byte offset of this instruction.</param>
 	/// <param name="opCode">The operation code (opcode) for this instruction.</param>
 	/// <param name="token">The operand (token) for this instruction.</param>
-	/// <exception cref="System.ArgumentNullException">
-	/// <paramref name="parent"/> is null.
-	/// </exception>
-	public SignatureInstruction(InstructionList parent, int offset, OpCode opCode,
+	public SignatureInstruction(MethodInstructionsList parent, int offset, OpCode opCode,
 		Token token)
 		: base(parent, offset, opCode, token)
 	{
@@ -35,10 +32,7 @@ public class SignatureInstruction : Instruction<Token, MethodSignature>
 	public override void Resolve() =>
 		Value = Value ?? new MethodSignature(Parent, Parent.ResolveSignature(Operand));
 
-	/// <summary>
-	/// Format the value.
-	/// </summary>
-	/// <returns>The formatted value.</returns>
+    /// <summary> Returns the formatted value. </summary>
 	protected override string FormatValue() =>
 		Value == null ? InvalidValue : Value.ToString();
 

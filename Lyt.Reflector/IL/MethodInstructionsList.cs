@@ -39,7 +39,7 @@ public sealed class MethodInstructionsList
             byte[]? data = this.MethodBody.GetILAsByteArray();
             if (data is not null)
             {
-                this.Data = new ReadOnlyCollection<byte>(data);
+                this.Data = data;
                 // this.DecodeInstructions(); 
             }
             else
@@ -65,7 +65,7 @@ public sealed class MethodInstructionsList
     public Module Module { get; }
 
     /// <summary> Gets the byte data for these instructions. </summary>
-    public ReadOnlyCollection<byte> Data { get; }
+    public byte[] Data { get; }
 
     /// <summary> Gets the count of instructions. </summary>
     public int Count => this.instructions.Count;
@@ -129,7 +129,7 @@ public sealed class MethodInstructionsList
     /// </exception>
     public IInstruction ResolveInstruction(int offset)
     {
-        int high = Count - 1;
+        int high = this.Count - 1;
         int low = 0;
 
         while (low <= high)
@@ -273,12 +273,12 @@ public sealed class MethodInstructionsList
         return MethodBody.LocalVariables[operand];
     }
 
-    /*
+    
 
     /// <summary> Decode the instructions. </summary>
     private void DecodeInstructions()
     {
-        int count = this.Data.Count;
+        int count = this.Data.Length;
         int offset = 0;
         while (offset < count)
         {
@@ -303,7 +303,7 @@ public sealed class MethodInstructionsList
         int length = this.Data.ReadInt32(operandOffset);
         if (length < 0)
         {
-            throw new ArgumentException(null, nameof(Data));
+            throw new ArgumentException(null, nameof(this.Data));
         }
 
         int[] branches = new int[length];
@@ -321,33 +321,16 @@ public sealed class MethodInstructionsList
     private IInstruction CreateToken(int offset, OpCode opCode, int operandOffset)
     {
         Token token = this.Data.ReadToken(operandOffset);
-
-        switch (token.Type)
+        return token.Type switch
         {
-            case TokenType.TypeDef:
-            case TokenType.TypeRef:
-            case TokenType.TypeSpec:
-                return new TypeInstruction(this, offset, opCode, token);
-
-            case TokenType.MethodSpec:
-            case TokenType.MethodDef:
-                return new MethodInstruction(this, offset, opCode, token);
-
-            case TokenType.FieldDef:
-                return new FieldInstruction(this, offset, opCode, token);
-
-            case TokenType.Signature:
-                return new SignatureInstruction(this, offset, opCode, token);
-
-            case TokenType.String:
-                return new StringInstruction(this, offset, opCode, token);
-
-            case TokenType.MemberRef:
-                return MemberInstruction.Create(this, offset, opCode, token);
-
-            default:
-                return new Instruction<Token>(this, offset, opCode, token);
-        }
+            TokenType.TypeDef or TokenType.TypeRef or TokenType.TypeSpec => new TypeInstruction(this, offset, opCode, token),
+            TokenType.MethodSpec or TokenType.MethodDef => new MethodInstruction(this, offset, opCode, token),
+            TokenType.FieldDef => new FieldInstruction(this, offset, opCode, token),
+            TokenType.Signature => new SignatureInstruction(this, offset, opCode, token),
+            TokenType.String => new StringInstruction(this, offset, opCode, token),
+            TokenType.MemberRef => MemberInstruction.Create(this, offset, opCode, token),
+            _ => new Instruction<Token>(this, offset, opCode, token),
+        };
     }
 
     // Resolve all of the instruction values
@@ -368,10 +351,10 @@ public sealed class MethodInstructionsList
     }
 
     // Try to create an instruction from the byte data at the specified offset
-    private bool TryCreate(ref int offset, out IInstruction instruction)
+    private bool TryCreate(ref int offset, out IInstruction? instruction)
     {
         instruction = null;
-        if (offset >= this.Data.Count)
+        if (offset >= this.Data.Length)
         {
             return false;
         }
@@ -489,14 +472,14 @@ public sealed class MethodInstructionsList
 
                 case OperandType.InlineType:
                     instruction = new TypeInstruction(this, offset, opCode,
-                        Data.ReadToken(index));
+                        this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineVar:
                     instruction = opCode.Name.Contains("arg") ?
                         (IInstruction)new ParameterInstruction<ushort>(
-                            this, offset, opCode, Data.ReadUInt16(index)) :
+                            this, offset, opCode, this.Data.ReadUInt16(index)) :
                         new VariableInstruction<ushort>(this, offset, opCode,
                             this.Data.ReadUInt16(index));
                     index += sizeof(ushort);
@@ -505,14 +488,14 @@ public sealed class MethodInstructionsList
                 case OperandType.ShortInlineVar:
                     instruction = opCode.Name.Contains("arg") ?
                         (IInstruction)new ParameterInstruction<byte>(
-                            this, offset, opCode, Data.ReadByte(index)) :
+                            this, offset, opCode, this.Data.ReadByte(index)) :
                         new VariableInstruction<byte>(this, offset, opCode,
                             this.Data.ReadByte(index));
                     index += sizeof(byte);
                     break;
 
                 default:
-                    throw new ArgumentException(null, nameof(Data));
+                    throw new ArgumentException(null, nameof(this.Data));
             }
 
             offset = index;
@@ -525,5 +508,5 @@ public sealed class MethodInstructionsList
         }
     }
 
-    */
+    
 }

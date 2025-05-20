@@ -8,19 +8,19 @@
 /// <param name="parent">The set of instructions containing this instruction.</param>
 /// <param name="offset">The byte offset of this instruction.</param>
 /// <param name="opCode">The operation code (opcode) for this instruction.</param>
-public class Instruction(InstructionList parent, int offset, OpCode opCode) : IInstruction
+public class Instruction(MethodInstructionsList parent, int offset, OpCode opCode) : IInstruction
 {
+    /// <summary> The text displayed for an unresolved value. </summary>
+    protected const string InvalidValue = "-?-";
+
     /// <summary> Gets the set of instructions containing this instruction. </summary>
-    public InstructionList Parent { get; } = parent;
+    public MethodInstructionsList Parent { get; } = parent;
 
     /// <summary> Gets the byte offset of this instruction. </summary>
     public int Offset { get; } = offset;
 
     /// <summary> Gets the operation code (opcode) for this instruction. </summary>
     public OpCode OpCode { get; } = opCode;
-
-    /// <summary> The text displayed for an unresolved value. </summary>
-    protected const string InvalidValue = "?";
 
     /// <summary> Gets a value indicating if this instruction if the target of a branch or switch instruction.</summary>
     public bool IsTarget { get; internal set; }

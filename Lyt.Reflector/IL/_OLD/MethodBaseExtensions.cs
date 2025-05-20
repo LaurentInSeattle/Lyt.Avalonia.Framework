@@ -1,5 +1,7 @@
 ﻿namespace Lyt.Reflector.IL;
 
+/*
+ * 
 /// <summary> Extension methods for the <see cref="MethodBase"/> class. </summary>
 public static class MethodBaseExtensions
 {
@@ -8,3 +10,5 @@ public static class MethodBaseExtensions
 	/// <returns>The Intermediate Language (IL) for this method's body.</returns>
 	public static MethodIL GetIL(this MethodBase method) => new (method);
 }
+
+*/

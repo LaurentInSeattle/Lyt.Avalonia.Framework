@@ -14,11 +14,8 @@ public class TypeInstruction : Instruction<Token, Type>
 	/// <param name="opCode">The operation code (opcode) for this instruction.</param>
 	/// <param name="token">The operand (token) for this instruction.</param>
 	/// <param name="type">The (optional) type for this instruction.</param>
-	/// <exception cref="System.ArgumentNullException">
-	/// <paramref name="parent"/> is null.
-	/// </exception>
-	public TypeInstruction(InstructionList parent, int offset, OpCode opCode,
-		Token token, Type type = null)
+	public TypeInstruction(MethodInstructionsList parent, int offset, OpCode opCode,
+		Token token, Type? type = null)
 		: base(parent, offset, opCode, token) =>
         this.Value = type;
 
@@ -33,7 +30,6 @@ public class TypeInstruction : Instruction<Token, Type>
 	/// </exception>
 	public override void Resolve() => Value = Value ?? Parent.ResolveType(Operand);
 
-	/// <summary> Format the value. </summary>
-	/// <returns>The formatted value.</returns>
+    /// <summary> Returns the formatted value. </summary>
 	protected override string FormatValue() => Value == null ? InvalidValue : FormatType(Value);
 }

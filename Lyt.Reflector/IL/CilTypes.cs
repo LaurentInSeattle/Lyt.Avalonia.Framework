@@ -51,8 +51,10 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
     /// <param name="type">The type to format.</param>
     /// <param name="includeModifiers">A value indicating if type modifiers should be included.</param>
     public void AppendType(
-        StringBuilder builder, InstructionList instructions,
-        Type type, bool includeModifiers = false)
+        StringBuilder builder, 
+        MethodInstructionsList instructions,
+        Type type, 
+        bool includeModifiers = false)
     {
         if (types.TryGetValue(type, out string? value))
         {
@@ -81,7 +83,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
     /// <param name="instructions">The list of instructions where the types are referenced.</param>
     /// <param name="types">The type parameters.</param>
     public void AppendTypeParameters(
-        StringBuilder builder, InstructionList instructions, IEnumerable<Type> types)
+        StringBuilder builder, MethodInstructionsList instructions, IEnumerable<Type> types)
     {
         builder.Append('<');
 
@@ -116,7 +118,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
     /// <exception cref="System.ArgumentNullException">
     /// <paramref name="instructions"/> or <paramref name="type"/> is null.
     /// </exception>
-    public string FormatType(InstructionList instructions, Type type, bool includeModifiers = false)
+    public string FormatType(MethodInstructionsList instructions, Type type, bool includeModifiers = false)
     {
 
         if (types.TryGetValue(type, out string? value))
@@ -135,9 +137,20 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
 
     /// <summary> Try to get the value for the specified key. </summary>
     /// <param name="key">The key to find.</param>
-    /// <param name="value">The value that was found (or null).</param>
+    /// <param name="value">The value that was found (or string.Empty).</param>
     /// <returns>True, if the key was found; otherwise, false.</returns>
-    public bool TryGetValue(Type key, out string? value) => types.TryGetValue(key, out value);
+    public bool TryGetValue(Type key, out string val)
+    {
+        val = string.Empty;
+        bool found = types.TryGetValue(key, out string? value);
+        if ( found && value is not null )
+        {
+            val = value;
+        }
+
+        return found;
+    } 
+
 
     IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
@@ -163,7 +176,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
 
     // Append the assembly name if different from the assembly for the instructions
     private static void AppendAssemblyName(
-        InstructionList instructions, StringBuilder builder, Type type)
+        MethodInstructionsList instructions, StringBuilder builder, Type type)
     {
         Assembly assembly = type.Assembly;
         if (instructions.IsSameAssembly(assembly))
@@ -178,7 +191,7 @@ public class CilTypes : IReadOnlyDictionary<Type, string>
 
     // Append a type that has no direct CIL equivalent
     private void AppendNonCilType(
-        InstructionList instructions, StringBuilder builder, Type type, bool includeModifiers)
+        MethodInstructionsList instructions, StringBuilder builder, Type type, bool includeModifiers)
     {
         if (includeModifiers)
         {

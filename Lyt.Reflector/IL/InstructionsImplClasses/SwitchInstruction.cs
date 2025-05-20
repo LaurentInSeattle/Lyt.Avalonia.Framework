@@ -22,7 +22,7 @@ public class SwitchInstruction : Instruction<int, IReadOnlyList<IInstruction>>
 	/// <exception cref="System.ArgumentOutOfRangeException">
 	/// <paramref name="operand"/> is less than zero.
 	/// </exception>
-	public SwitchInstruction(InstructionList parent, int offset, OpCode opCode,
+	public SwitchInstruction(MethodInstructionsList parent, int offset, OpCode opCode,
 		int operand, int[] branchOperands)
 		: base(parent, offset, opCode, operand)
 	{
@@ -61,8 +61,7 @@ public class SwitchInstruction : Instruction<int, IReadOnlyList<IInstruction>>
 			.Select(operand => Parent.ResolveInstruction(branchBase + operand))
 			.ToList());
 
-	/// <summary> Format the value. </summary>
-	/// <returns>The formatted value.</returns>
+    /// <summary> Returns the formatted value. </summary>
 	protected override string FormatValue()
 	{
 		var builder = new StringBuilder(1024);

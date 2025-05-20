@@ -17,8 +17,8 @@ public interface IInstruction
 	/// <summary> Gets the operation code (opcode) for this instruction. </summary>
 	OpCode OpCode { get; }
 
-	/// <summary> Gets the set of instructions containing this instruction. </summary>
-	InstructionList Parent { get; }
+    /// <summary> Gets the set of instructions containing this instruction. </summary>
+    MethodInstructionsList Parent { get; }
 
 	/// <summary> Get the operand for this instruction. </summary>
 	/// <returns>The operand for this instruction.</returns>
