@@ -19,9 +19,6 @@ public class BranchInstruction<TOperand> : Instruction<TOperand, IInstruction>
     /// <param name="opCode">The operation code (opcode) for this instruction.</param>
     /// <param name="operand">The operand for this instruction.</param>
     /// <param name="operandSize">The byte size of the operand for this instruction.</param>
-    /// <exception cref="System.ArgumentNullException">
-    /// <paramref name="parent"/> is null.
-    /// </exception>
     public BranchInstruction(MethodInstructionsList parent, int offset, OpCode opCode,
         TOperand operand, byte operandSize)
         : base(parent, offset, opCode, operand) 

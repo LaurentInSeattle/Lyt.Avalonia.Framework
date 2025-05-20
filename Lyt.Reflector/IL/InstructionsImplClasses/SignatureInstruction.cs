@@ -10,17 +10,7 @@ public class SignatureInstruction(
     MethodInstructionsList parent, int offset, OpCode opCode, Token token) 
     : Instruction<Token, MethodSignature>(parent, offset, opCode, token)
 {
-    /// <summary>
-    /// Resolve the signature for this instructon.
-    /// </summary>
-    /// <exception cref="System.ArgumentException">
-    /// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a signature within the scope
-    /// of <see cref="IInstruction.Parent"/>.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a valid signature within
-    /// the scope <see cref="IInstruction.Parent"/>.
-    /// </exception>
+    /// <summary> Resolve the signature for this instructon. </summary>
     public override void Resolve() =>
         this.Value ??= 
 			new MethodSignature(this.Parent, this.Parent.ResolveSignature(this.Operand));

@@ -1,8 +1,8 @@
 ﻿namespace Lyt.Reflector.IL;
 
 /// <summary>
-/// An instruction that references type information (<see cref="OperandType.InlineType"/> or
-/// <see cref="OperandType.InlineTok"/>).
+/// An instruction that references type information 
+/// (<see cref="OperandType.InlineType"/> or <see cref="OperandType.InlineTok"/>).
 /// </summary>
 public class TypeInstruction : Instruction<Token, Type>
 {
@@ -19,17 +19,10 @@ public class TypeInstruction : Instruction<Token, Type>
 		: base(parent, offset, opCode, token) =>
         this.Value = type;
 
-	/// <summary> Resolve the type for this instructon. </summary>
-	/// <exception cref="System.ArgumentException">
-	/// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a type within the scope
-	/// of <see cref="IInstruction.Parent"/>.
-	/// </exception>
-	/// <exception cref="System.ArgumentOutOfRangeException">
-	/// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a valid type within
-	/// the scope <see cref="IInstruction.Parent"/>.
-	/// </exception>
-	public override void Resolve() => Value = Value ?? Parent.ResolveType(Operand);
+	/// <summary> Resolve the type for this instruction. </summary>
+	public override void Resolve() => this.Value ??= this.Parent.ResolveType(this.Operand);
 
     /// <summary> Returns the formatted value. </summary>
-	protected override string FormatValue() => Value == null ? InvalidValue : FormatType(Value);
+	protected override string FormatValue() 
+		=> this.Value == null ? InvalidValue : this.FormatType(this.Value);
 }

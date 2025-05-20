@@ -20,14 +20,6 @@ public class MethodInstruction : Instruction<Token, MethodBase>
         => this.Value = method;
 
     /// <summary> Resolve the method for this instructon. </summary>
-    /// <exception cref="System.ArgumentException">
-    /// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a method within the scope
-    /// of <see cref="IInstruction.Parent"/>.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <see cref="Instruction{TOperand, TValue}.Operand"/> is not a valid method within
-    /// the scope <see cref="IInstruction.Parent"/>.
-    /// </exception>
     public override void Resolve() => this.Value ??= this.Parent.ResolveMethod(this.Operand);
 
     /// <summary> Returns the formatted value. </summary>

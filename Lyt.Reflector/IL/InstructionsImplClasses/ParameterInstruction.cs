@@ -27,11 +27,7 @@ public class ParameterInstruction<TOperand>(
     /// <summary> Gets a value indicating if the operand and resulting value are implied (as opposed to explicit).</summary>
     public bool IsOperandImplied => this.OpCode.OperandType == OperandType.InlineNone;
 
-    /// <summary> Resolve the parameter for this instructon. </summary>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <see cref="Instruction{TOperand, TValue}.Operand"/> does not identify a valid
-    /// parameter within the scope of <see cref="IInstruction.Parent"/>.
-    /// </exception>
+    /// <summary> Resolve the parameter for this instruction. </summary>
     public override void Resolve()
     {
         if (this.Value != null || this.IsThis)
