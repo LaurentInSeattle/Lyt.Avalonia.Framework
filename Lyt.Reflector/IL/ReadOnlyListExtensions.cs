@@ -7,6 +7,10 @@ internal static class ByteArrayExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)] 
     internal static byte ReadByte(this byte[] data, int offset) => data[offset];
 
+    /// <summary> Read a signed 8 bit integer from this array. </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static sbyte ReadSByte(this byte[] data, int offset) => (sbyte)data[offset];
+
     /// <summary> Read an array of bytes from this array. </summary>
     /// <returns>An array of bytes.</returns>
     internal static byte[] ReadBytes(this IReadOnlyList<byte> data, int offset, int count)
@@ -114,10 +118,6 @@ internal static class ByteArrayExtensions
                 data.GetRange(offset, sizeof(float)) :
                 data.Reverse(offset, sizeof(float)), 0);
 
-    /// <summary> Read a signed 8 bit integer from this array. </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static sbyte ReadSByte(this byte[] data, int offset) => (sbyte)data[offset];
-
     /// <summary> Read a 32 bit token from this array.</summary>
     internal static Token ReadToken(this byte[] data, int offset) => new(ReadInt32(data, offset));
 
@@ -133,9 +133,12 @@ internal static class ByteArrayExtensions
     // Get an array that is a subset of this array
     private static byte[] GetRange(this byte[] data, int offset, int size)
     {
-        var range = new byte[size];
+        byte[] range = new byte[size];
         for (int index = 0; index < size; index++)
+        {
             range[index] = data[offset + index];
+        }
+
         return range;
     }
 

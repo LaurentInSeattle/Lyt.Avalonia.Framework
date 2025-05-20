@@ -24,9 +24,19 @@ public class MethodSignature
         offset += count;
 
         bool isOptional = false;
-        this.ReturnType = this.DecodeType(offset, ref isOptional, out count);
+        Type? maybeType = this.DecodeType(offset, ref isOptional, out count);
+        if (maybeType is Type type)
+        {
+            this.ReturnType = type;
+        }
+        else
+        {
+            this.ReturnType = typeof(void);
+        }
+            
         offset += count;
 
+        // Needed ? 
         if (this.ReturnType == null)
         {
             throw new ArgumentException(null, nameof(data));
@@ -48,10 +58,10 @@ public class MethodSignature
     public Type ReturnType { get; }
 
     /// <summary> Gets the types for the required parameters. </summary>
-    public IReadOnlyList<Type> RequiredParameters { get; private set; }
+    public List<Type> RequiredParameters { get; private set; }
 
     /// <summary> Gets the types for the optional parameters. </summary>
-    public IReadOnlyList<Type> OptionalParameters { get; private set; }
+    public List<Type> OptionalParameters { get; private set; }
 
     /// <summary> Gets a value indicating if the calling convention is managed or unmanaged. </summary>
     public bool IsUnmanaged { get; private set; }
@@ -154,7 +164,7 @@ public class MethodSignature
 
     // Append the text for a Type to the specified string builder
     private void AppendType(StringBuilder builder, Type type, bool includeModifiers = true) =>
-        CilTypes.Instance.AppendType(builder, Parent, type, includeModifiers);
+        CilTypes.Instance.AppendType(builder, this.Parent, type, includeModifiers);
 
     // Append the text for a sequence of types to the specified string builder
     private void AppendTypes(StringBuilder builder, IEnumerable<Type> types,
@@ -171,7 +181,7 @@ public class MethodSignature
                 builder.Append(", ");
             }
 
-            AppendType(builder, type);
+            this.AppendType(builder, type);
         }
     }
 
@@ -182,15 +192,17 @@ public class MethodSignature
         {
             try
             {
-                type = Parent.ResolveType(Data.ReadCompressedTypeDefOrRef(offset, out int count));
-                if (type != null)
+                type = this.Parent.ResolveType(
+                    this.Data.ReadCompressedTypeDefOrRef(offset, out int count));
+                if (type is not null)
                 {
                     offset += count;
                     return true;
                 }
             }
-            catch
+            catch(Exception ex) 
             {
+                Debug.WriteLine("Failed to resolve type: " + ex);
             }
         }
 
@@ -202,7 +214,6 @@ public class MethodSignature
     private Type? DecodeType(int offset, ref bool isOptional, out int count)
     {
         int startOffset = offset;
-
         var elementType = (ElementType)this.Data.ReadByte(offset++);
         if (elementType == ElementType.Sentinel)
         {
@@ -228,22 +239,26 @@ public class MethodSignature
 
         for(int index = 0;  index < parameterCount; index++)
         {
-            Type type = this.DecodeType(offset, ref isOptional, out int count);
-            if (type == null)
+            Type? type = this.DecodeType(offset, ref isOptional, out int count);
+            if (type is null)
             {
                 return false;
             }
 
             if (isOptional)
+            {
                 optionalParameters.Add(type);
+            }
             else
+            {
                 requiredParameters.Add(type);
+            }
 
             offset += count;
         }
 
-        this.RequiredParameters = new ReadOnlyCollection<Type>(requiredParameters);
-        OptionalParameters = new ReadOnlyCollection<Type>(optionalParameters);
+        this.RequiredParameters = requiredParameters;
+        this.OptionalParameters = optionalParameters;
         return true;
     }
 
@@ -251,36 +266,36 @@ public class MethodSignature
     // CallingConvention / CallingConventions types
     private bool DecodeCallingConvention()
     {
-        CilCallingConvention type = CilCallingConvention & CilCallingConvention.Mask;
+        CilCallingConvention type = this.CilCallingConvention & CilCallingConvention.Mask;
 
         switch (type)
         {
             case CilCallingConvention.Standard:
-                CallingConventions = CallingConventions.Standard;
+                this.CallingConventions = CallingConventions.Standard;
                 break;
 
             case CilCallingConvention.WinApi:
-                CallingConvention = CallingConvention.Winapi;
-                return IsUnmanaged = true;
+                this.CallingConvention = CallingConvention.Winapi;
+                return this.IsUnmanaged = true;
 
             case CilCallingConvention.Cdecl:
-                CallingConvention = CallingConvention.Cdecl;
-                return IsUnmanaged = true;
+                this.CallingConvention = CallingConvention.Cdecl;
+                return this.IsUnmanaged = true;
 
             case CilCallingConvention.StdCall:
-                CallingConvention = CallingConvention.StdCall;
-                return IsUnmanaged = true;
+                this.CallingConvention = CallingConvention.StdCall;
+                return this.IsUnmanaged = true;
 
             case CilCallingConvention.ThisCall:
-                CallingConvention = CallingConvention.ThisCall;
-                return IsUnmanaged = true;
+                this.CallingConvention = CallingConvention.ThisCall;
+                return this.IsUnmanaged = true;
 
             case CilCallingConvention.FastCall:
-                CallingConvention = CallingConvention.FastCall;
-                return IsUnmanaged = true;
+                this.CallingConvention = CallingConvention.FastCall;
+                return this.IsUnmanaged = true;
 
             case CilCallingConvention.VarArgs:
-                CallingConventions = CallingConventions.VarArgs;
+                this.CallingConventions = CallingConventions.VarArgs;
                 break;
 
             case CilCallingConvention.Field:
@@ -291,14 +306,14 @@ public class MethodSignature
                 return false;
         }
 
-        if ((CilCallingConvention & CilCallingConvention.HasThis) != 0)
+        if ((this.CilCallingConvention & CilCallingConvention.HasThis) != 0)
         {
-            CallingConventions |= CallingConventions.HasThis;
+            this.CallingConventions |= CallingConventions.HasThis;
         }
 
-        if ((CilCallingConvention & CilCallingConvention.ExplicitThis) != 0)
+        if ((this.CilCallingConvention & CilCallingConvention.ExplicitThis) != 0)
         {
-            CallingConventions |= CallingConventions.ExplicitThis;
+            this.CallingConventions |= CallingConventions.ExplicitThis;
         }
 
         return true;

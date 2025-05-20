@@ -40,7 +40,7 @@ public sealed class MethodInstructionsList
             if (data is not null)
             {
                 this.Data = data;
-                // this.DecodeInstructions(); 
+                this.DecodeInstructions(); 
             }
             else
             {
@@ -265,12 +265,12 @@ public sealed class MethodInstructionsList
     /// </exception>
     public LocalVariableInfo ResolveVariable(int operand)
     {
-        if (operand < 0 || operand > MethodBody.LocalVariables.Count)
+        if (operand < 0 || operand > this.MethodBody.LocalVariables.Count)
         {
             throw new ArgumentOutOfRangeException(nameof(operand));
         }
 
-        return MethodBody.LocalVariables[operand];
+        return this.MethodBody.LocalVariables[operand];
     }
 
     
