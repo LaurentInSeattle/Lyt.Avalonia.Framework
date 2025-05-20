@@ -4,25 +4,29 @@ public sealed class MethodInstructionsList
 {
     private static readonly Dictionary<OpCode, byte> impliedParameters =
         new()
-    {
-        { OpCodes.Ldarg_0, 0 },
-        { OpCodes.Ldarg_1, 1 },
-        { OpCodes.Ldarg_2, 2 },
-        { OpCodes.Ldarg_3, 3 }
-    };
+        {
+            // Load Args
+            { OpCodes.Ldarg_0, 0 },
+            { OpCodes.Ldarg_1, 1 },
+            { OpCodes.Ldarg_2, 2 },
+            { OpCodes.Ldarg_3, 3 }
+        };
 
     private static readonly Dictionary<OpCode, byte> impliedVariables =
         new()
-    {
-        { OpCodes.Ldloc_0, 0 },
-        { OpCodes.Ldloc_1, 1 },
-        { OpCodes.Ldloc_2, 2 },
-        { OpCodes.Ldloc_3, 3 },
-        { OpCodes.Stloc_0, 0 },
-        { OpCodes.Stloc_1, 1 },
-        { OpCodes.Stloc_2, 2 },
-        { OpCodes.Stloc_3, 3 }
-    };
+        {
+            // Load local 
+            { OpCodes.Ldloc_0, 0 },
+            { OpCodes.Ldloc_1, 1 },
+            { OpCodes.Ldloc_2, 2 },
+            { OpCodes.Ldloc_3, 3 },
+
+            // Store local 
+            { OpCodes.Stloc_0, 0 },
+            { OpCodes.Stloc_1, 1 },
+            { OpCodes.Stloc_2, 2 },
+            { OpCodes.Stloc_3, 3 }
+        };
 
     private readonly List<IInstruction> instructions = [];
 
@@ -85,40 +89,30 @@ public sealed class MethodInstructionsList
     /// </summary>
     public bool IsInvalidData { get; private set; }
 
-
-    /// <summary> Get an enumerator for these instructions. </summary>
-    /// <returns>An enumerator for these instructions.</returns>
-    public IEnumerator<IInstruction> GetEnumerator() => this.instructions.GetEnumerator();
-
-    /// <summary>
-    /// Gets a value indicating if the specified instruction is contained
-    /// within a method that has "this" as its first argument.
-    /// </summary>
-    /// <param name="instruction">The instruction to test.</param>
-    /// <returns>True, if the containing method has a "this" argument; otherwise, false.</returns>
-    public bool HasThis(IInstruction instruction) 
-        => (this.Method.CallingConvention & CallingConventions.HasThis) != 0;
-
     /// <summary>
     /// Gets a value indicating if the specified assembly is the same
     /// as the one containing this instruction list.
     /// </summary>
     /// <param name="assembly">The assembly to test.</param>
     /// <returns>True, if the assembly is the same; otherwise, false.</returns>
-    public bool IsSameAssembly(Assembly assembly) => Module.Assembly == assembly;
+    public bool IsSameAssembly(Assembly assembly) => this.Module.Assembly == assembly;
 
     /// <summary> Resolve field information from a metadata token. </summary>
     /// <param name="token">The metadata token.</param>
-    /// <returns>The field information.</returns>
-    /// <exception cref="System.ArgumentException">
-    /// <paramref name="token"/> is not a field within the scope of this method's module.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <paramref name="token"/> is not a valid field within this method's module.
-    /// </exception>
-    public FieldInfo ResolveField(Token token) =>
-        Module.ResolveField(token.Value, Method.DeclaringType.GetGenericArguments(),
-            Method.GetGenericArguments());
+    /// <returns>The field information, or null .</returns>
+    public FieldInfo? ResolveField(Token token)
+    {
+        if (this.Method.DeclaringType is Type declaringType)
+        {
+            return 
+                this.Module.ResolveField(
+                       token.Value, 
+                       declaringType.GetGenericArguments(),
+                       this.Method.GetGenericArguments());
+        }
+
+        return null;
+    } 
 
     /// <summary> Resolve an instruction for a byte offset. </summary>
     /// <param name="offset">The byte offset of an instruction within this method body.</param>
@@ -164,48 +158,54 @@ public sealed class MethodInstructionsList
 
     /// <summary> Resolve member information from a metadata token. </summary>
     /// <param name="token">The metadata token.</param>
-    /// <returns>The member information.</returns>
-    /// <exception cref="System.ArgumentException">
-    /// <paramref name="token"/> is not a member within the scope of this method's module.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <paramref name="token"/> is not a valid member within this method's module.
-    /// </exception>
-    public MemberInfo ResolveMember(Token token) =>
-        Module.ResolveMember(token.Value, Method.DeclaringType.GetGenericArguments(),
-            Method.GetGenericArguments());
+    /// <returns>The member information, or null.</returns>
+    public MemberInfo? ResolveMember(Token token)
+    {
+        if (this.Method.DeclaringType is Type declaringType)
+        {
+            return
+                this.Module.ResolveMember(
+                       token.Value,
+                       declaringType.GetGenericArguments(),
+                       this.Method.GetGenericArguments());
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Resolve method information from a metadata token.
     /// </summary>
     /// <param name="token">The metadata token.</param>
-    /// <returns>The method information.</returns>
-    /// <exception cref="System.ArgumentException">
-    /// <paramref name="token"/> is not a method within the scope of this method's module.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <paramref name="token"/> is not a valid method within this method's module.
-    /// </exception>
-    public MethodBase ResolveMethod(Token token) =>
-        Module.ResolveMethod(token.Value, Method.DeclaringType.GetGenericArguments(),
-            Method.GetGenericArguments());
+    /// <returns>The method information, or null.</returns>
+    public MethodBase? ResolveMethod(Token token)
+    {
+        if (this.Method.DeclaringType is Type declaringType)
+        {
+            return
+                this.Module.ResolveMethod(
+                       token.Value,
+                       declaringType.GetGenericArguments(),
+                       this.Method.GetGenericArguments());
+        }
 
-    /// <summary>
-    /// Resolve parameter information from the specified index.
-    /// </summary>
+        return null;
+    }
+
+    /// <summary> Resolve parameter information from the specified index. </summary>
     /// <param name="operand">The operand for the parameter.</param>
-    /// <returns>The parameter information.</returns>
+    /// <returns>The parameter information or null.</returns>
     /// <exception cref="System.ArgumentOutOfRangeException">
     /// <paramref name="operand"/> does not identify a valid parameter for this method.
     /// </exception>
-    public ParameterInfo ResolveParameter(int operand)
+    public ParameterInfo? ResolveParameter(int operand)
     {
-        if ((Method.CallingConvention & CallingConventions.HasThis) != 0 && operand-- == 0)
+        if ((this.Method.CallingConvention & CallingConventions.HasThis) != 0 && operand-- == 0)
         {
             return null; // The "this" argument
         }
 
-        ParameterInfo[] parameters = Method.GetParameters();
+        ParameterInfo[] parameters = this.Method.GetParameters();
         if (operand < 0 || operand > parameters.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(operand));
@@ -214,50 +214,34 @@ public sealed class MethodInstructionsList
         return parameters[operand];
     }
 
-    /// <summary>
-    /// Resolve signature information from a metadata token.
-    /// </summary>
+    /// <summary> Resolve signature information from a metadata token. </summary>
     /// <param name="token">The metadata token.</param>
-    /// <returns>The signature information.</returns>
-    /// <exception cref="System.ArgumentException">
-    /// <paramref name="token"/> is not a signature within the scope of this method's module.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <paramref name="token"/> is not a valid signature within this method's module.
-    /// </exception>
+    /// <returns>The signature information as an array of bytes. </returns>
     public byte[] ResolveSignature(Token token) => this.Module.ResolveSignature(token.Value);
 
-    /// <summary>
-    /// Resolve string information from a metadata token.
-    /// </summary>
+    /// <summary> Resolve string information from a metadata token. </summary>
     /// <param name="token">The metadata token.</param>
     /// <returns>The string information.</returns>
-    /// <exception cref="System.ArgumentException">
-    /// <paramref name="token"/> is not a string within the scope of this method's module.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <paramref name="token"/> is not a valid string within this method's module.
-    /// </exception>
     public string ResolveString(Token token) => this.Module.ResolveString(token.Value);
 
-    /// <summary>
-    /// Resolve type information from a metadata token.
-    /// </summary>
+    /// <summary> Resolve type information from a metadata token. </summary>
     /// <param name="token">The metadata token.</param>
-    /// <returns>The type information.</returns>
-    /// <exception cref="System.ArgumentException">
-    /// <paramref name="token"/> is not a type within the scope of this method's module.
-    /// </exception>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// <paramref name="token"/> is not a valid type within this method's module.
-    /// </exception>
-    public Type ResolveType(Token token) =>
-        Module.ResolveType(token.Value, Method.DeclaringType.GetGenericArguments(),
-            Method.GetGenericArguments());
+    /// <returns>The type information, or null.</returns>
+    public Type? ResolveType(Token token)
+    {
+        if (this.Method.DeclaringType is Type declaringType)
+        {
+            return
+                this.Module.ResolveType(
+                       token.Value,
+                       declaringType.GetGenericArguments(),
+                       this.Method.GetGenericArguments());
+        }
 
-    /// <summary>
-    /// Resolve local variable information from the specified index.
-    /// </summary>
+        return null;
+    }
+
+    /// <summary> Resolve local variable information from the specified index. </summary>
     /// <param name="operand">The zero-based index of the variable.</param>
     /// <returns>The local variable information.</returns>
     /// <exception cref="System.ArgumentOutOfRangeException">
@@ -273,8 +257,6 @@ public sealed class MethodInstructionsList
         return this.MethodBody.LocalVariables[operand];
     }
 
-    
-
     /// <summary> Decode the instructions. </summary>
     private void DecodeInstructions()
     {
@@ -282,7 +264,7 @@ public sealed class MethodInstructionsList
         int offset = 0;
         while (offset < count)
         {
-            if (this.TryCreate(ref offset, out IInstruction instruction))
+            if (this.TryCreate(ref offset, out IInstruction? instruction) && instruction is not null )
             {
                 this.instructions.Add(instruction);
             }
@@ -293,17 +275,16 @@ public sealed class MethodInstructionsList
             }
         }
 
-        this.Resolve();
+        this.ResolveAllInstructions();
     }
-
      
     // Create a switch instruction
-    private IInstruction CreateSwitch(int offset, OpCode opCode, ref int operandOffset)
+    private SwitchInstruction CreateSwitch(int offset, OpCode opCode, ref int operandOffset)
     {
         int length = this.Data.ReadInt32(operandOffset);
         if (length < 0)
         {
-            throw new ArgumentException(null, nameof(this.Data));
+            throw new ArgumentException(null, nameof(operandOffset));
         }
 
         int[] branches = new int[length];
@@ -317,9 +298,9 @@ public sealed class MethodInstructionsList
         return new SwitchInstruction(this, offset, opCode, length, branches);
     }
 
-    // Try to create a token for the specified instruction
-    private IInstruction CreateToken(int offset, OpCode opCode, int operandOffset)
+    private IInstruction CreateInstructionyByReadingToken(int offset, OpCode opCode, int operandOffset)
     {
+        // Try to create a token for the specified instruction
         Token token = this.Data.ReadToken(operandOffset);
         return token.Type switch
         {
@@ -334,7 +315,7 @@ public sealed class MethodInstructionsList
     }
 
     // Resolve all of the instruction values
-    private void Resolve()
+    private void ResolveAllInstructions()
     {
         foreach (IInstruction instruction in this.instructions)
         {
@@ -367,68 +348,66 @@ public sealed class MethodInstructionsList
             return false;
         }
 
+        var dataException = new ArgumentException(null, nameof(offset));
         try
         {
+            string? opCodeName = opCode.Name;
             switch (opCode.OperandType)
             {
                 case OperandType.InlineBrTarget:
-                    instruction = new BranchInstruction<int>(this, offset, opCode,
-                        this.Data.ReadInt32(index), sizeof(int));
+                    instruction = 
+                        new BranchInstruction<int>(this, offset, opCode, this.Data.ReadInt32(index), sizeof(int));
                     index += sizeof(int);
                     break;
 
                 case OperandType.ShortInlineBrTarget:
-                    instruction = new BranchInstruction<sbyte>(this, offset, opCode,
-                        this.Data.ReadSByte(index), sizeof(sbyte));
+                    instruction = 
+                        new BranchInstruction<sbyte>(this, offset, opCode, this.Data.ReadSByte(index), sizeof(sbyte));
                     index += sizeof(sbyte);
                     break;
 
                 case OperandType.InlineField:
-                    instruction = new FieldInstruction(this, offset, opCode,
-                        this.Data.ReadToken(index));
+                    instruction = 
+                        new FieldInstruction(this, offset, opCode, this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineI:
-                    instruction = new Instruction<int>(this, offset, opCode,
-                        this.Data.ReadInt32(index));
+                    instruction = 
+                        new Instruction<int>(this, offset, opCode, this.Data.ReadInt32(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineI8:
-                    instruction = new Instruction<long>(this, offset, opCode,
-                        this.Data.ReadInt64(index));
+                    instruction = 
+                        new Instruction<long>(this, offset, opCode,this.Data.ReadInt64(index));
                     index += sizeof(long);
                     break;
 
                 case OperandType.ShortInlineI:
-                    instruction = opCode == OpCodes.Ldc_I4_S ?
-                        (IInstruction)new Instruction<sbyte>(this, offset, opCode,
-                            this.Data.ReadSByte(index)) :
-                        new Instruction<byte>(this, offset, opCode,
-                            this.Data.ReadByte(index));
+                    instruction = 
+                        opCode == OpCodes.Ldc_I4_S ?
+                            new Instruction<sbyte>(this, offset, opCode, this.Data.ReadSByte(index)) :
+                            new Instruction<byte>(this, offset, opCode, this.Data.ReadByte(index));
                     index += sizeof(byte);
                     break;
 
-
                 case OperandType.InlineMethod:
-                    instruction = new MethodInstruction(this, offset, opCode,
-                        this.Data.ReadToken(index));
+                    instruction = 
+                        new MethodInstruction(this, offset, opCode, this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineNone:
                     if (impliedParameters.TryGetValue(opCode, out byte operand))
                     {
-                        instruction = new ParameterInstruction<byte>(
-                            this, offset, opCode, operand);
+                        instruction = new ParameterInstruction<byte>(this, offset, opCode, operand);
                     }
                     else
                     {
                         if (impliedVariables.TryGetValue(opCode, out operand))
                         {
-                            instruction = new VariableInstruction<byte>(
-                                this, offset, opCode, operand);
+                            instruction = new VariableInstruction<byte>(this, offset, opCode, operand);
                         }
                         else
                         {
@@ -438,26 +417,26 @@ public sealed class MethodInstructionsList
                     break;
 
                 case OperandType.InlineR:
-                    instruction = new Instruction<double>(this, offset, opCode,
-                        this.Data.ReadDouble(index));
+                    instruction = 
+                        new Instruction<double>(this, offset, opCode,this.Data.ReadDouble(index));
                     index += sizeof(double);
                     break;
 
                 case OperandType.ShortInlineR:
-                    instruction = new Instruction<float>(this, offset, opCode,
-                        this.Data.ReadSingle(index));
+                    instruction = 
+                        new Instruction<float>(this, offset, opCode, this.Data.ReadSingle(index));
                     index += sizeof(float);
                     break;
 
                 case OperandType.InlineSig:
-                    instruction = new SignatureInstruction(this, offset, opCode,
-                        this.Data.ReadToken(index));
+                    instruction = 
+                        new SignatureInstruction(this, offset, opCode, this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineString:
-                    instruction = new StringInstruction(this, offset, opCode,
-                        this.Data.ReadToken(index));
+                    instruction = 
+                        new StringInstruction(this, offset, opCode, this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
@@ -466,47 +445,73 @@ public sealed class MethodInstructionsList
                     break;
 
                 case OperandType.InlineTok:
-                    instruction = this.CreateToken(offset, opCode, index);
+                    instruction = this.CreateInstructionyByReadingToken(offset, opCode, index);
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineType:
-                    instruction = new TypeInstruction(this, offset, opCode,
-                        this.Data.ReadToken(index));
+                    instruction = 
+                        new TypeInstruction(this, offset, opCode, this.Data.ReadToken(index));
                     index += sizeof(int);
                     break;
 
                 case OperandType.InlineVar:
-                    instruction = opCode.Name.Contains("arg") ?
-                        (IInstruction)new ParameterInstruction<ushort>(
-                            this, offset, opCode, this.Data.ReadUInt16(index)) :
-                        new VariableInstruction<ushort>(this, offset, opCode,
-                            this.Data.ReadUInt16(index));
-                    index += sizeof(ushort);
+                    if (!string.IsNullOrWhiteSpace(opCodeName))
+                    {
+                        instruction = opCodeName.Contains("arg") ?
+                            new ParameterInstruction<ushort>(this, offset, opCode, this.Data.ReadUInt16(index)) :
+                            new VariableInstruction<ushort>(this, offset, opCode, this.Data.ReadUInt16(index));
+                        index += sizeof(ushort);
+                    } 
+                    else
+                    {
+                        throw dataException;
+                    }
                     break;
 
                 case OperandType.ShortInlineVar:
-                    instruction = opCode.Name.Contains("arg") ?
-                        (IInstruction)new ParameterInstruction<byte>(
-                            this, offset, opCode, this.Data.ReadByte(index)) :
-                        new VariableInstruction<byte>(this, offset, opCode,
-                            this.Data.ReadByte(index));
-                    index += sizeof(byte);
+                    if (!string.IsNullOrWhiteSpace(opCodeName))
+                    {
+                        instruction = 
+                            opCodeName.Contains("arg") ?
+                                new ParameterInstruction<byte>(this, offset, opCode, this.Data.ReadByte(index)) :
+                                new VariableInstruction<byte>(this, offset, opCode, this.Data.ReadByte(index));
+                        index += sizeof(byte);
+                    }
+                    else
+                    {
+                        throw dataException;
+                    }
                     break;
 
                 default:
-                    throw new ArgumentException(null, nameof(this.Data));
+                    throw dataException;
             }
 
             offset = index;
             return true;
         }
-        catch
+        catch(Exception ex) 
         {
+            Debug.WriteLine("Failed to create instruction: " + ex.ToString());
             instruction = null;
             return false;
         }
-    }
-
-    
+    }    
 }
+
+/*
+    /// <summary> Get an enumerator for these instructions. </summary>
+    /// <returns>An enumerator for these instructions.</returns>
+    //public IEnumerator<IInstruction> GetEnumerator() => this.instructions.GetEnumerator();
+
+    ///// <summary>
+    ///// Gets a value indicating if the specified instruction is contained
+    ///// within a method that has "this" as its first argument.
+    ///// </summary>
+    ///// <param name="instruction">The instruction to test.</param>
+    ///// <returns>True, if the containing method has a "this" argument; otherwise, false.</returns>
+    //public bool HasThis(IInstruction instruction) 
+    //    => (this.Method.CallingConvention & CallingConventions.HasThis) != 0;
+
+*/ 

@@ -104,24 +104,23 @@ public static class ReflectionUtilities
         var ignoreType = Tuple.Create(false, new List<Type>());
         var relevantType = Tuple.Create(true, dependantTypes);
 
-        // Find dependant types in local variables 
-        var localVariables = methodBody.LocalVariables;
-        foreach (var variable in localVariables)
-        {
-            Type type = variable.LocalType;
+        //// Find dependant types in local variables 
+        //var localVariables = methodBody.LocalVariables;
+        //foreach (var variable in localVariables)
+        //{
+        //    Type type = variable.LocalType;
 
-            // TODO ! 
-        }
+        //    // TODO ! 
+        //}
 
-        // Analyse IL to figure out external calls 
-        // First we need to extract out the raw IL
-        byte[]? il = methodBody.GetILAsByteArray();
-        if (il is not null)
-        {
-            // TODO 
-            il.Analyse(module); 
-        }
-
+        //// Analyse IL to figure out external calls 
+        //// First we need to extract out the raw IL
+        //byte[]? il = methodBody.GetILAsByteArray();
+        //if (il is not null)
+        //{
+        //    // TODO 
+        //    il.Analyse(module); 
+        //}
 
         return ignoreType;
     }
@@ -276,6 +275,7 @@ public static class ReflectionUtilities
            methodName.StartsWith("remove_") ||
            methodName.StartsWith("<Clone>");
 
+    /*
     public static string Analyse(this byte[] il, Module module)
     {
         // For aggregating our response
@@ -284,13 +284,12 @@ public static class ReflectionUtilities
         // can remap them over our method body
         var opCodes = typeof(OpCodes)
             .GetFields()
-            .Select(fi => (OpCode)fi.GetValue(null));
+            .Select(fi => (OpCode)fi.GetValue(null)!);
 
         //opCodes.Dump();
 
         // For each byte in our method body, try to match it to an opcode
-        var mappedIL = il.Select(op =>
-            opCodes.FirstOrDefault(opCode => opCode.Value == op));
+        var mappedIL = il.Select(op => opCodes.FirstOrDefault(opCode => opCode.Value == op));
 
         // OpCode/Operand parsing: 
         //     Some opcodes have no operands, some use ints, etc. 
@@ -389,4 +388,5 @@ public static class ReflectionUtilities
 
         return sb.ToString();
     }
+    */
 }

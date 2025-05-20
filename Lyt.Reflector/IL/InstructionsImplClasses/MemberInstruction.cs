@@ -20,7 +20,10 @@ public class MemberInstruction : Instruction<Token, MemberInfo>
     public static IInstruction Create(
         MethodInstructionsList parent, int offset, OpCode opCode, Token token)
     {
-        MemberInfo member = parent.ResolveMember(token);
+        MemberInfo? maybeMember = 
+            parent.ResolveMember(token) ?? 
+                throw new InvalidOperationException("Failed to resolve token " +token.ToString() );
+        MemberInfo member = maybeMember;
         if (member is MethodBase method)
         {
             return new MethodInstruction(parent, offset, opCode, token, method);
