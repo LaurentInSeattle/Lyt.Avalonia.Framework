@@ -1,5 +1,6 @@
 ﻿namespace Lyt.Reflector.Structures; 
 
+/*
 public static class Solver
 {
     public static FieldInfo? SafeResolveField(this Module m, int token)
@@ -71,4 +72,6 @@ public static class Solver
         catch { fi = null; }
         return ok;
     }
+
 }
+*/
