@@ -11,7 +11,8 @@
 public class Instruction(MethodInstructionsList parent, int offset, OpCode opCode) : IInstruction
 {
     /// <summary> The text displayed for an unresolved value. </summary>
-    protected const string InvalidValue = "-?-";
+    /// <remarks> DO NOT Change: this is hardcoded in the unit tests !! (Fix that!) </remarks>
+    protected const string InvalidValue = "?";
 
     /// <summary> Gets the set of instructions containing this instruction. </summary>
     public MethodInstructionsList Parent { get; } = parent;

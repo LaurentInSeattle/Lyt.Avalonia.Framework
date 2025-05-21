@@ -74,6 +74,8 @@ public sealed class MethodInstructionsList
     /// <summary> Gets the count of instructions. </summary>
     public int Count => this.instructions.Count;
 
+    public List<IInstruction> Instructions => this.instructions;
+
     /// <summary> Gets the instruction at the specified zero-based index. </summary>
     /// <param name="index">The zero-based index of the instruction.</param>
     /// <returns>The instruction at the specified zero-based index.</returns>
