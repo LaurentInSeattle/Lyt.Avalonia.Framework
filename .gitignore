@@ -47,3 +47,5 @@
 /Lyt.Reflector/obj
 /Lyt.Avalonia.Translator.Service/obj
 /Lyt.Avalonia.Translator.Service/bin
+/Lyt.Reflector.Tests/bin/Debug/net9.0
+/Lyt.Reflector.Tests/obj
