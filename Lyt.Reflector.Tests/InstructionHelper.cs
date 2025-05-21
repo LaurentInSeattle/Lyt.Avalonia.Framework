@@ -360,7 +360,11 @@ public class InstructionHelper
             $"{expectedOpCode.Name} expectedIsTarget failed");
         Assert.AreEqual(expectedParent, instruction.Parent,
             $"{expectedOpCode.Name} expectedParent failed");
-        Assert.AreEqual(expectedText, instruction.ToString(),
+
+        string instructionText = instruction.ToString();
+        //Debug.WriteLine(expectedText);
+        //Debug.WriteLine(instructionText);
+        Assert.AreEqual(expectedText, instructionText,
             $"{expectedOpCode.Name} expectedText failed");
     }
 }

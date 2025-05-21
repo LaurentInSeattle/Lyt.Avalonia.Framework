@@ -56,9 +56,10 @@ public class ParemeterInstruction_Tests : InstructionHelper
             false, MyParameterName1), (byte)1);
     }
 
-    private MethodInfo CreateMethod(Action<ILGenerator> addInstructions,
-        bool isStatic, params string[] parameterNames) =>
-        CreateAssembly(il => il.Emit(OpCodes.Ret), type =>
+    private MethodInfo? CreateMethod(Action<ILGenerator> addInstructions,
+        bool isStatic, params string[] parameterNames)
+    {
+        var assembly = CreateAssembly(il => il.Emit(OpCodes.Ret), type =>
             {
                 var method = type.DefineMethod(MyMethodName, MethodAttributes.Public |
                     (isStatic ? MethodAttributes.Static : 0),
@@ -71,11 +72,16 @@ public class ParemeterInstruction_Tests : InstructionHelper
                         parameterNames[index]);
 
                 addInstructions(method.GetILGenerator());
-            })
-            .GetModule(TestModuleName)
-            .GetType(TestTypeName)
-            .GetMethod(MyMethodName, BindingFlags.Public |
-                (isStatic ? BindingFlags.Static : BindingFlags.Instance));
+            }); 
+
+        var modules = assembly.GetModules();
+        var module = modules[0];
+        var type = module.GetType(TestTypeName);
+        var methodInfo = type.GetMethod(
+            MyMethodName, 
+            BindingFlags.Public | (isStatic ? BindingFlags.Static : BindingFlags.Instance));
+        return methodInfo; 
+    } 
 
     private byte GetExpectedValue(OpCode opCode)
     {

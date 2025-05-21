@@ -5,7 +5,7 @@ public class SignatureInstruction_Tests : InstructionHelper
 {
 	[TestMethod]
 	public void InlineSig_Types_SignatureInstruction() =>
-		TestInstruction("int32(bool, uint8, char, valuetype [mscorlib]System.DateTime, class [mscorlib]System.DBNull, valuetype [mscorlib]System.Decimal, float64, int16, int32, int64, object, int8, float32, string, uint16, uint32, uint64, native int, native uint, typedref, class [Transeric.Reflection.Tests]Transeric.Reflection.Tests.SignatureInstruction_Tests)",
+		TestInstruction("int32(bool, uint8, char, valuetype [System.Private.CoreLib]System.DateTime, class [System.Private.CoreLib]System.DBNull, valuetype [System.Private.CoreLib]System.Decimal, float64, int16, int32, int64, object, int8, float32, string, uint16, uint32, uint64, native int, native uint, typedref, class [Lyt.Reflector.Tests]Lyt.Reflector.Tests.SignatureInstruction_Tests)",
 			CallingConventions.Standard, typeof(int),
 			new Type[] { typeof(bool), typeof(byte), typeof(char), typeof(DateTime),
 			typeof(DBNull), typeof(decimal), typeof(double), typeof(short),
