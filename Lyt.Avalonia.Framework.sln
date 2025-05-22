@@ -51,6 +51,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NoDependencies", "NoDepende
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reflector", "Reflector", "{97A69412-E447-8697-6031-E0B75B42FF47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lyt.Console", "Lyt.Console\Lyt.Console.csproj", "{A781C430-1D37-49CC-ADFC-6664502C520D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +127,10 @@ Global
 		{77023F98-500B-486F-A564-F677F6B0E74D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77023F98-500B-486F-A564-F677F6B0E74D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77023F98-500B-486F-A564-F677F6B0E74D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A781C430-1D37-49CC-ADFC-6664502C520D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A781C430-1D37-49CC-ADFC-6664502C520D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A781C430-1D37-49CC-ADFC-6664502C520D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A781C430-1D37-49CC-ADFC-6664502C520D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +152,7 @@ Global
 		{63C2446B-1E13-46C5-AC02-453AF1DD1097} = {97A69412-E447-8697-6031-E0B75B42FF47}
 		{87D609FA-31EA-9705-6D00-26BA400B3736} = {8670B5A8-0397-5F8B-AD18-045EC32A71D5}
 		{77023F98-500B-486F-A564-F677F6B0E74D} = {97A69412-E447-8697-6031-E0B75B42FF47}
+		{A781C430-1D37-49CC-ADFC-6664502C520D} = {DDBA4163-5359-5F73-4625-0FB9F117EDFE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61798396-CA66-417D-917E-1D756E56AD60}
