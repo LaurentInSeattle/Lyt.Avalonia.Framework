@@ -51,3 +51,5 @@
 /Lyt.Reflector.Tests/obj
 /Lyt.Console/bin/Debug/net9.0
 /Lyt.Console/obj
+/Lyt.Messenger/bin/Debug/net9.0
+/Lyt.Messenger/obj
