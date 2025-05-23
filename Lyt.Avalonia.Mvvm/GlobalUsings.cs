@@ -49,6 +49,7 @@ global using Lyt.Avalonia.Interfaces.UserInterface;
 
 global using Lyt.Avalonia.Mvvm.Animations;
 global using Lyt.Avalonia.Mvvm.Behaviors;
+global using Lyt.Avalonia.Mvvm.Extensions;
 global using Lyt.Avalonia.Mvvm.Core;
 global using Lyt.Avalonia.Mvvm.Logging;
 global using Lyt.Avalonia.Mvvm.Splash;

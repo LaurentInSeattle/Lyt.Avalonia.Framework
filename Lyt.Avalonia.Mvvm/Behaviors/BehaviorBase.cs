@@ -1,6 +1,4 @@
-﻿using Lyt.Avalonia.Mvvm.Extensions;
-
-namespace Lyt.Avalonia.Mvvm.Behaviors;
+﻿namespace Lyt.Avalonia.Mvvm.Behaviors;
 
 /// <summary> Allows extending functionality to any object, including Bindable. </summary>
 /// <typeparam name="TObject">The type of the associated object.</typeparam>
