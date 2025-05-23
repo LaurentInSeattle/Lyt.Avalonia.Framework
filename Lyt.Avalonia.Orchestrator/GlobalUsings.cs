@@ -30,9 +30,7 @@ global using Lyt.Avalonia.Interfaces.Logger;
 
 global using Lyt.Avalonia.Mvvm;
 global using Lyt.Avalonia.Mvvm.Core;
-global using Lyt.Avalonia.Mvvm.Messaging;
-global using Lyt.Avalonia.Mvvm.Utilities;
+
+global using Lyt.Messaging;
 global using Lyt.StateMachine;
-
-
-
+global using Lyt.Utilities;
