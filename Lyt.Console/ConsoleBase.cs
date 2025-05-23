@@ -9,7 +9,7 @@ public class ConsoleBase(
     Type applicationModelType,
     List<Type> modelTypes,
     List<Type> singletonTypes,
-    List<Tuple<Type, Type>> servicesInterfaceAndType) 
+    List<Tuple<Type, Type>> servicesInterfaceAndType) : IApplicationBase
 {
     // The host cannot be null or else there is no app...
     public static IHost AppHost { get; private set; }
@@ -97,7 +97,7 @@ public class ConsoleBase(
         this.OnStartupComplete();
     }
 
-    public async void Shutdown()
+    public async Task Shutdown()
     {
         this.Logger.Info("***   Shutdown   ***");
         this.OnShutdownBegin();
@@ -125,7 +125,7 @@ public class ConsoleBase(
                 .ConfigureServices((_0, services) =>
                 {
                     // Register the app
-                    _ = services.AddSingleton<ConsoleBase>(this);
+                    _ = services.AddSingleton<IApplicationBase>(this);
 
                     // The Application Model, also  a singleton, no need here to also add it without the inferface  
                     _ = services.AddSingleton(typeof(IApplicationModel), this.applicationModelType);
