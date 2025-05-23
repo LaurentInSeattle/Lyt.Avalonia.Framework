@@ -55,3 +55,6 @@
 /Lyt.Messenger/obj
 /Lyt.Utilities/bin/Debug/net9.0
 /Lyt.Utilities/obj
+/Lyt.Console/bin/Release/net9.0
+/Lyt.Messenger/bin/Release/net9.0
+/Lyt.Utilities/bin/Release/net9.0
