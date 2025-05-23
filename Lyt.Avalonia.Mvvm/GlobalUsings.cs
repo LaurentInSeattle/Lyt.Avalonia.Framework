@@ -51,6 +51,7 @@ global using Lyt.Avalonia.Mvvm.Animations;
 global using Lyt.Avalonia.Mvvm.Behaviors;
 global using Lyt.Avalonia.Mvvm.Core;
 global using Lyt.Avalonia.Mvvm.Logging;
-global using Lyt.Avalonia.Mvvm.Messaging;
 global using Lyt.Avalonia.Mvvm.Splash;
 global using Lyt.Avalonia.Mvvm.Utilities;
+
+global using Lyt.Messaging;
