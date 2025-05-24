@@ -7,6 +7,9 @@ public abstract class BehaviorBase<TObject> where TObject : class, ISupportBehav
     /// <summary> Gets the TObject to which this behavior is attached. </summary>
     public TObject? AssociatedObject { get; private set; }
 
+    /// <summary> Returns true if this behavior is attached, false otherwise.</summary>
+    public bool IsAttached => this.AssociatedObject is not null;
+
     /// <summary> Attaches this behavior to the specified TObject. </summary>
     /// <param name="associatedObject">The TObject to which to attach.</param>
     public void Attach(TObject associatedObject)
