@@ -9,6 +9,7 @@ global using System.Diagnostics;
 global using System.Linq;
 global using System.Reflection;
 global using System.Runtime.CompilerServices;
+global using System.Runtime.InteropServices;
 global using System.Runtime.Versioning;
 global using System.Text;
 global using System.Text.RegularExpressions;
@@ -49,10 +50,11 @@ global using Lyt.Avalonia.Interfaces.UserInterface;
 
 global using Lyt.Avalonia.Mvvm.Animations;
 global using Lyt.Avalonia.Mvvm.Behaviors;
-global using Lyt.Avalonia.Mvvm.Extensions;
 global using Lyt.Avalonia.Mvvm.Core;
 global using Lyt.Avalonia.Mvvm.Logging;
 global using Lyt.Avalonia.Mvvm.Splash;
 global using Lyt.Avalonia.Mvvm.Utilities;
 
 global using Lyt.Messaging;
+global using Lyt.Utilities.Extensions;
+
